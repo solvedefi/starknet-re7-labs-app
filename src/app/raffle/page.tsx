@@ -87,17 +87,18 @@ const Raffle: NextPage = () => {
         </p>
         <p className="ml-2 text-white text-sm lg:text-base">
           3. You have to register if you want to participate. This mean you or
-          anyone on your behalf will be available t to collect the merch.{' '}
+          anyone on your behalf will be available to collect the merch.{' '}
         </p>
         <p className="ml-2 text-white text-sm lg:text-base">
           4. The rewards will be in the form of exclusive merch reserved for you
         </p>
         <p className="ml-2 text-white text-sm lg:text-base">
           5. Selected winners can collect their merch on 13th Nov, from The Fig
-          lobby, Bangkok
+          Lobby, Bangkok
         </p>
         <p className="ml-2 text-white text-sm lg:text-base">
-          6. Winners will be announced on our socials everyday
+          6. Winners will be announced on our socials (i.e. X, TG, etc.)
+          everyday
         </p>
       </div>
     </div>

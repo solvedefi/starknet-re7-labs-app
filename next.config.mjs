@@ -2,9 +2,9 @@
 const nextConfig = {
   // output: 'export',
   compiler: {
-    removeConsole: {
-      exclude: ['error', 'debug'],
-    },
+    // removeConsole: {
+    //   exclude: ['error', 'debug'],
+    // },
   },
   async rewrites() {
     return [
@@ -62,7 +62,8 @@ const nextConfig = {
       },
       {
         source: '/tnc/v1',
-        destination: 'https://github.com/strkfarm/static-assets/blob/177389cad715d69245c1b125df87f90318ac2d7b/tnc.pdf',
+        destination:
+          'https://github.com/strkfarm/static-assets/blob/177389cad715d69245c1b125df87f90318ac2d7b/tnc.pdf',
         permanent: true,
       },
     ];

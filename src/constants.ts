@@ -62,6 +62,8 @@ const CONSTANTS = {
       '0x20d5fc4c9df4f943ebb36078e703369c04176ed00accf290e8295b659d2cea6',
     DeltaNeutralMMETHUSDC:
       '0x9d23d9b1fa0db8c9d75a1df924c3820e594fc4ab1475695889286f3f6df250',
+    DeltaNeutralMMETHUSDCXL:
+      '0x5852a2fa5f3fa08fc8b0b95096792a954009da28e1fa08430bde9e91bf395fe',
   },
   MOBILE_MSG: 'Desktop/Tablet only',
 };
@@ -95,6 +97,17 @@ export const TOKENS: TokenInfo[] = [
     decimals: 18,
     displayDecimals: 2,
     logo: CONSTANTS.LOGOS.STRK,
+    minAmount: MyNumber.fromEther('10', 18),
+    maxAmount: MyNumber.fromEther('10000', 18),
+    stepAmount: MyNumber.fromEther('10', 18),
+    isERC4626: false,
+  },
+  {
+    token: '0x057146f6409deb4c9fa12866915dd952aa07c1eb2752e451d7f3b042086bdeb8',
+    name: 'iETH-c', // nostra eth collateral
+    decimals: 18,
+    displayDecimals: 2,
+    logo: CONSTANTS.LOGOS.ETH,
     minAmount: MyNumber.fromEther('10', 18),
     maxAmount: MyNumber.fromEther('10000', 18),
     stepAmount: MyNumber.fromEther('10', 18),
@@ -188,6 +201,14 @@ export const NFTS: NFTInfo[] = [
   {
     name: 'frmDNMMETHUSDC',
     address: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
+    logo: CONSTANTS.LOGOS.ETH,
+    config: {
+      mainTokenName: 'ETH',
+    },
+  },
+  {
+    name: 'frmDNMMETHUSDC2',
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
     logo: CONSTANTS.LOGOS.ETH,
     config: {
       mainTokenName: 'ETH',

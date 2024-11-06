@@ -1,5 +1,6 @@
 import { IDapp } from '@/store/IDapp.store';
 import { BalanceResult, getBalanceAtom } from '@/store/balance.atoms';
+import { LendingSpace } from '@/store/lending.base';
 import { Category, PoolInfo } from '@/store/pools';
 import { zkLend } from '@/store/zklend.store';
 import MyNumber from '@/utils/MyNumber';
@@ -254,14 +255,17 @@ export class IStrategy extends IStrategyProps {
     return eligiblePools;
   }
 
-  filterZkLend(tokenName: string) {
+  filterTokenByProtocol(
+    tokenName: string,
+    protocol: IDapp<LendingSpace.MyBaseAprDoc[]> = zkLend,
+  ) {
     return (
       pools: PoolInfo[],
       amount: string,
       prevActions: StrategyAction[],
     ) => {
       return pools.filter(
-        (p) => p.pool.name == tokenName && p.protocol.name == zkLend.name,
+        (p) => p.pool.name == tokenName && p.protocol.name == protocol.name,
       );
     };
   }

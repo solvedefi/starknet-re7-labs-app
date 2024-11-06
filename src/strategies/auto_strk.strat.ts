@@ -23,6 +23,7 @@ import {
   getERC20BalanceAtom,
 } from '@/store/balance.atoms';
 import { getPrice, getTokenInfoFromName } from '@/utils';
+import { zkLend } from '@/store/zklend.store';
 
 interface Step {
   name: string;
@@ -73,12 +74,12 @@ export class AutoTokenStrategy extends IStrategy {
       {
         name: `Supplies your ${token} to zkLend`,
         optimizer: this.optimizer,
-        filter: [this.filterZkLend(this.token.name)],
+        filter: [this.filterTokenByProtocol(this.token.name, zkLend)],
       },
       {
         name: `Re-invest your STRK Rewards every 7 days`,
         optimizer: this.compounder,
-        filter: [this.filterZkLend('STRK')],
+        filter: [this.filterTokenByProtocol('STRK', zkLend)],
       },
     ];
     const _risks = [...this.risks];

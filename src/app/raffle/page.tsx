@@ -1,6 +1,7 @@
 import { NextPage } from 'next';
 import Image from 'next/image';
 import React from 'react';
+import { Button } from '@chakra-ui/react';
 
 import ActiveDeposits from './_components/active-deposits';
 import RaffleTimer from './_components/raffle-timer';
@@ -21,9 +22,14 @@ const Raffle: NextPage = () => {
             during Starkspace (Devcon, Bangkok)
           </p>
 
-          <button className="border-white border px-4 py-2.5 rounded-md text-white text-sm font-bold transition-all active:scale-90 mt-3">
+          <Button
+            as="a"
+            href="https://docs.strkfarm.xyz/p/community/raffle"
+            target="_blank"
+            className="border-white border px-4 py-2.5 rounded-md text-white text-sm font-bold transition-all active:scale-90 mt-3"
+          >
             Know More
-          </button>
+          </Button>
         </div>
 
         <Image

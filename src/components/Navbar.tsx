@@ -213,7 +213,7 @@ export default function Navbar(props: NavbarProps) {
       top="0"
     >
       <TncModal />
-      <Center bg="bg" color="gray" padding={0}>
+      {/* <Center bg="bg" color="gray" padding={0}>
         <Text
           fontSize="12px"
           textAlign={'center'}
@@ -233,7 +233,7 @@ export default function Navbar(props: NavbarProps) {
             </Link>
           </b>
         </Text>
-      </Center>
+      </Center> */}
       <Box
         width={'100%'}
         maxWidth="1400px"

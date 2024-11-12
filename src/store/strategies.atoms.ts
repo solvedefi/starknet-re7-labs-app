@@ -10,7 +10,6 @@ import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
 import Mustache from 'mustache';
 import { getTokenInfoFromName } from '@/utils';
 import { allPoolsAtomUnSorted } from './protocols';
-import { DeltaNeutralMM2 } from '@/strategies/delta_neutral_mm_2';
 
 export interface StrategyInfo extends IStrategyProps {
   name: string;

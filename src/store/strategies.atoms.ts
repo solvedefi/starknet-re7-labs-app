@@ -88,18 +88,18 @@ export function getStrategies() {
     },
   );
 
-  const deltaNeutralMMETHUSDCReverse = new DeltaNeutralMM2(
-    getTokenInfoFromName('ETH'),
-    'ETH Sensei XL',
-    Mustache.render(DNMMDescription, { token1: 'ETH', token2: 'USDC' }),
-    'USDC',
-    CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
-    [1, 0.5846153846, 1, 0.920975, 0.552509], // precomputed factors based on strategy math
-    StrategyLiveStatus.NEW,
-    {
-      maxTVL: 2000,
-    },
-  );
+  // const deltaNeutralMMETHUSDCReverse = new DeltaNeutralMM2(
+  //   getTokenInfoFromName('ETH'),
+  //   'ETH Sensei XL',
+  //   Mustache.render(DNMMDescription, { token1: 'ETH', token2: 'USDC' }),
+  //   'USDC',
+  //   CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
+  //   [1, 0.5846153846, 1, 0.920975, 0.552509], // precomputed factors based on strategy math
+  //   StrategyLiveStatus.NEW,
+  //   {
+  //     maxTVL: 2000,
+  //   },
+  // );
 
   const strategies: IStrategy[] = [
     autoStrkStrategy,
@@ -107,7 +107,7 @@ export function getStrategies() {
     deltaNeutralMMUSDCETH,
     deltaNeutralMMETHUSDC,
     deltaNeutralMMSTRKETH,
-    deltaNeutralMMETHUSDCReverse,
+    // deltaNeutralMMETHUSDCReverse,
   ];
 
   return strategies;

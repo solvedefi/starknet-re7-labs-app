@@ -191,7 +191,7 @@ export function getPoolInfoFromStrategy(
     additional: {
       riskFactor: strat.riskFactor,
       tags: [getLiveStatusEnum(strat.status.number)],
-      isAudited: true,
+      isAudited: strat.name.includes('XL') ? false : true,
       leverage: strat.leverage,
     },
   };

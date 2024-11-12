@@ -63,7 +63,7 @@ const CONSTANTS = {
     DeltaNeutralMMETHUSDC:
       '0x9d23d9b1fa0db8c9d75a1df924c3820e594fc4ab1475695889286f3f6df250',
     DeltaNeutralMMETHUSDCXL:
-      '0x5852a2fa5f3fa08fc8b0b95096792a954009da28e1fa08430bde9e91bf395fe',
+      '0x9140757f8fb5748379be582be39d6daf704cc3a0408882c0d57981a885eed9',
   },
   MOBILE_MSG: 'Desktop/Tablet only',
 };

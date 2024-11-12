@@ -10,6 +10,7 @@ import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
 import Mustache from 'mustache';
 import { getTokenInfoFromName } from '@/utils';
 import { allPoolsAtomUnSorted } from './protocols';
+import { DeltaNeutralMM2 } from '@/strategies/delta_neutral_mm_2';
 
 export interface StrategyInfo extends IStrategyProps {
   name: string;
@@ -87,18 +88,18 @@ export function getStrategies() {
     },
   );
 
-  // const deltaNeutralMMETHUSDCReverse = new DeltaNeutralMM2(
-  //   getTokenInfoFromName('ETH'),
-  //   'ETH Sensei XL',
-  //   Mustache.render(DNMMDescription, { token1: 'ETH', token2: 'USDC' }),
-  //   'USDC',
-  //   CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
-  //   [1, 0.5846153846, 1, 0.920975, 0.552509], // precomputed factors based on strategy math
-  //   StrategyLiveStatus.NEW,
-  //   {
-  //     maxTVL: 2000,
-  //   },
-  // );
+  const deltaNeutralMMETHUSDCReverse = new DeltaNeutralMM2(
+    getTokenInfoFromName('ETH'),
+    'ETH Sensei XL',
+    Mustache.render(DNMMDescription, { token1: 'ETH', token2: 'USDC' }),
+    'USDC',
+    CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
+    [1, 0.5846153846, 1, 0.920975, 0.552509], // precomputed factors based on strategy math
+    StrategyLiveStatus.NEW,
+    {
+      maxTVL: 2000,
+    },
+  );
 
   const strategies: IStrategy[] = [
     autoStrkStrategy,
@@ -106,7 +107,7 @@ export function getStrategies() {
     deltaNeutralMMUSDCETH,
     deltaNeutralMMETHUSDC,
     deltaNeutralMMSTRKETH,
-    // deltaNeutralMMETHUSDCReverse,
+    deltaNeutralMMETHUSDCReverse,
   ];
 
   return strategies;

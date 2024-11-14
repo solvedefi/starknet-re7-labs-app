@@ -46,8 +46,6 @@ import {
 import { StrategyParams } from '../page';
 import MyNumber from '@/utils/MyNumber';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
-import { isMobile } from 'react-device-detect';
-import CONSTANTS from '@/constants';
 
 const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
@@ -247,9 +245,7 @@ const Strategy = ({ params }: StrategyParams) => {
                                 ) == 0
                                 ? '-'
                                 : `${balData.data.amount.toEtherToFixedDecimals(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
-                              : isMobile
-                                ? CONSTANTS.MOBILE_MSG
-                                : 'Connect wallet'}
+                              : 'Connect wallet'}
                           </Text>
                         </Box>
                         <Tooltip label="Life time earnings">
@@ -276,8 +272,6 @@ const Strategy = ({ params }: StrategyParams) => {
                       <b>Your Holdings: </b>
                       {address ? (
                         <Spinner size="sm" marginTop={'5px'} />
-                      ) : isMobile ? (
-                        CONSTANTS.MOBILE_MSG
                       ) : (
                         'Connect wallet'
                       )}

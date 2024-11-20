@@ -31,6 +31,7 @@ import { getERC20Balance } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import {
+  getEndpoint,
   getTokenInfoFromName,
   MyMenuItemProps,
   MyMenuListProps,
@@ -62,7 +63,7 @@ export const MYCONNECTORS: any[] = isInArgentMobileAppBrowser()
       ArgentMobileConnector.init({
         options: {
           dappName: 'STRKFarm',
-          url: window.location.hostname,
+          url: getEndpoint(),
           chainId: constants.NetworkName.SN_MAIN,
         },
         inAppBrowserOptions: {},
@@ -75,7 +76,7 @@ export const MYCONNECTORS: any[] = isInArgentMobileAppBrowser()
       ArgentMobileConnector.init({
         options: {
           dappName: 'STRKFarm',
-          url: window.location.hostname,
+          url: getEndpoint(),
           chainId: constants.NetworkName.SN_MAIN,
         },
       }),

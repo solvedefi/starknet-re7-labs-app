@@ -55,14 +55,15 @@ import {
 } from 'starknetkit/argentMobile';
 import { WebWalletConnector } from 'starknetkit/webwallet';
 import TncModal from './TncModal';
+import { constants } from 'starknet';
 
 export const MYCONNECTORS: any[] = isInArgentMobileAppBrowser()
   ? [
       ArgentMobileConnector.init({
         options: {
           dappName: 'STRKFarm',
-          projectId: 'strkfarm',
-          url: 'https://app.strkfarm.xyz',
+          url: window.location.hostname,
+          chainId: constants.NetworkName.SN_MAIN,
         },
         inAppBrowserOptions: {},
       }),
@@ -74,8 +75,8 @@ export const MYCONNECTORS: any[] = isInArgentMobileAppBrowser()
       ArgentMobileConnector.init({
         options: {
           dappName: 'STRKFarm',
-          projectId: 'strkfarm',
-          url: 'https://app.strkfarm.xyz',
+          url: window.location.hostname,
+          chainId: constants.NetworkName.SN_MAIN,
         },
       }),
     ];

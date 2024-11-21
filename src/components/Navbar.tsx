@@ -136,7 +136,7 @@ export default function Navbar(props: NavbarProps) {
       argentMobileOptions: {
         dappName: 'STRKFarm',
         chainId: constants.NetworkName.SN_MAIN,
-        url: window.location.hostname,
+        url: getEndpoint(),
       },
       dappName: 'Endur.fi',
       connectors: getConnectors(isMobile) as StarknetkitConnector[],

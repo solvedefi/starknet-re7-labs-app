@@ -285,7 +285,7 @@ export default function Navbar(props: NavbarProps) {
               Home
             </Button>
           </Link>
-          <Link href="/raffle" margin="0 10px 0 0">
+          {/* <Link href="/raffle" margin="0 10px 0 0">
             <Button
               bg="transparent"
               color="color2"
@@ -302,7 +302,7 @@ export default function Navbar(props: NavbarProps) {
             >
               🕹 {'  '}Raffle
             </Button>
-          </Link>
+          </Link> */}
           <Link href="/community" margin="0 10px 0 0">
             <Button
               bg="transparent"
@@ -467,9 +467,9 @@ export default function Navbar(props: NavbarProps) {
                   <Link href="/" color="color1_light" onClick={onClose}>
                     Home
                   </Link>
-                  <Link href="/raffle" color="color1_light" onClick={onClose}>
+                  {/* <Link href="/raffle" color="color1_light" onClick={onClose}>
                     🕹 {'  '}Raffle
-                  </Link>
+                  </Link> */}
                   <Link
                     href="/community"
                     color="color1_light"

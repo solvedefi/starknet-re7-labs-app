@@ -32,6 +32,7 @@ import { getPoolInfoFromStrategy, sortAtom } from '@/store/protocols';
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons';
 import mixpanel from 'mixpanel-browser';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
+import { isMobile } from 'react-device-detect';
 
 interface YieldCardProps {
   pool: PoolInfo;
@@ -468,7 +469,7 @@ function StrategyMobileCard(props: YieldCardProps) {
 function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
   return {
     href: pool.protocol.link,
-    target: '_blank',
+    target: isMobile ? '_self' : '_blank',
     onClick: () => {
       mixpanel.track('Pool clicked', {
         pool: pool.pool.name,

@@ -138,7 +138,7 @@ export default function Navbar(props: NavbarProps) {
         chainId: constants.NetworkName.SN_MAIN,
         url: getEndpoint(),
       },
-      dappName: 'Endur.fi',
+      dappName: 'STRKFarm',
       connectors: getConnectors(isMobile) as StarknetkitConnector[],
     };
   }, [isMobile]);

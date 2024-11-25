@@ -38,7 +38,7 @@ export const endur = new Endur();
 
 const EndurAtoms = {
   endurStats: customAtomWithFetch({
-    url: 'https://testnet.endur.fi/api/stats',
+    url: 'https://app.endur.fi/api/stats',
     queryKey: 'Endur_stats',
   }),
   rewardInfo: customAtomWithQuery({

@@ -9,29 +9,34 @@ import { MY_STORE } from '@/store';
 import MyNumber from '@/utils/MyNumber';
 import { IStrategy, NFTInfo, TokenInfo } from '@/strategies/IStrategy';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
+import EndurAtoms, { endur } from '@/store/endur.store';
+import { privatePoolsAtom } from '@/store/protocols';
 
 export const revalidate = 3600; // 1 hr
 
 const allPoolsAtom = atom<PoolInfo[]>((get) => {
   const pools: PoolInfo[] = [];
-  const poolAtoms = [ZkLendAtoms, NostraLendingAtoms];
+  const poolAtoms = [ZkLendAtoms, NostraLendingAtoms, EndurAtoms];
   return poolAtoms.reduce((_pools, p) => _pools.concat(get(p.pools)), pools);
 });
 
 async function getPools(store: any, retry = 0) {
   const allPools: PoolInfo[] | undefined = store.get(allPoolsAtom);
+  // ! todo endur rewards
+  // const endurRewards = store.get(EndurAtoms.rewardInfo);
 
-  const minProtocolsRequired = [zkLend.name, nostraLending.name];
+  const minProtocolsRequired = [zkLend.name, nostraLending.name, endur.name];
   const hasRequiredPools = minProtocolsRequired.every((p) => {
     if (!allPools) return false;
     return allPools.some(
-      (pool) => pool.protocol.name === p && pool.type == PoolType.Lending,
+      (pool) => pool.protocol.name === p && pool.type == PoolType.Lending, // || pool.type == PoolType.Staking),
     );
   });
   const MAX_RETRIES = 120;
   if (retry >= MAX_RETRIES) {
     throw new Error('Failed to fetch pools');
   } else if (!allPools || !hasRequiredPools) {
+    // || !endurRewards.data) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     return getPools(store, retry + 1);
   }
@@ -93,10 +98,11 @@ async function getStrategyInfo(
 export async function GET(req: Request) {
   const allPools = await getPools(MY_STORE);
   const strategies = getStrategies();
+  const privatePools = MY_STORE.get(privatePoolsAtom);
 
   strategies.forEach((strategy) => {
     try {
-      strategy.solve(allPools, '1000');
+      strategy.solve([...allPools, ...privatePools], '1000');
     } catch (err) {
       console.error('Error solving strategy', strategy.name, err);
     }

@@ -32,9 +32,9 @@ import { isMobile } from 'react-device-detect';
 
 const banner_images = [
   {
-    desktop: '/banners/ognft.svg',
-    mobile: '/banners/ognft_small.svg',
-    link: 'https://x.com/strkfarm/status/1788558092109775029',
+    desktop: '/banners/endur.svg',
+    mobile: '/banners/endur_mobile.svg',
+    link: 'https://endur.fi',
   },
   {
     desktop: '/banners/seed_grant.svg',

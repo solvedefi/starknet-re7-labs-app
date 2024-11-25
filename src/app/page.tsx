@@ -34,7 +34,7 @@ const banner_images = [
   {
     desktop: '/banners/endur.svg',
     mobile: '/banners/endur_mobile.svg',
-    link: 'https://endur.fi',
+    link: 'https://endur.fi/r/strkfarm',
   },
   {
     desktop: '/banners/seed_grant.svg',
@@ -114,7 +114,7 @@ export default function Home() {
       </Box>
 
       <Box className="embla" ref={emblaRef} margin={0} width={'100%'}>
-        <Box className="embla__container">
+        <Box className="embla__container" cursor={'pointer'}>
           {banner_images.map((banner, index) => (
             <Box
               className="embla__slide"

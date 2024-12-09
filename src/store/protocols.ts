@@ -8,14 +8,15 @@ import MySwapAtoms, { mySwap } from './myswap.store';
 import NostraDegenAtoms, { nostraDegen } from './nostradegen.store';
 import NostraDexAtoms, { nostraDex } from './nostradex.store';
 import NostraLendingAtoms, { nostraLending } from './nostralending.store';
+import VesuAtoms, { vesu } from './vesu.store';
+import ZkLendAtoms, { zkLend } from './zklend.store';
+import NimboraDexAtoms, { nimboraDex } from './nimboradex.store';
 import { Category, PoolInfo, PoolType } from './pools';
 import { getLiveStatusEnum } from './strategies.atoms';
 import STRKFarmAtoms, {
   strkfarm,
   STRKFarmStrategyAPIResult,
 } from './strkfarm.atoms';
-import VesuAtoms, { vesu } from './vesu.store';
-import ZkLendAtoms, { zkLend } from './zklend.store';
 import EndurAtoms, { endur } from './endur.store';
 
 export const PROTOCOLS = [
@@ -99,11 +100,11 @@ export const PROTOCOLS = [
     class: vesu,
     atoms: VesuAtoms,
   },
-  // {
-  //   name: nimbora.name,
-  //   class: nimbora,
-  //   atoms: NimboraAtoms,
-  // }
+  {
+    name: nimboraDex.name,
+    class: nimboraDex,
+    atoms: NimboraDexAtoms,
+  },
 ];
 
 export const ALL_FILTER = 'All';

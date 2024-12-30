@@ -32,6 +32,11 @@ import { isMobile } from 'react-device-detect';
 
 const banner_images = [
   {
+    desktop: '/banners/strkfarm_braavos.svg',
+    mobile: '/banners/strkfarm_braavos_mobile.svg',
+    link: 'https://starknet.quest/quest/235',
+  },
+  {
     desktop: '/banners/endur.svg',
     mobile: '/banners/endur_mobile.svg',
     link: 'https://endur.fi/r/strkfarm',

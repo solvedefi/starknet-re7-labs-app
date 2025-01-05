@@ -1,5 +1,6 @@
 import { IDapp } from '@/store/IDapp.store';
 import { BalanceResult, getBalanceAtom } from '@/store/balance.atoms';
+import { IndexedPoolData } from '@/store/endur.store';
 import { LendingSpace } from '@/store/lending.base';
 import { Category, PoolInfo } from '@/store/pools';
 import { zkLend } from '@/store/zklend.store';
@@ -269,7 +270,9 @@ export class IStrategy extends IStrategyProps {
 
   filterTokenByProtocol(
     tokenName: string,
-    protocol: IDapp<LendingSpace.MyBaseAprDoc[]> = zkLend,
+    protocol:
+      | IDapp<LendingSpace.MyBaseAprDoc[]>
+      | IDapp<IndexedPoolData> = zkLend,
   ) {
     return (
       pools: PoolInfo[],

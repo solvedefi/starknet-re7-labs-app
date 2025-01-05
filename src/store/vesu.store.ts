@@ -133,6 +133,28 @@ const poolsData: VesuPool[] = [
     baseApr: '',
     tvl: '',
   },
+  {
+    id: 'xSTRK',
+    isVesu: true,
+    tokenA: 'xSTRK',
+    poolId:
+      '2345856225134458665876812536882617294246962319062565703131100435311373119841', // re7
+    tokenAddress: getTokenInfoFromName('xSTRK').token,
+    rewardApr: '',
+    baseApr: '',
+    tvl: '',
+  },
+  {
+    id: 'STRK_re7',
+    isVesu: true,
+    tokenA: 'STRK',
+    poolId:
+      '2345856225134458665876812536882617294246962319062565703131100435311373119841', // re7
+    tokenAddress: getTokenInfoFromName('STRK').token,
+    rewardApr: '',
+    baseApr: '',
+    tvl: '',
+  },
 ];
 
 // Fetch and update pools data with base APR values

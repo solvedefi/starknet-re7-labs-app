@@ -200,12 +200,12 @@ export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
   const priceInfoRes = await fetch(url);
   const priceInfo = await priceInfoRes.json();
   const now = new Date();
-  const priceTime = new Date(priceInfo.data.timestamp);
+  const priceTime = new Date(priceInfo.timestamp);
   if (now.getTime() - priceTime.getTime() > 900000) {
     // 15 mins
     throw new Error('Price is stale');
   }
-  const price = Number(priceInfo.data.price);
+  const price = Number(priceInfo.price);
   return price;
 }
 

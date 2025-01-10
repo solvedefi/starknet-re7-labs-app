@@ -187,9 +187,10 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
   const allPools = get(allPoolsAtomUnSorted);
   const requiredPools = allPools.filter(
     (p) =>
-      // p.protocol.name === 'zkLend' ||
-      // p.protocol.name === 'Nostra' ||
-      p.protocol.name === 'Vesu' || p.protocol.name === endur.name,
+      p.protocol.name === 'zkLend' ||
+      p.protocol.name === 'Nostra' ||
+      p.protocol.name === 'Vesu' ||
+      p.protocol.name === endur.name,
   );
 
   const privatePools: PoolInfo[] = get(privatePoolsAtom);

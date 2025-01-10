@@ -7,12 +7,12 @@ import {
   TokenInfo,
 } from './IStrategy';
 import MyNumber from '@/utils/MyNumber';
-import { getPrice, getTokenInfoFromName } from '@/utils';
-import { getERC20Balance } from '@/store/balance.atoms';
+import { getEndpoint, getTokenInfoFromName } from '@/utils';
 import { vesu } from '@/store/vesu.store';
 import { endur } from '@/store/endur.store';
 import { PoolInfo } from '@/store/pools';
 import { Contract } from 'starknet';
+import { fetchQuotes, QuoteRequest } from '@avnu/avnu-sdk';
 
 export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
   constructor(
@@ -136,19 +136,42 @@ export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
       };
 
     try {
-      const mainTokenName = this.token.name;
-      const colToken = getTokenInfoFromName(`i${mainTokenName}-c`);
-
-      const bal = await getERC20Balance(colToken, this.strategyAddress);
-      console.log('getTVL222', bal.amount.toString());
-      // This reduces the zToken TVL to near actual deposits made by users wihout looping
-      const discountFactor = this.stepAmountFactors[4];
-      const amount = bal.amount.operate('div', 1 + discountFactor);
-      console.log('getTVL1', amount.toString());
-      const price = await getPrice(this.token);
+      const resp = await fetch(
+        `${getEndpoint()}/vesu/positions?walletAddress=${this.strategyAddress}`,
+      );
+      const data = await resp.json();
+      if (!data.data || data.data.length == 0) {
+        throw new Error('No positions found');
+      }
+      const collateralXSTRK = new MyNumber(
+        data.data[0].collateral.value,
+        data.data[0].collateral.decimals,
+      );
+      const collateralUSDValue = new MyNumber(
+        data.data[0].collateral.usdPrice.value,
+        data.data[0].collateral.usdPrice.decimals,
+      );
+      const debtSTRK = new MyNumber(
+        data.data[0].debt.value,
+        data.data[0].debt.decimals,
+      );
+      const debtUSDValue = new MyNumber(
+        data.data[0].debt.usdPrice.value,
+        data.data[0].debt.usdPrice.decimals,
+      );
+      const xSTRKPrice = await this.getXSTRKPrice();
+      const collateralInSTRK =
+        Number(collateralXSTRK.toEtherToFixedDecimals(6)) * xSTRKPrice;
       return {
-        amount,
-        usdValue: Number(amount.toEtherStr()) * price,
+        amount: MyNumber.fromEther(
+          (
+            collateralInSTRK - Number(debtSTRK.toEtherToFixedDecimals(6))
+          ).toFixed(6),
+          data.data[0].collateral.decimals,
+        ),
+        usdValue:
+          Number(collateralUSDValue.toEtherStr()) -
+          Number(debtUSDValue.toEtherStr()),
         tokenInfo: this.token,
       };
     } catch (error) {
@@ -160,6 +183,31 @@ export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
       };
     }
   };
+
+  async getXSTRKPrice(retry = 0): Promise<number> {
+    const params: QuoteRequest = {
+      sellTokenAddress: getTokenInfoFromName(this.secondaryToken).token || '',
+      buyTokenAddress: this.token.token,
+      sellAmount: BigInt(Number(MyNumber.fromEther('1', 18).toString())),
+      takerAddress: this.token.token,
+    };
+    console.log('getXSTRKPrice', params);
+    const quotes = await fetchQuotes(params);
+    console.log('fetchQuotes', quotes);
+    if (quotes.length == 0) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return await this.getXSTRKPrice(retry + 1);
+    }
+
+    const firstQuore = quotes[0];
+    const price = Number(
+      new MyNumber(firstQuore.buyAmount.toString(), 18).toEtherToFixedDecimals(
+        6,
+      ),
+    );
+    console.log('getXSTRKPrice', price);
+    return price;
+  }
 
   getSettings = async () => {
     const cls = await provider.getClassAt(this.strategyAddress);

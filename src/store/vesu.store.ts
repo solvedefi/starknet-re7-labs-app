@@ -12,7 +12,7 @@ import {
 import { LendingSpace } from './lending.base';
 import { atomWithQuery, AtomWithQueryResult } from 'jotai-tanstack-query';
 import { IDapp } from './IDapp.store';
-import { getTokenInfoFromName } from '@/utils';
+import { getHosturl, getTokenInfoFromName } from '@/utils';
 
 // Initialize the provider
 const provider = new RpcProvider({ nodeUrl: process.env.NEXT_PUBLIC_RPC_URL });
@@ -177,7 +177,7 @@ console.log(poolsData, 'updated-pool-data');
 export class Vesu extends IDapp<VesuPool[]> {
   name = 'Vesu';
   link = 'https://www.vesu.xyz/markets';
-  logo = 'https://assets.strkfarm.xyz/integrations/vesu/logo.png';
+  logo = `https://assets.${getHosturl()}/integrations/vesu/logo.png`;
   incentiveDataKey = 'Vesu';
 
   _computePoolsInfo(data: any) {

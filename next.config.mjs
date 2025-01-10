@@ -2,9 +2,9 @@
 const nextConfig = {
   // output: 'export',
   compiler: {
-    // removeConsole: {
-    //   exclude: ['error'],
-    // },
+    removeConsole: {
+      exclude: ['error'],
+    },
   },
   async rewrites() {
     return [
@@ -44,6 +44,10 @@ const nextConfig = {
       {
         source: '/nimbora/:path*',
         destination: 'https://stats.nimbora.io/:path*',
+      },
+      {
+        source: '/vesu/:path*',
+        destination: 'https://api.vesu.xyz/:path*',
       },
     ];
   },

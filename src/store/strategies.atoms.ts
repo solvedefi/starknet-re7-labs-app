@@ -1,19 +1,19 @@
 import { atom } from 'jotai';
-import { AutoTokenStrategy } from '@/strategies/auto_strk.strat';
 import {
   IStrategy,
   IStrategyProps,
   StrategyLiveStatus,
 } from '@/strategies/IStrategy';
 import CONSTANTS from '@/constants';
-import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
 import Mustache from 'mustache';
 import { getTokenInfoFromName } from '@/utils';
 import { allPoolsAtomUnSorted, privatePoolsAtom } from './protocols';
-import { DeltaNeutralMM2 } from '@/strategies/delta_neutral_mm_2';
 import { AutoXSTRKStrategy } from '@/strategies/auto_xstrk.strat';
 import EndurAtoms, { endur } from './endur.store';
 import { getDefaultPoolInfo, PoolInfo } from './pools';
+import { AutoTokenStrategy } from '@/strategies/auto_strk.strat';
+import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
+import { DeltaNeutralMM2 } from '@/strategies/delta_neutral_mm_2';
 
 export interface StrategyInfo extends IStrategyProps {
   name: string;
@@ -118,6 +118,26 @@ export function getStrategies() {
     },
   );
 
+  // const deltaNeutralxSTRKSTRK = new DeltaNeutralMMVesuEndur(
+  //   getTokenInfoFromName('STRK'),
+  //   'xSTRK Sensei',
+  //   Mustache.render(DNMMDescription, { token1: 'STRK', token2: 'xSTRK' }),
+  //   'xSTRK',
+  //   CONSTANTS.CONTRACTS.DeltaNeutralxSTRKSTRKXL,
+  //   [1, 1, 0.725, 1.967985], // precomputed factors based on strategy math
+  //   StrategyLiveStatus.HOT,
+  //   {
+  //     maxTVL: 1000000,
+  //     alerts: [
+  //       {
+  //         type: 'info',
+  //         text: 'Note: On withdrawal, you will receive xSTRK. You can use xSTRK as STRK for most use-cases, however, you can redeem it for STRK anytime on endur.fi',
+  //         tab: 'withdraw',
+  //       },
+  //     ],
+  //   },
+  // );
+
   const xSTRKStrategy = new AutoXSTRKStrategy(
     'Stake STRK',
     'Endur is Starknet’s dedicated staking platform, where you can stake STRK to earn staking rewards. This strategy, built on Endur, is an incentivized vault that boosts returns by offering additional rewards. In the future, it may transition to auto-compounding on DeFi Spring, reinvesting rewards for maximum growth. Changes will be announced at least three days in advance on our socials.',
@@ -136,6 +156,7 @@ export function getStrategies() {
     deltaNeutralMMETHUSDC,
     deltaNeutralMMSTRKETH,
     deltaNeutralMMETHUSDCReverse,
+    // deltaNeutralxSTRKSTRK,
     // xSTRKStrategy,
   ];
 
@@ -165,9 +186,9 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
   const allPools = get(allPoolsAtomUnSorted);
   const requiredPools = allPools.filter(
     (p) =>
-      p.protocol.name === 'zkLend' ||
-      p.protocol.name === 'Nostra' ||
-      p.protocol.name === endur.name,
+      // p.protocol.name === 'zkLend' ||
+      // p.protocol.name === 'Nostra' ||
+      p.protocol.name === 'Vesu' || p.protocol.name === endur.name,
   );
 
   const privatePools: PoolInfo[] = get(privatePoolsAtom);

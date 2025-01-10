@@ -10,9 +10,19 @@ const LOGOS = {
   ETH: '/zklend/icons/tokens/eth.svg?w=20',
   STRK: '/zklend/icons/tokens/strk.svg?w=20',
   DAI: '/zklend/icons/tokens/dai.svg?w=20',
+  kSTRK: '/zklend/icons/tokens/kstrk.svg?w=20',
+  xSTRK: 'https://endur.fi/logo.svg',
 };
 
-export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI';
+export type TokenName =
+  | 'USDT'
+  | 'USDC'
+  | 'ETH'
+  | 'STRK'
+  | 'WBTC'
+  | 'DAI'
+  | 'kSTRK'
+  | 'xSTRK';
 
 const CONSTANTS = {
   DEX_INCENTIVE_URL:
@@ -72,6 +82,8 @@ const CONSTANTS = {
       '0x9d23d9b1fa0db8c9d75a1df924c3820e594fc4ab1475695889286f3f6df250',
     DeltaNeutralMMETHUSDCXL:
       '0x9140757f8fb5748379be582be39d6daf704cc3a0408882c0d57981a885eed9',
+    DeltaNeutralxSTRKSTRKXL:
+      '0x7023a5cadc8a5db80e4f0fde6b330cbd3c17bbbf9cb145cbabd7bd5e6fb7b0b',
   },
   MOBILE_MSG: 'Desktop/Tablet only',
 };
@@ -109,7 +121,7 @@ export const TOKENS: TokenInfo[] = [
     name: 'xSTRK',
     decimals: 18,
     displayDecimals: 2,
-    logo: CONSTANTS.LOGOS.STRK,
+    logo: CONSTANTS.LOGOS.xSTRK,
     minAmount: MyNumber.fromEther('10', 18),
     maxAmount: MyNumber.fromEther('10000', 18),
     stepAmount: MyNumber.fromEther('10', 18),
@@ -208,11 +220,24 @@ export const TOKENS: TokenInfo[] = [
     name: 'frmxSTRK',
     decimals: 18,
     displayDecimals: 2,
-    logo: CONSTANTS.LOGOS.STRK,
+    logo: CONSTANTS.LOGOS.xSTRK,
     minAmount: MyNumber.fromEther('0.01', 18),
     maxAmount: MyNumber.fromEther('10000', 18),
     stepAmount: MyNumber.fromEther('0.01', 18),
     isERC4626: true,
+  },
+  {
+    token: standariseAddress(
+      '0x045cd05ee2caaac3459b87e5e2480099d201be2f62243f839f00e10dde7f500c',
+    ),
+    name: 'kSTRK',
+    decimals: 18,
+    displayDecimals: 2,
+    logo: CONSTANTS.LOGOS.STRK,
+    minAmount: MyNumber.fromEther('10', 18),
+    maxAmount: MyNumber.fromEther('10000', 18),
+    stepAmount: MyNumber.fromEther('10', 18),
+    isERC4626: false,
   },
 ];
 
@@ -247,6 +272,14 @@ export const NFTS: NFTInfo[] = [
     logo: CONSTANTS.LOGOS.ETH,
     config: {
       mainTokenName: 'ETH',
+    },
+  },
+  {
+    name: 'frmDNMMxSTRKSTRK',
+    address: CONSTANTS.CONTRACTS.DeltaNeutralxSTRKSTRKXL,
+    logo: CONSTANTS.LOGOS.xSTRK,
+    config: {
+      mainTokenName: 'xSTRK',
     },
   },
 ];

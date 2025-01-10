@@ -96,8 +96,11 @@ export function generateReferralCode() {
 }
 
 export function getReferralUrl(referralCode: string) {
-  if (window.location.origin.includes('app.strkfarm.xyz')) {
-    return `https://strkfarm.xyz/r/${referralCode}`;
+  if (
+    window.location.origin.includes('app.strkfarm.xyz') ||
+    window.location.origin.includes('app.strkfarm.com')
+  ) {
+    return `https://${getHosturl()}/r/${referralCode}`;
   }
   return `${window.location.origin}/r/${referralCode}`;
 }
@@ -172,8 +175,21 @@ export function getEndpoint() {
   return (
     (typeof window === 'undefined'
       ? process.env.HOSTNAME
-      : window.location.origin) || 'https://app.strkfarm.xyz'
+      : window.location.origin) || 'https://app.strkfarm.com'
   );
+}
+
+export function getHosturl() {
+  const FALLBACK = 'strkfarm.com';
+  try {
+    return (
+      (typeof window !== 'undefined'
+        ? window.location.hostname.split('.').slice(-2).join('.')
+        : null) || FALLBACK
+    );
+  } catch (e) {
+    return FALLBACK;
+  }
 }
 
 export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {

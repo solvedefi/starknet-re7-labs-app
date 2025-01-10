@@ -3,7 +3,6 @@ import { num } from 'starknet';
 import { TOKENS } from './constants';
 import toast from 'react-hot-toast';
 import { TokenInfo } from './strategies/IStrategy';
-import axios from 'axios';
 import fetchWithRetry from './utils/fetchWithRetry';
 
 export function getUniqueStrings(arr: Array<string>) {
@@ -152,11 +151,11 @@ export function copyReferralLink(refCode: string) {
 }
 
 export async function getPrice(tokenInfo: TokenInfo) {
-  // try {
-  //   return await getPriceFromMyAPI(tokenInfo);
-  // } catch (e) {
-  //   console.warn('getPriceFromMyAPI error', e);
-  // }
+  try {
+    return await getPriceFromMyAPI(tokenInfo);
+  } catch (e) {
+    console.warn('getPriceFromMyAPI error', e);
+  }
   console.log('getPrice coinbase', tokenInfo.name);
   const priceInfo = await fetchWithRetry(
     `https://api.coinbase.com/v2/prices/${tokenInfo.name}-USDT/spot`,
@@ -196,10 +195,10 @@ export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
   console.log('getPrice from redis', tokenInfo.name);
 
   const endpoint = getEndpoint();
-  if (endpoint.includes('localhost')) {
-    throw new Error('getEndpoint: skip redis');
-  }
-  const priceInfo = await axios.get(`${endpoint}/api/price/${tokenInfo.name}`);
+  const url = `${endpoint}/api/price/${tokenInfo.name}`;
+  console.log('getPrice url', url);
+  const priceInfoRes = await fetch(url);
+  const priceInfo = await priceInfoRes.json();
   const now = new Date();
   const priceTime = new Date(priceInfo.data.timestamp);
   if (now.getTime() - priceTime.getTime() > 900000) {

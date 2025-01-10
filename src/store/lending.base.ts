@@ -64,7 +64,11 @@ export namespace LendingSpace {
         }
 
         const logo1 = CONSTANTS.LOGOS[<TokenName>poolName];
-
+        const aprSplit: APRSplit = {
+          apr: arr[arr.length - 1].strk_grant_apr_nrs,
+          title: 'STRK rewards',
+          description: 'Starknet DeFi Spring incentives',
+        };
         const poolInfo: PoolInfo = {
           pool: {
             id: getPoolId(info.name, poolName),
@@ -78,13 +82,7 @@ export namespace LendingSpace {
           },
           apr: arr[arr.length - 1].strk_grant_apr_nrs,
           tvl: arr[arr.length - 1].supply_usd,
-          aprSplits: [
-            {
-              apr: arr[arr.length - 1].strk_grant_apr_nrs,
-              title: 'STRK rewards',
-              description: 'Starknet DeFi Spring incentives',
-            },
-          ],
+          aprSplits: [aprSplit],
           category,
           type: PoolType.Lending,
           borrow: {

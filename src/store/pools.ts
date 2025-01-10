@@ -186,3 +186,14 @@ export const StrkLendingIncentivesAtom = atom((get) => {
   }
   return _data;
 });
+
+/** Given pool name, returns Appropriate category */
+export function getCategoryFromName(poolName: string) {
+  let category = Category.Others;
+  if (['USDC', 'USDT'].includes(poolName)) {
+    category = Category.Stable;
+  } else if (poolName.includes('STRK')) {
+    category = Category.STRK;
+  }
+  return category;
+}

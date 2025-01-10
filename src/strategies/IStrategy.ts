@@ -9,7 +9,7 @@ import { Atom, atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { Call, ProviderInterface } from 'starknet';
 
-interface Step {
+export interface Step {
   name: string;
   optimizer: (
     pools: PoolInfo[],

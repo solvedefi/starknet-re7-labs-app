@@ -180,10 +180,16 @@ export function getEndpoint() {
 }
 
 export function getHosturl() {
-  return (
-    (typeof window !== 'undefined' ? window.location.host : null) ||
-    'strkfarm.com'
-  );
+  const FALLBACK = 'strkfarm.com';
+  try {
+    return (
+      (typeof window !== 'undefined'
+        ? window.location.hostname.split('.').slice(-2).join('.')
+        : null) || FALLBACK
+    );
+  } catch (e) {
+    return FALLBACK;
+  }
 }
 
 export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {

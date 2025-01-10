@@ -14,13 +14,13 @@ import { getDefaultPoolInfo, PoolInfo } from './pools';
 import { AutoTokenStrategy } from '@/strategies/auto_strk.strat';
 import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
 import { DeltaNeutralMM2 } from '@/strategies/delta_neutral_mm_2';
+import { DeltaNeutralMMVesuEndur } from '@/strategies/delta_neutral_mm_vesu_endur';
 
 export interface StrategyInfo extends IStrategyProps {
   name: string;
 }
 
 export function getStrategies() {
-  // const simpleStableStrat = new SimpleStableStrategy();
   const autoStrkStrategy = new AutoTokenStrategy(
     'STRK',
     'Auto Compounding STRK',
@@ -118,25 +118,26 @@ export function getStrategies() {
     },
   );
 
-  // const deltaNeutralxSTRKSTRK = new DeltaNeutralMMVesuEndur(
-  //   getTokenInfoFromName('STRK'),
-  //   'xSTRK Sensei',
-  //   Mustache.render(DNMMDescription, { token1: 'STRK', token2: 'xSTRK' }),
-  //   'xSTRK',
-  //   CONSTANTS.CONTRACTS.DeltaNeutralxSTRKSTRKXL,
-  //   [1, 1, 0.725, 1.967985], // precomputed factors based on strategy math
-  //   StrategyLiveStatus.HOT,
-  //   {
-  //     maxTVL: 1000000,
-  //     alerts: [
-  //       {
-  //         type: 'info',
-  //         text: 'Note: On withdrawal, you will receive xSTRK. You can use xSTRK as STRK for most use-cases, however, you can redeem it for STRK anytime on endur.fi',
-  //         tab: 'withdraw',
-  //       },
-  //     ],
-  //   },
-  // );
+  const xSTRKDescription = `Deposit your {{token1}} to automatically loop your funds via Endur and Vesu to create a delta neutral position. This strategy is designed to maximize your yield on {{token1}}. Your position is automatically adjusted periodically to maintain a healthy health factor. You receive a NFT as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your NFT for {{token2}}.`;
+  const deltaNeutralxSTRKSTRK = new DeltaNeutralMMVesuEndur(
+    getTokenInfoFromName('STRK'),
+    'xSTRK Sensei',
+    Mustache.render(xSTRKDescription, { token1: 'STRK', token2: 'xSTRK' }),
+    'xSTRK',
+    CONSTANTS.CONTRACTS.DeltaNeutralxSTRKSTRKXL,
+    [1, 1, 0.725, 1.967985], // precomputed factors based on strategy math
+    StrategyLiveStatus.HOT,
+    {
+      maxTVL: 1000000,
+      alerts: [
+        {
+          type: 'info',
+          text: 'Note: On withdrawal, you will receive xSTRK. You can use xSTRK as STRK for most use-cases, however, you can redeem it for STRK anytime on endur.fi',
+          tab: 'withdraw',
+        },
+      ],
+    },
+  );
 
   const xSTRKStrategy = new AutoXSTRKStrategy(
     'Stake STRK',
@@ -156,7 +157,7 @@ export function getStrategies() {
     deltaNeutralMMETHUSDC,
     deltaNeutralMMSTRKETH,
     deltaNeutralMMETHUSDCReverse,
-    // deltaNeutralxSTRKSTRK,
+    deltaNeutralxSTRKSTRK,
     // xSTRKStrategy,
   ];
 

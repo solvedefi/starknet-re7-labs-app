@@ -2,6 +2,7 @@ import { provider, TokenName } from '@/constants';
 import { DeltaNeutralMM } from './delta_neutral_mm';
 import {
   IStrategySettings,
+  Step,
   StrategyAction,
   StrategyLiveStatus,
   TokenInfo,
@@ -15,6 +16,7 @@ import { Contract } from 'starknet';
 import { fetchQuotes, QuoteRequest } from '@avnu/avnu-sdk';
 
 export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
+  vesuPoolName = 'Re7 xSTRK';
   constructor(
     token: TokenInfo,
     name: string,
@@ -45,24 +47,32 @@ export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
     prevActions: StrategyAction[],
   ) {
     const dapp = prevActions.length == 0 ? this.protocol1 : this.protocol2;
+    const tokenName =
+      prevActions.length == 0
+        ? this.token.name
+        : `${this.token.name} (${this.vesuPoolName})`;
     return pools.filter(
-      (p) => p.pool.name == this.token.name && p.protocol.name == dapp.name,
+      (p) => p.pool.name == tokenName && p.protocol.name == dapp.name,
     );
   }
 
-  filterSecondaryToken(
+  filtetVesuToken(
     pools: PoolInfo[],
     amount: string,
     prevActions: StrategyAction[],
+    tokenName: string,
   ) {
     const dapp = this.protocol2;
     console.log(
       'filterSecondaryToken',
       pools.filter((p) => p.protocol.name == dapp.name),
-      this.secondaryToken,
+      tokenName,
+      `${tokenName} (${this.vesuPoolName})`,
     );
     return pools.filter(
-      (p) => p.pool.name == this.secondaryToken && p.protocol.name == dapp.name,
+      (p) =>
+        p.pool.name == `${tokenName} (${this.vesuPoolName})` &&
+        p.protocol.name == dapp.name,
     );
   }
 
@@ -97,7 +107,7 @@ export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
     ];
   }
 
-  getSteps() {
+  getSteps(): Step[] {
     return [
       {
         name: `Stake ${this.token.name} to ${this.protocol1.name}`,
@@ -107,12 +117,20 @@ export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
       {
         name: `Supply's your ${this.secondaryToken} to ${this.protocol2.name}`,
         optimizer: this.optimizer,
-        filter: [this.filterSecondaryToken],
+        filter: [
+          (...args) => {
+            return this.filtetVesuToken(...args, this.secondaryToken);
+          },
+        ],
       },
       {
-        name: `Borrow ${this.token.name} from ${this.protocol1.name}`,
+        name: `Borrow ${this.token.name} from ${this.protocol2.name}`,
         optimizer: this.optimizer,
-        filter: [this.filterMainToken],
+        filter: [
+          (...args) => {
+            return this.filtetVesuToken(...args, this.token.name);
+          },
+        ],
       },
       {
         name: `Loop back to step 1, repeat 3 more times`,
@@ -125,6 +143,48 @@ export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
         filter: [this.filterTokenByProtocol('STRK', this.protocol1)],
       },
     ];
+  }
+
+  getLookRepeatYieldAmount(
+    eligiblePools: PoolInfo[],
+    amount: string,
+    actions: StrategyAction[],
+  ) {
+    console.log('getLookRepeatYieldAmount', amount, actions);
+    let full_amount = Number(amount);
+    this.stepAmountFactors.slice(0, actions.length).forEach((factor, i) => {
+      full_amount /= factor;
+    });
+    const excessFactor = this.stepAmountFactors[actions.length];
+    const amount1 = excessFactor * full_amount;
+    const exp1 = amount1 * this.actions[0].pool.apr;
+    const amount2 = this.stepAmountFactors[1] * amount1;
+    const exp2 = amount2 * this.actions[1].pool.apr;
+    const amount3 = this.stepAmountFactors[2] * amount2;
+    const exp3 = -amount3 * this.actions[2].pool.borrow.apr;
+    const effecitveAmount = amount1 - amount3;
+    const effectiveAPR = (exp1 + exp2 + exp3) / effecitveAmount;
+    const pool: PoolInfo = { ...eligiblePools[0] };
+    pool.apr = effectiveAPR;
+    const strategyAction: StrategyAction = {
+      pool,
+      amount: effecitveAmount.toString(),
+      isDeposit: true,
+    };
+    console.log(
+      'getLookRepeatYieldAmount exp1',
+      this.id,
+      exp1,
+      full_amount,
+      exp2,
+      amount2,
+      this.actions[2],
+      this.actions[1],
+      exp3,
+      amount1,
+      amount3,
+    );
+    return [...actions, strategyAction];
   }
 
   getTVL = async () => {

@@ -12,7 +12,7 @@ import {
 import { LendingSpace } from './lending.base';
 import { atomWithQuery, AtomWithQueryResult } from 'jotai-tanstack-query';
 import { IDapp } from './IDapp.store';
-import { getTokenInfoFromName } from '@/utils';
+import { getHosturl, getTokenInfoFromName } from '@/utils';
 
 // Initialize the provider
 const provider = new RpcProvider({ nodeUrl: process.env.NEXT_PUBLIC_RPC_URL });
@@ -133,6 +133,28 @@ const poolsData: VesuPool[] = [
     baseApr: '',
     tvl: '',
   },
+  {
+    id: 'xSTRK',
+    isVesu: true,
+    tokenA: 'xSTRK',
+    poolId:
+      '2345856225134458665876812536882617294246962319062565703131100435311373119841', // re7
+    tokenAddress: getTokenInfoFromName('xSTRK').token,
+    rewardApr: '',
+    baseApr: '',
+    tvl: '',
+  },
+  {
+    id: 'STRK_re7',
+    isVesu: true,
+    tokenA: 'STRK',
+    poolId:
+      '2345856225134458665876812536882617294246962319062565703131100435311373119841', // re7
+    tokenAddress: getTokenInfoFromName('STRK').token,
+    rewardApr: '',
+    baseApr: '',
+    tvl: '',
+  },
 ];
 
 // Fetch and update pools data with base APR values
@@ -155,7 +177,7 @@ console.log(poolsData, 'updated-pool-data');
 export class Vesu extends IDapp<VesuPool[]> {
   name = 'Vesu';
   link = 'https://www.vesu.xyz/markets';
-  logo = 'https://assets.strkfarm.xyz/integrations/vesu/logo.png';
+  logo = `https://assets.${getHosturl()}/integrations/vesu/logo.png`;
   incentiveDataKey = 'Vesu';
 
   _computePoolsInfo(data: any) {

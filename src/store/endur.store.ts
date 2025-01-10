@@ -23,7 +23,7 @@ interface PoolData {
   };
 }
 
-interface IndexedPoolData {
+export interface IndexedPoolData {
   [key: string]: PoolData[];
 }
 

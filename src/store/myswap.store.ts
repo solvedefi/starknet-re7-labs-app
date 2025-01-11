@@ -83,7 +83,7 @@ export class MySwap extends IDapp<IndexedPoolData> {
             poolName,
             isStable,
           );
-          const riskFactor = isStable ? 0.5 : 1;
+          const riskFactor = isStable ? 0.5 : 3;
 
           const tokens: TokenName[] = <TokenName[]>poolName.split('/');
           const logo1 = CONSTANTS.LOGOS[tokens[0]];

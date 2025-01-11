@@ -182,11 +182,13 @@ export const allPoolsAtomUnSorted = atom((get) => {
 export function getPoolInfoFromStrategy(
   strat: STRKFarmStrategyAPIResult,
 ): PoolInfo {
-  let category = Category.Others;
+  const category = [Category.Others];
   if (strat.name.includes('STRK')) {
-    category = Category.STRK;
+    category.push(Category.STRK);
   } else if (strat.name.includes('USDC')) {
-    category = Category.Stable;
+    category.push(Category.Stable);
+  } else if (strat.name.includes('ETH')) {
+    category.push(Category.ETH);
   }
   return {
     pool: {
@@ -306,7 +308,9 @@ export const filteredPools = atom((get) => {
     // category filter
     if (
       !categories.includes(ALL_FILTER) &&
-      !categories.includes(pool.category.valueOf())
+      !categories.some((category) =>
+        pool.category.some((poolCategory) => poolCategory === category),
+      )
     )
       return false;
 

@@ -1,5 +1,12 @@
 import CONSTANTS, { TokenName } from '@/constants';
-import { APRSplit, Category, PoolInfo, PoolMetadata, PoolType } from './pools';
+import {
+  APRSplit,
+  Category,
+  getCategoriesFromName,
+  PoolInfo,
+  PoolMetadata,
+  PoolType,
+} from './pools';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { StrategyAction, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { getPoolId } from './IDapp.store';
@@ -56,12 +63,7 @@ export namespace LendingSpace {
         const arr = myData[poolName];
         if (arr.length === 0) return;
 
-        let category = Category.Others;
-        if (['USDC', 'USDT'].includes(poolName)) {
-          category = Category.Stable;
-        } else if (poolName.includes('STRK')) {
-          category = Category.STRK;
-        }
+        const category: Category[] = getCategoriesFromName(poolName);
 
         const logo1 = CONSTANTS.LOGOS[<TokenName>poolName];
         const aprSplit: APRSplit = {

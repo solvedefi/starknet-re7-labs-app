@@ -223,7 +223,9 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    const eligiblePools = pools.filter((p) => p.category == Category.Stable);
+    const eligiblePools = pools.filter((p) =>
+      p.category.includes(Category.Stable),
+    );
     if (!eligiblePools) throw new Error(`${this.tag}: [F1] no eligible pools`);
     return eligiblePools;
   }

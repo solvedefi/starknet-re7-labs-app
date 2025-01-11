@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import {
   APRSplit,
-  getCategoryFromName,
+  getCategoriesFromName,
   PoolInfo,
   PoolMetadata,
   PoolType,
@@ -80,7 +80,7 @@ async function getVesuPoolInfo(pool: VesuPool, asset: VesuAsset) {
           description: '',
         },
       ],
-      category: getCategoryFromName(asset.symbol),
+      category: getCategoriesFromName(asset.symbol),
       type: PoolType.Lending,
       borrow: {
         apr: bitIntToNumber(asset.stats.borrowApr),

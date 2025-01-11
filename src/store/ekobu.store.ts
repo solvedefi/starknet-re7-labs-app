@@ -5,7 +5,13 @@ import fetchWithRetry from '@/utils/fetchWithRetry';
 import { atom } from 'jotai';
 import { atomWithQuery, AtomWithQueryResult } from 'jotai-tanstack-query';
 import { IDapp } from './IDapp.store';
-import { Category, PoolInfo, PoolType, ProtocolAtoms } from './pools';
+import {
+  Category,
+  getCategoriesFromName,
+  PoolInfo,
+  PoolType,
+  ProtocolAtoms,
+} from './pools';
 
 interface EkuboBaseAprDoc {
   tokens: Token[];
@@ -97,16 +103,12 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
       poolData?.forEach((pool) => {
         if (!this.supportedPools.includes(pool.pool)) return;
 
-        console.log('ekubo', pool);
-
-        let category = Category.Others;
-        let riskFactor = 3;
-        if (pool.pool === 'USDC/USDT') {
-          category = Category.Stable;
-          riskFactor = 0.5;
-        } else if (pool.pool.includes('STRK')) {
-          category = Category.STRK;
-        }
+        const isStable = pool.pool === 'USDC/USDT';
+        const category: Category[] = getCategoriesFromName(
+          pool.pool, // poolName
+          isStable, // isStable condition
+        );
+        const riskFactor = isStable ? 0.5 : 3;
 
         const tokens: TokenName[] = <TokenName[]>pool.pool.split('/');
         const logo1 = CONSTANTS.LOGOS[tokens[0]];

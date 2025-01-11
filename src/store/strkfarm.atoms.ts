@@ -2,6 +2,7 @@ import CONSTANTS from '@/constants';
 import {
   APRSplit,
   Category,
+  getCategoriesFromName,
   PoolInfo,
   PoolMetadata,
   PoolType,
@@ -53,14 +54,12 @@ export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
     const rawPools: STRKFarmStrategyAPIResult[] = data.strategies;
     const pools: PoolInfo[] = [];
     return rawPools.map((rawPool) => {
-      let category = Category.Others;
       const poolName = rawPool.name;
       const riskFactor = rawPool.riskFactor;
-      if (poolName.includes('USDC') || poolName.includes('USDT')) {
-        category = Category.Stable;
-      } else if (poolName.includes('STRK')) {
-        category = Category.STRK;
-      }
+
+      const isStable = poolName.includes('USDC') || poolName.includes('USDT');
+      const categories: Category[] = getCategoriesFromName(poolName, isStable);
+
       const poolInfo: PoolInfo = {
         pool: {
           id: rawPool.id,
@@ -75,7 +74,7 @@ export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
         apr: 0,
         tvl: rawPool.tvlUsd,
         aprSplits: [],
-        category,
+        category: categories,
         type: PoolType.Derivatives,
         lending: {
           collateralFactor: 0,

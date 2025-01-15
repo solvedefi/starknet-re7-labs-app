@@ -9,7 +9,7 @@ import { Atom, atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { Call, ProviderInterface } from 'starknet';
 
-interface Step {
+export interface Step {
   name: string;
   optimizer: (
     pools: PoolInfo[],
@@ -82,6 +82,7 @@ export interface IStrategySettings {
   }[];
   hideHarvestInfo?: boolean;
   is_promoted?: boolean;
+  isAudited?: boolean;
 }
 
 export interface AmountInfo {
@@ -223,7 +224,9 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    const eligiblePools = pools.filter((p) => p.category == Category.Stable);
+    const eligiblePools = pools.filter((p) =>
+      p.category.includes(Category.Stable),
+    );
     if (!eligiblePools) throw new Error(`${this.tag}: [F1] no eligible pools`);
     return eligiblePools;
   }

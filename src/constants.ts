@@ -275,11 +275,11 @@ export const NFTS: NFTInfo[] = [
     },
   },
   {
-    name: 'frmDNMMxSTRKSTRK',
+    name: 'frmDNMMSTRKxSTRK',
     address: CONSTANTS.CONTRACTS.DeltaNeutralxSTRKSTRKXL,
-    logo: CONSTANTS.LOGOS.xSTRK,
+    logo: CONSTANTS.LOGOS.STRK,
     config: {
-      mainTokenName: 'xSTRK',
+      mainTokenName: 'STRK',
     },
   },
 ];

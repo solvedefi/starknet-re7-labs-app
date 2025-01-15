@@ -25,8 +25,6 @@ import {
 } from '@/store/balance.atoms';
 import { atom } from 'jotai';
 import { IDapp } from '@/store/IDapp.store';
-import { LendingSpace } from '@/store/lending.base';
-import { IndexedPoolData } from '@/store/endur.store';
 
 export class DeltaNeutralMM extends IStrategy {
   riskFactor = 0.75;
@@ -37,8 +35,8 @@ export class DeltaNeutralMM extends IStrategy {
   readonly stepAmountFactors: number[];
   fee_factor = 0.1; // 10% fee
 
-  protocol1: IDapp<LendingSpace.MyBaseAprDoc[]> | IDapp<IndexedPoolData>;
-  protocol2: IDapp<LendingSpace.MyBaseAprDoc[]> | IDapp<IndexedPoolData>;
+  protocol1: IDapp<any>;
+  protocol2: IDapp<any>;
   constructor(
     token: TokenInfo,
     name: string,
@@ -48,12 +46,8 @@ export class DeltaNeutralMM extends IStrategy {
     stepAmountFactors: number[],
     liveStatus: StrategyLiveStatus,
     settings: IStrategySettings,
-    protocol1:
-      | IDapp<LendingSpace.MyBaseAprDoc[]>
-      | IDapp<IndexedPoolData> = zkLend,
-    protocol2:
-      | IDapp<LendingSpace.MyBaseAprDoc[]>
-      | IDapp<IndexedPoolData> = nostraLending,
+    protocol1: IDapp<any> = zkLend,
+    protocol2: IDapp<any> = nostraLending,
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
     const nftInfo = NFTS.find(

@@ -11,7 +11,8 @@ const LOGOS = {
   STRK: '/zklend/icons/tokens/strk.svg?w=20',
   DAI: '/zklend/icons/tokens/dai.svg?w=20',
   kSTRK: '/zklend/icons/tokens/kstrk.svg?w=20',
-  xSTRK: 'https://endur.fi/logo.svg',
+  xSTRK: '/imagedelivery/c1f44170-c1b0-4531-3d3b-5f0bacfe1300/logo',
+  sSTRK: '/imagedelivery/e28697ac-a8ba-462f-0d40-ad33b285c200/logo',
 };
 
 export type TokenName =
@@ -22,6 +23,7 @@ export type TokenName =
   | 'WBTC'
   | 'DAI'
   | 'kSTRK'
+  | 'sSTRK'
   | 'xSTRK';
 
 const CONSTANTS = {

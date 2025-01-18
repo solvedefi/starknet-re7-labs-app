@@ -34,7 +34,7 @@ export class NostraDex extends Jediswap {
           const rewardApr = parseFloat(poolData.rewardApr);
 
           const _poolName = poolData.id.replace('-', '/');
-          const isStable = _poolName == 'USDC/USDT';
+          const isStable = _poolName === 'USDC/USDT';
           const category: Category[] = getCategoriesFromName(
             _poolName,
             isStable,

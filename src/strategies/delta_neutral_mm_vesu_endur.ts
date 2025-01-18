@@ -17,6 +17,7 @@ import { fetchQuotes, QuoteRequest } from '@avnu/avnu-sdk';
 
 export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
   vesuPoolName = 'Re7 xSTRK';
+  fee_factor: number = 0.2;
   constructor(
     token: TokenInfo,
     name: string,

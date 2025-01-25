@@ -137,7 +137,7 @@ export function getStrategies() {
       alerts: [
         {
           type: 'info',
-          text: 'Note: On withdrawal, you will receive xSTRK. You can use xSTRK as STRK for most use-cases, however, you can redeem it for STRK anytime on endur.fi',
+          text: 'Note: Expected STRK received may vary slightly due to the DEX price difference of xSTRK compared to its true price on Endur.',
           tab: 'withdraw',
         },
       ],

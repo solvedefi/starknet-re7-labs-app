@@ -137,8 +137,13 @@ export function getStrategies() {
       alerts: [
         {
           type: 'info',
-          text: 'Note: Expected STRK received may vary slightly due to the DEX price difference of xSTRK compared to its true price on Endur.',
+          text: 'Note: Expected STRK received may vary slightly due to the DEX price difference of xSTRK compared to its true price on Endur. We recommend holding atleast for 2-3 weeks to adjust for this loss.',
           tab: 'withdraw',
+        },
+        {
+          type: 'warning',
+          text: 'Note: Deposits may fail due to high utilisation on Vesu. We are working to add a dynamic TVL limit to better show limits.',
+          tab: 'deposit',
         },
       ],
       isAudited: false,

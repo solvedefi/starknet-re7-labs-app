@@ -135,15 +135,15 @@ export function getStrategies() {
     {
       maxTVL: 1000000,
       alerts: [
+        // {
+        //   type: 'warning',
+        //   text: 'Note: Deposits may fail sometimes due to high utilisation on Vesu. We are working to add a dynamic TVL limit to better show limits.',
+        //   tab: 'deposit',
+        // },
         {
           type: 'info',
-          text: 'Note: Expected STRK received may vary slightly due to the DEX price difference of xSTRK compared to its true price on Endur. We recommend holding atleast for 2-3 weeks to adjust for this loss.',
-          tab: 'withdraw',
-        },
-        {
-          type: 'warning',
-          text: 'Note: Deposits may fail due to high utilisation on Vesu. We are working to add a dynamic TVL limit to better show limits.',
-          tab: 'deposit',
+          text: 'Depeg-risk: If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
+          tab: 'all',
         },
       ],
       isAudited: false,

@@ -26,7 +26,6 @@ import {
   Wrap,
   WrapItem,
 } from '@chakra-ui/react';
-import { useAccount } from '@starknet-react/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -46,9 +45,10 @@ import {
 import { StrategyParams } from '../page';
 import MyNumber from '@/utils/MyNumber';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { addressAtom } from '@/store/claims.atoms';
 
 const Strategy = ({ params }: StrategyParams) => {
-  const { address } = useAccount();
+  const address = useAtomValue(addressAtom);
   const strategies = useAtomValue(strategiesAtom);
   const transactions = useAtomValue(transactionsAtom);
   const [isMounted, setIsMounted] = useState(false);
@@ -282,6 +282,36 @@ const Strategy = ({ params }: StrategyParams) => {
                       <b>Your Holdings: Error</b>
                     </Text>
                   )}
+                  {address &&
+                    balData.data &&
+                    strategy.id == 'xstrk_sensei' &&
+                    profit < 0 &&
+                    profit /
+                      Number(balData.data.amount.toEtherToFixedDecimals(6)) <
+                      -0.01 && (
+                      <Alert
+                        status={'info'}
+                        fontSize={'12px'}
+                        color={'light_grey'}
+                        borderRadius={'10px'}
+                        bg="color2_50p"
+                        padding={'10px'}
+                        marginTop={'10px'}
+                      >
+                        <AlertIcon />
+                        Why did my holdings drop?{' '}
+                        <a
+                          href="https://docs.strkfarm.com/p/faq#q.-why-did-my-holdings-decrease-in-the-xstrk-sensei-strategy"
+                          style={{
+                            marginLeft: '5px',
+                            textDecoration: 'underline',
+                          }}
+                          target="_blank"
+                        >
+                          Learn more
+                        </a>
+                      </Alert>
+                    )}
                 </Box>
               </Card>
             </GridItem>
@@ -331,7 +361,7 @@ const Strategy = ({ params }: StrategyParams) => {
                       {strategy.settings.alerts != undefined && (
                         <VStack mt={'20px'}>
                           {strategy.settings.alerts
-                            .filter((a) => a.tab == 'deposit')
+                            .filter((a) => a.tab == 'deposit' || a.tab == 'all')
                             .map((alert, index) => (
                               <Alert
                                 status={alert.type}
@@ -363,7 +393,9 @@ const Strategy = ({ params }: StrategyParams) => {
                       {strategy.settings.alerts != undefined && (
                         <VStack mt={'20px'}>
                           {strategy.settings.alerts
-                            .filter((a) => a.tab == 'withdraw')
+                            .filter(
+                              (a) => a.tab == 'withdraw' || a.tab == 'all',
+                            )
                             .map((alert, index) => (
                               <Alert
                                 status={alert.type}

@@ -34,13 +34,13 @@ import mixpanel from 'mixpanel-browser';
 import { isMobile } from 'react-device-detect';
 import { FaWallet } from 'react-icons/fa';
 
-interface YieldCardProps {
+export interface YieldCardProps {
   pool: PoolInfo;
   index: number;
   showProtocolName?: boolean;
 }
 
-function getStratCardBg(status: StrategyLiveStatus, index: number) {
+export function getStratCardBg(status: StrategyLiveStatus, index: number) {
   if (status == StrategyLiveStatus.HOT) {
     return '#414173';
   }
@@ -59,7 +59,7 @@ function getStratCardBadgeBg(status: StrategyLiveStatus) {
   return 'bg';
 }
 
-function StrategyInfo(props: YieldCardProps) {
+export function StrategyInfo(props: YieldCardProps) {
   const { pool } = props;
   return (
     <Box>
@@ -197,7 +197,7 @@ function StrategyAPY(props: YieldCardProps) {
   );
 }
 
-function getStrategyWiseHoldingsInfo(
+export function getStrategyWiseHoldingsInfo(
   userData: UserStats | null | undefined,
   id: string,
 ) {
@@ -222,7 +222,7 @@ function getStrategyWiseHoldingsInfo(
   };
 }
 
-function StrategyTVL(props: YieldCardProps) {
+export function StrategyTVL(props: YieldCardProps) {
   const { pool } = props;
   const address = useAtomValue(addressAtom);
   const { data: userData } = useAtomValue(userStatsAtom);
@@ -456,7 +456,7 @@ function StrategyMobileCard(props: YieldCardProps) {
   );
 }
 
-function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
+export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
   return {
     href: pool.protocol.link,
     target: isMobile ? '_self' : '_blank',

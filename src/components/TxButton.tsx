@@ -96,6 +96,9 @@ export default function TxButton(props: TxButtonProps) {
   }, [status, data]);
 
   const disabledText = useMemo(() => {
+    if (props.strategy?.settings.isPaused) {
+      return 'Paused';
+    }
     if (props.justDisableIfNoWalletConnect) {
       if (!address) return props.text;
       return '';

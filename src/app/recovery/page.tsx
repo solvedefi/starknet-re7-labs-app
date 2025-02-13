@@ -83,113 +83,137 @@ export default function Recovery() {
           <Tbody>
             {strkFarmPools.length > 0 && (
               <>
-                {strkFarmPools.map((pool, index) => {
-                  const strat = getPoolInfoFromStrategy(pool);
+                {strkFarmPools
+                  .sort((a, b) => {
+                    if (a.id === 'xstrk_sensei') return -1;
+                    if (b.id === 'xstrk_sensei') return 1;
+                    return 0;
+                  })
+                  .map((pool, index) => {
+                    const strat = getPoolInfoFromStrategy(pool);
 
-                  const holdingsInfo = getStrategyWiseHoldingsInfo(
-                    userData,
-                    strat.pool.id,
-                  );
+                    const holdingsInfo = getStrategyWiseHoldingsInfo(
+                      userData,
+                      strat.pool.id,
+                    );
 
-                  const isPoolLive =
-                    strat.additional &&
-                    strat.additional.tags[0] &&
-                    isLive(strat.additional.tags[0]);
+                    const isPoolLive =
+                      strat.additional &&
+                      strat.additional.tags[0] &&
+                      isLive(strat.additional.tags[0]);
 
-                  return (
-                    <React.Fragment key={index}>
-                      <Tr
-                        color={'white'}
-                        bg={index % 2 === 0 ? 'color1_50p' : 'color2_50p'}
-                        display={{ base: 'none', md: 'table-row' }}
-                        as={'a'}
-                        {...getLinkProps(strat, true)}
-                      >
-                        <Td>
-                          <Box>
-                            <HStack spacing={2}>
-                              <AvatarGroup
-                                size="xs"
-                                max={2}
-                                marginRight={'10px'}
-                              >
-                                {strat.pool.logos.map((logo) => (
-                                  <Avatar key={logo} src={logo} />
-                                ))}
-                              </AvatarGroup>
-                              <Box>
-                                <HStack spacing={2}>
-                                  <Heading size="sm" marginTop={'2px'}>
-                                    {strat.pool.name}
-                                  </Heading>
-                                </HStack>
-                              </Box>
-                            </HStack>
-                          </Box>
-                        </Td>
-                        <Td>
-                          <Box
-                            width={'100%'}
-                            textAlign={'right'}
-                            fontWeight={600}
-                            display={'flex'}
-                            flexDirection={'column'}
-                            justifyContent={'center'}
-                            alignItems={'flex-end'}
-                          >
-                            {address &&
-                              isPoolLive &&
-                              strat.protocol.name === 'STRKFarm' && (
-                                <Text fontSize={'16px'}>
-                                  {holdingsInfo.amount !== 0 ? (
-                                    <Flex
-                                      justifyContent={'flex-end'}
-                                      marginTop={'-5px'}
-                                      width={'100%'}
-                                      opacity={0.9}
-                                      gap={'2'}
-                                    >
+                    return (
+                      <React.Fragment key={index}>
+                        <Tr
+                          color={'white'}
+                          bg={index % 2 === 0 ? 'color1_50p' : 'color2_50p'}
+                          display={{ base: 'none', md: 'table-row' }}
+                          as={'a'}
+                          {...getLinkProps(strat, true)}
+                        >
+                          <Td>
+                            <Box>
+                              <HStack spacing={2}>
+                                <AvatarGroup
+                                  size="xs"
+                                  max={2}
+                                  marginRight={'10px'}
+                                >
+                                  {strat.pool.logos.map((logo) => (
+                                    <Avatar key={logo} src={logo} />
+                                  ))}
+                                </AvatarGroup>
+                                <Box>
+                                  <HStack
+                                    spacing={2}
+                                    display={'flex'}
+                                    alignItems={'center'}
+                                    gap={'2.5'}
+                                  >
+                                    <Heading size="sm" marginTop={'2px'}>
+                                      {strat.pool.name}
+                                    </Heading>
+                                    {strat.pool.id !== 'xstrk_sensei' && (
                                       <Text
-                                        textAlign={'right'}
-                                        fontSize={'16px'}
+                                        px="2"
+                                        py={'1px'}
+                                        borderRadius={'8px'}
+                                        bgColor={'color1_50p'}
+                                        fontSize={'10px'}
+                                        color={'#fff'}
+                                        fontWeight={'bold'}
                                       >
-                                        {getDisplayCurrencyAmount(
-                                          holdingsInfo.amount,
-                                          holdingsInfo.tokenInfo
-                                            .displayDecimals,
-                                        ).toLocaleString()}
+                                        Retired
                                       </Text>
-                                      <Box
-                                        display="flex"
-                                        alignItems="center"
-                                        gap="1"
-                                        fontSize={'14px'}
-                                        opacity={0.6}
+                                    )}
+                                  </HStack>
+                                </Box>
+                              </HStack>
+                            </Box>
+                          </Td>
+                          <Td>
+                            <Box
+                              width={'100%'}
+                              textAlign={'right'}
+                              fontWeight={600}
+                              display={'flex'}
+                              flexDirection={'column'}
+                              justifyContent={'center'}
+                              alignItems={'flex-end'}
+                            >
+                              {address &&
+                                isPoolLive &&
+                                strat.protocol.name === 'STRKFarm' && (
+                                  <Text fontSize={'16px'}>
+                                    {holdingsInfo.amount !== 0 ? (
+                                      <Flex
+                                        justifyContent={'flex-end'}
+                                        marginTop={'-5px'}
+                                        width={'100%'}
+                                        opacity={0.9}
+                                        gap={'2'}
                                       >
-                                        {holdingsInfo.tokenInfo.name}
-                                        <Image
-                                          width={'16px'}
-                                          src={holdingsInfo.tokenInfo.logo}
-                                          ml={'4px'}
-                                          mr={'1px'}
-                                          filter={'grayscale(1)'}
-                                          alt="token-amount"
-                                        />
-                                      </Box>
-                                    </Flex>
-                                  ) : (
-                                    <Text>-</Text>
-                                  )}
-                                </Text>
-                              )}
+                                        <Text
+                                          textAlign={'right'}
+                                          fontSize={'16px'}
+                                        >
+                                          {getDisplayCurrencyAmount(
+                                            holdingsInfo.amount,
+                                            holdingsInfo.tokenInfo
+                                              .displayDecimals,
+                                          ).toLocaleString()}
+                                        </Text>
+                                        <Box
+                                          display="flex"
+                                          alignItems="center"
+                                          gap="1"
+                                          fontSize={'14px'}
+                                          opacity={0.6}
+                                        >
+                                          {holdingsInfo.tokenInfo.name}
+                                          <Image
+                                            width={'16px'}
+                                            src={holdingsInfo.tokenInfo.logo}
+                                            ml={'4px'}
+                                            mr={'1px'}
+                                            filter={'grayscale(1)'}
+                                            alt="token-amount"
+                                          />
+                                        </Box>
+                                      </Flex>
+                                    ) : (
+                                      <Text>-</Text>
+                                    )}
+                                  </Text>
+                                )}
 
-                            {(!isPoolLive || !address) && <Text>-</Text>}
-                          </Box>
-                        </Td>
-                      </Tr>
-                    </React.Fragment>
-                  );
-                })}
+                              {(!isPoolLive || !address) && <Text>-</Text>}
+                            </Box>
+                          </Td>
+                        </Tr>
+                      </React.Fragment>
+                    );
+                  })}
               </>
             )}
           </Tbody>
@@ -211,7 +235,6 @@ export default function Recovery() {
           <Skeleton height="70px" />
         </Stack>
       )} */}
-      Yield
     </Container>
   );
 }

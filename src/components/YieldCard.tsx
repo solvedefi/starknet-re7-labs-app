@@ -110,6 +110,20 @@ export function StrategyInfo(props: YieldCardProps) {
                 </Link>
               </Tooltip>
             )}
+            {pool.pool.id !== 'xstrk_sensei' &&
+              pool.pool.id !== 'endur_strk' && (
+                <Text
+                  px="2"
+                  py={'1px'}
+                  borderRadius={'8px'}
+                  bgColor={'color1_50p'}
+                  fontSize={'10px'}
+                  color={'#fff'}
+                  fontWeight={'bold'}
+                >
+                  Retired
+                </Text>
+              )}
           </HStack>
           {props.showProtocolName && (
             <HStack marginTop={'5px'} spacing={1}>

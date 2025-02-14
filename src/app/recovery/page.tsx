@@ -133,19 +133,6 @@ export default function Recovery() {
                                     <Heading size="sm" marginTop={'2px'}>
                                       {strat.pool.name}
                                     </Heading>
-                                    {strat.pool.id !== 'xstrk_sensei' && (
-                                      <Text
-                                        px="2"
-                                        py={'1px'}
-                                        borderRadius={'8px'}
-                                        bgColor={'color1_50p'}
-                                        fontSize={'10px'}
-                                        color={'#fff'}
-                                        fontWeight={'bold'}
-                                      >
-                                        Retired
-                                      </Text>
-                                    )}
                                   </HStack>
                                 </Box>
                               </HStack>

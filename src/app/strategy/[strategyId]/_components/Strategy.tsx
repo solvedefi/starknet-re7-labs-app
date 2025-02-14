@@ -320,25 +320,27 @@ const Strategy = ({ params }: StrategyParams) => {
                       </Alert>
                     )}
                 </Box>
-                <Alert
-                  fontSize={'14px'}
-                  color={'light_grey'}
-                  borderRadius={'10px'}
-                  bg="color2_50p"
-                  paddingY={'10px'}
-                  px={'14px'}
-                  mt={'5'}
-                >
-                  <AlertIcon />
+                {isRetired && (
+                  <Alert
+                    fontSize={'14px'}
+                    color={'light_grey'}
+                    borderRadius={'10px'}
+                    bg="color2_50p"
+                    paddingY={'10px'}
+                    px={'14px'}
+                    mt={'5'}
+                  >
+                    <AlertIcon />
 
-                  <Text>
-                    This strategy is retired due to zkLend exploit. You can
-                    recover your partial funds from{' '}
-                    <Link href="/recovery" color={'white'}>
-                      here.
-                    </Link>
-                  </Text>
-                </Alert>
+                    <Text>
+                      This strategy is retired due to zkLend exploit. You can
+                      recover your partial funds from{' '}
+                      <Link href="/recovery" color={'white'}>
+                        here.
+                      </Link>
+                    </Text>
+                  </Alert>
+                )}
               </Card>
             </GridItem>
 

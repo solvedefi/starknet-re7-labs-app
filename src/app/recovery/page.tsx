@@ -14,10 +14,11 @@ import { userStatsAtom } from '@/store/utils.atoms';
 import { isLive } from '@/strategies/IStrategy';
 import { getDisplayCurrencyAmount } from '@/utils';
 import {
+  Alert,
+  AlertIcon,
   Avatar,
   AvatarGroup,
   Box,
-  Button,
   Container,
   Flex,
   Heading,
@@ -75,17 +76,60 @@ export default function Recovery() {
             marginBottom={'0px'}
             maxW={'70%'}
           >
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum
-            beatae aspernatur cum?
+            We were able to partially recover the funds from affected strategies
+            due to zkLend exploit. You can check and claim this amount here
           </Text>
         </Box>
-        <Button>Claim</Button>
+
+        <Box
+          display={'flex'}
+          alignItems={'center'}
+          flexDir={'column'}
+          gap={'2'}
+          w={'140px'}
+        >
+          <Box
+            _disabled={{ opacity: 0.4 }}
+            aria-disabled={true}
+            bg={'white'}
+            borderRadius="6px"
+            padding={'6px 20px'}
+            cursor={'pointer'}
+            fontWeight={600}
+          >
+            Claim
+          </Box>
+          <Text color="color2" fontSize={'12px'} textAlign={'center'}>
+            Claims opening soon
+          </Text>
+        </Box>
       </Box>
 
-      <Container width="100%" float={'left'} padding={'0px'} marginTop={'12px'}>
+      <Box my="3">
+        <Alert
+          status={'info'}
+          fontSize={'14px'}
+          color={'#a7a0c1'}
+          borderRadius={'10px'}
+          fontWeight={'medium'}
+          border={'1px solid #633dbf'}
+          bg="color2_50p"
+          paddingY={'10px'}
+          marginTop={'10px'}
+          px={'16px'}
+        >
+          <AlertIcon />
+          Check your eligible claims by connecting your wallet. Please note that
+          approximately 40-50% of your original funds are expected to be
+          available. If you don&apos;t see the expected amount, kindly reach out
+          to us on Telegram before February 20th (End of Day) for assistance.
+        </Alert>
+      </Box>
+
+      <Container width="100%" float={'left'} padding={'0px'} marginTop={'16px'}>
         <Table variant="simple">
           <Thead display={{ base: 'none', md: 'table-header-group' }}>
-            <Tr fontSize={'18px'} color={'white'} bg="bg">
+            <Tr fontSize={'18px'} color={'white'} bg="#000">
               <Th>Strategy name</Th>
               <Th textAlign={'right'}>Amount</Th>
             </Tr>

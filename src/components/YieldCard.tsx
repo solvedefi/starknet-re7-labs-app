@@ -38,6 +38,7 @@ export interface YieldCardProps {
   pool: PoolInfo;
   index: number;
   showProtocolName?: boolean;
+  isRetired?: boolean;
 }
 
 export function getStratCardBg(status: StrategyLiveStatus, index: number) {
@@ -61,6 +62,7 @@ function getStratCardBadgeBg(status: StrategyLiveStatus) {
 
 export function StrategyInfo(props: YieldCardProps) {
   const { pool } = props;
+
   return (
     <Box>
       <HStack spacing={2}>
@@ -110,20 +112,19 @@ export function StrategyInfo(props: YieldCardProps) {
                 </Link>
               </Tooltip>
             )}
-            {pool.pool.id !== 'xstrk_sensei' &&
-              pool.pool.id !== 'endur_strk' && (
-                <Text
-                  px="2"
-                  py={'1px'}
-                  borderRadius={'8px'}
-                  bgColor={'color1_50p'}
-                  fontSize={'10px'}
-                  color={'#fff'}
-                  fontWeight={'bold'}
-                >
-                  Retired
-                </Text>
-              )}
+            {props.isRetired && (
+              <Text
+                px="2"
+                py={'1px'}
+                borderRadius={'8px'}
+                bgColor={'color1_50p'}
+                fontSize={'10px'}
+                color={'#fff'}
+                fontWeight={'bold'}
+              >
+                Retired
+              </Text>
+            )}
           </HStack>
           {props.showProtocolName && (
             <HStack marginTop={'5px'} spacing={1}>
@@ -185,27 +186,37 @@ function getAPRWithToolTip(pool: PoolInfo) {
 
 function StrategyAPY(props: YieldCardProps) {
   const { pool } = props;
+
   return (
     <Box width={'100%'} marginBottom={'5px'}>
-      {getAPRWithToolTip(pool)}
-      {pool.additional && pool.additional.leverage && (
-        <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
-          <Box width={'100%'}>
-            <Box float={'right'} display={'flex'} fontSize={'13px'}>
-              <Text color="#FCC01E" textAlign={'right'}>
-                ⚡
-              </Text>
-              <Text
-                width="100%"
-                color="cyan"
-                textAlign={'right'}
-                fontWeight={600}
-              >
-                {pool.additional.leverage.toFixed(1)}X
-              </Text>
-            </Box>
-          </Box>
-        </Tooltip>
+      {pool.isRetired ? (
+        <Text ml="auto" w="fit-content" mr="6">
+          -
+        </Text>
+      ) : (
+        <>
+          {getAPRWithToolTip(pool)}
+
+          {pool.additional && pool.additional.leverage && (
+            <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
+              <Box width={'100%'}>
+                <Box float={'right'} display={'flex'} fontSize={'13px'}>
+                  <Text color="#FCC01E" textAlign={'right'}>
+                    ⚡
+                  </Text>
+                  <Text
+                    width="100%"
+                    color="cyan"
+                    textAlign={'right'}
+                    fontWeight={600}
+                  >
+                    {pool.additional.leverage.toFixed(1)}X
+                  </Text>
+                </Box>
+              </Box>
+            </Tooltip>
+          )}
+        </>
       )}
     </Box>
   );
@@ -247,6 +258,7 @@ export function StrategyTVL(props: YieldCardProps) {
     pool.additional &&
     pool.additional.tags[0] &&
     isLive(pool.additional.tags[0]);
+
   return (
     <Box
       width={'100%'}
@@ -487,13 +499,17 @@ export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
   };
 }
 export default function YieldCard(props: YieldCardProps) {
-  const { pool, index } = props;
+  const { pool, index, isRetired } = props;
 
   return (
     <>
       <Tr
         color={'white'}
-        bg={getStratCardBg(pool.additional.tags[0], index)}
+        bg={
+          pool.isRetired || isRetired
+            ? '#1d1d2c'
+            : getStratCardBg(pool.additional.tags[0], index)
+        }
         display={{ base: 'none', md: 'table-row' }}
         as={'a'}
         {...getLinkProps(pool, props.showProtocolName)}
@@ -503,18 +519,37 @@ export default function YieldCard(props: YieldCardProps) {
             pool={pool}
             index={index}
             showProtocolName={props.showProtocolName}
+            isRetired={props.isRetired}
           />
         </Td>
         <Td>
-          <StrategyAPY pool={pool} index={index} />
+          {pool.isRetired || isRetired ? (
+            <Text ml="auto" w="fit-content" mr="2">
+              -
+            </Text>
+          ) : (
+            <StrategyAPY pool={pool} index={index} />
+          )}
         </Td>
         <Td>
-          {pool.additional?.riskFactor
-            ? GetRiskLevel(pool.additional?.riskFactor)
-            : '-'}
+          {pool.isRetired || isRetired ? (
+            <Text ml="auto" w="fit-content" mr="2">
+              -
+            </Text>
+          ) : pool.additional?.riskFactor ? (
+            GetRiskLevel(pool.additional?.riskFactor)
+          ) : (
+            '-'
+          )}
         </Td>
         <Td>
-          <StrategyTVL pool={pool} index={index} />
+          {pool.isRetired || isRetired ? (
+            <Text ml="auto" w="fit-content" mr="2">
+              -
+            </Text>
+          ) : (
+            <StrategyTVL pool={pool} index={index} />
+          )}
         </Td>
       </Tr>
       <StrategyMobileCard
@@ -531,7 +566,14 @@ export function YieldStrategyCard(props: {
   index: number;
 }) {
   const strat = getPoolInfoFromStrategy(props.strat);
-  return <YieldCard pool={strat} index={props.index} showProtocolName={true} />;
+  return (
+    <YieldCard
+      pool={strat}
+      index={props.index}
+      showProtocolName={true}
+      isRetired={props.strat.isRetired}
+    />
+  );
 }
 
 export function HeaderSorter(props: {

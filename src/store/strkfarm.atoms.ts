@@ -1,4 +1,8 @@
 import CONSTANTS from '@/constants';
+import strkfarmLogo from '@public/logo.png';
+import { atom } from 'jotai';
+import { atomWithQuery, AtomWithQueryResult } from 'jotai-tanstack-query';
+import { IDapp } from './IDapp.store';
 import {
   APRSplit,
   Category,
@@ -8,10 +12,6 @@ import {
   PoolType,
   ProtocolAtoms,
 } from './pools';
-import { atom } from 'jotai';
-import { IDapp } from './IDapp.store';
-import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
-import strkfarmLogo from '@public/logo.png';
 import { getLiveStatusEnum } from './strategies.atoms';
 
 export interface STRKFarmStrategyAPIResult {
@@ -29,6 +29,7 @@ export interface STRKFarmStrategyAPIResult {
   riskFactor: number;
   logo: string;
   isAudited: boolean;
+  isRetired: boolean;
   actions: {
     name: string;
     protocol: {

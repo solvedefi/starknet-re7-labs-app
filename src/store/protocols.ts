@@ -176,7 +176,14 @@ export const allPoolsAtomUnSorted = atom((get) => {
   return PROTOCOLS.reduce(
     (_pools, p) => _pools.concat(get(p.atoms.pools)),
     pools,
-  );
+  ).map((pool) => {
+    if (pool.pool.id === 'xstrk_sensei' || pool.pool.id === 'endur_strk') {
+      pool.isRetired = false;
+    } else {
+      pool.isRetired = true;
+    }
+    return pool;
+  });
 });
 
 export function getPoolInfoFromStrategy(

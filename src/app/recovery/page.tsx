@@ -44,7 +44,16 @@ export default function Recovery() {
   const strkFarmPools = React.useMemo(() => {
     if (!strkFarmPoolsRes || !strkFarmPoolsRes.data)
       return [] as STRKFarmStrategyAPIResult[];
-    return strkFarmPoolsRes.data.strategies.sort((a, b) => b.apy - a.apy);
+    return strkFarmPoolsRes.data.strategies
+      .sort((a, b) => b.apy - a.apy)
+      .map((pool) => {
+        if (pool.id === 'xstrk_sensei' || pool.id === 'endur_strk') {
+          pool.isRetired = true;
+        } else {
+          pool.isRetired = false;
+        }
+        return pool;
+      });
   }, [strkFarmPoolsRes]);
 
   return (
@@ -72,6 +81,7 @@ export default function Recovery() {
         </Box>
         <Button>Claim</Button>
       </Box>
+
       <Container width="100%" float={'left'} padding={'0px'} marginTop={'12px'}>
         <Table variant="simple">
           <Thead display={{ base: 'none', md: 'table-header-group' }}>

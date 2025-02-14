@@ -9,20 +9,25 @@ export async function GET(_req: Request) {
   console.log('strategies', strategies.length);
 
   const values = strategies.map(async (strategy, index) => {
-    let retry = 0;
-    while (retry < 3) {
-      try {
-        const tvlInfo = await strategy.getTVL();
-        console.log('tvlInfo', index, tvlInfo);
-        return tvlInfo.usdValue;
-      } catch (e) {
-        console.log(e);
-        if (retry < 3) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          retry++;
+    if (strategy.id === 'xstrk_sensei' || strategy.id === 'endur_strk') {
+      let retry = 0;
+      while (retry < 3) {
+        try {
+          const tvlInfo = await strategy.getTVL();
+          console.log('tvlInfo', index, tvlInfo);
+          return tvlInfo.usdValue;
+        } catch (e) {
+          console.log(e);
+          if (retry < 3) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            retry++;
+          }
         }
       }
+    } else {
+      return 0;
     }
+
     throw new Error('Failed to fetch data');
   });
 

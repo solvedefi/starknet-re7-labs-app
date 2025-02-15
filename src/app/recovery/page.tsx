@@ -1,29 +1,14 @@
 'use client';
 
 import {
-  getLinkProps,
-  getStrategyWiseHoldingsInfo,
-} from '@/components/YieldCard';
-import { addressAtom } from '@/store/claims.atoms';
-import { getPoolInfoFromStrategy } from '@/store/protocols';
-import {
-  STRKFarmBaseAPYsAtom,
-  STRKFarmStrategyAPIResult,
-} from '@/store/strkfarm.atoms';
-import { userStatsAtom } from '@/store/utils.atoms';
-import { isLive } from '@/strategies/IStrategy';
-import { getDisplayCurrencyAmount } from '@/utils';
-import {
   Alert,
   AlertIcon,
   Avatar,
   AvatarGroup,
   Box,
   Container,
-  Flex,
   Heading,
   HStack,
-  Image,
   Skeleton,
   Stack,
   Table,
@@ -34,28 +19,107 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
+import { useProvider } from '@starknet-react/core';
 import { useAtomValue } from 'jotai';
 import React from 'react';
+
+import strategyAbi from '@/abi/strategy.abi.json';
+import {
+  getLinkProps,
+  getStrategyWiseHoldingsInfo,
+} from '@/components/YieldCard';
+import CONSTANTS from '@/constants';
+import { addressAtom } from '@/store/claims.atoms';
+import { getPoolInfoFromStrategy } from '@/store/protocols';
+import { STRKFarmBaseAPYsAtom } from '@/store/strkfarm.atoms';
+import { userStatsAtom } from '@/store/utils.atoms';
+import { isLive } from '@/strategies/IStrategy';
+import MyNumber from '@/utils/MyNumber';
+import { Contract } from 'starknet';
+
+const STRATEGY_ADDRESSES = {
+  strk_sensei: CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
+  eth_sensei: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
+  usdc_sensei: CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
+  eth_sensei_xl: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
+};
 
 export default function Recovery() {
   const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
   const { data: userData } = useAtomValue(userStatsAtom);
   const address = useAtomValue(addressAtom);
 
+  const [balances, setBalances] = React.useState({
+    strk_sensei: '0',
+    eth_sensei: '0',
+    usdc_sensei: '0',
+    eth_sensei_xl: '0',
+  });
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const { provider } = useProvider();
+
   const strkFarmPools = React.useMemo(() => {
-    if (!strkFarmPoolsRes || !strkFarmPoolsRes.data)
-      return [] as STRKFarmStrategyAPIResult[];
+    if (!strkFarmPoolsRes?.data?.strategies || !address) return [];
+
     return strkFarmPoolsRes.data.strategies
-      .sort((a, b) => b.apy - a.apy)
-      .map((pool) => {
-        if (pool.id === 'xstrk_sensei' || pool.id === 'endur_strk') {
-          pool.isRetired = true;
-        } else {
-          pool.isRetired = false;
-        }
-        return pool;
-      });
-  }, [strkFarmPoolsRes]);
+      .map((pool) => ({
+        ...pool,
+        isRetired: ['xstrk_sensei', 'endur_strk'].includes(pool.id),
+      }))
+      .sort((a, b) =>
+        a.id === 'xstrk_sensei'
+          ? -1
+          : b.id === 'xstrk_sensei'
+            ? 1
+            : b.apy - a.apy,
+      );
+  }, [address, strkFarmPoolsRes]);
+
+  React.useEffect(() => {
+    if (!strkFarmPoolsRes?.data?.strategies || !address) return;
+
+    (async () => {
+      try {
+        setIsLoading(true);
+
+        const contractCalls = Object.entries(STRATEGY_ADDRESSES).map(
+          async ([key, address]) => {
+            const contract = new Contract(strategyAbi, address, provider);
+            const res = await contract.call('nostra_position', [address]);
+            return {
+              key,
+              balance: new MyNumber(res.toString(), 18).toEtherToFixedDecimals(
+                2,
+              ),
+            };
+          },
+        );
+
+        const results = await Promise.all(contractCalls);
+        const updatedBalances = results.reduce(
+          (acc, { key, balance }) => ({ ...acc, [key]: balance }),
+          { ...balances },
+        );
+
+        setBalances(updatedBalances);
+      } catch (error) {
+        setIsLoading(false);
+        console.error('Error fetching balances:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, provider, strkFarmPoolsRes]);
+
+  const poolAmounts: Record<string, string> = {
+    strk_sensei: balances.strk_sensei,
+    eth_sensei: balances.eth_sensei,
+    usdc_sensei: balances.usdc_sensei,
+    eth_sensei_xl: balances.eth_sensei_xl,
+  };
 
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
@@ -202,50 +266,15 @@ export default function Recovery() {
                               justifyContent={'center'}
                               alignItems={'flex-end'}
                             >
+                              {isLoading && <Skeleton height="20px" />}
+
                               {address &&
                                 isPoolLive &&
-                                strat.protocol.name === 'STRKFarm' && (
-                                  <Text fontSize={'16px'}>
-                                    {holdingsInfo.amount !== 0 ? (
-                                      <Flex
-                                        justifyContent={'flex-end'}
-                                        marginTop={'-5px'}
-                                        width={'100%'}
-                                        opacity={0.9}
-                                        gap={'2'}
-                                      >
-                                        <Text
-                                          textAlign={'right'}
-                                          fontSize={'16px'}
-                                        >
-                                          {getDisplayCurrencyAmount(
-                                            holdingsInfo.amount,
-                                            holdingsInfo.tokenInfo
-                                              .displayDecimals,
-                                          ).toLocaleString()}
-                                        </Text>
-                                        <Box
-                                          display="flex"
-                                          alignItems="center"
-                                          gap="1"
-                                          fontSize={'14px'}
-                                          opacity={0.6}
-                                        >
-                                          {holdingsInfo.tokenInfo.name}
-                                          <Image
-                                            width={'16px'}
-                                            src={holdingsInfo.tokenInfo.logo}
-                                            ml={'4px'}
-                                            mr={'1px'}
-                                            filter={'grayscale(1)'}
-                                            alt="token-amount"
-                                          />
-                                        </Box>
-                                      </Flex>
-                                    ) : (
-                                      <Text>-</Text>
-                                    )}
-                                  </Text>
+                                strat.protocol.name === 'STRKFarm' &&
+                                !isLoading && (
+                                  <Box fontSize={'16px'}>
+                                    {poolAmounts[pool.id] ?? <Text>-</Text>}
+                                  </Box>
                                 )}
 
                               {(!isPoolLive || !address) && <Text>-</Text>}
@@ -268,14 +297,6 @@ export default function Recovery() {
           </Stack>
         )}
       </Container>
-      {/* {strkFarmPools.length === 0 && (
-        <Stack>
-          <Skeleton height="70px" />
-          <Skeleton height="70px" />
-          <Skeleton height="70px" />
-          <Skeleton height="70px" />
-        </Stack>
-      )} */}
     </Container>
   );
 }

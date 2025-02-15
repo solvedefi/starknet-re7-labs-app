@@ -31,10 +31,11 @@ import mixpanel from 'mixpanel-browser';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Deposit from '@/components/Deposit';
-import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
-import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import { transactionsAtom, TxHistoryAtom } from '@/store/transactions.atom';
 import HarvestTime from '@/components/HarvestTime';
+import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
+import { addressAtom } from '@/store/claims.atoms';
+import { strategiesAtom, StrategyInfo } from '@/store/strategies.atoms';
+import { transactionsAtom, TxHistoryAtom } from '@/store/transactions.atom';
 import {
   capitalize,
   getTokenInfoFromAddr,
@@ -42,10 +43,9 @@ import {
   shortAddress,
   timeAgo,
 } from '@/utils';
-import { StrategyParams } from '../page';
 import MyNumber from '@/utils/MyNumber';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
-import { addressAtom } from '@/store/claims.atoms';
+import { StrategyParams } from '../page';
 
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
@@ -161,6 +161,11 @@ const Strategy = ({ params }: StrategyParams) => {
 
   if (!isMounted) return null;
 
+  const isRetired =
+    strategy?.id === 'xstrk_sensei' || strategy?.id === 'endur_xstrk'
+      ? false
+      : true;
+
   return (
     <>
       <Flex marginBottom={'10px'}>
@@ -180,7 +185,9 @@ const Strategy = ({ params }: StrategyParams) => {
           <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
             <GridItem display="flex" colSpan={colSpan1}>
               <Card width="100%" padding={'15px'} color="white" bg="highlight">
-                <HarvestTime strategy={strategy} balData={balData} />
+                {!isRetired && (
+                  <HarvestTime strategy={strategy} balData={balData} />
+                )}
                 <Box display={{ base: 'block', md: 'flex' }} marginTop={'10px'}>
                   <Box width={{ base: '100%', md: '100%' }}>
                     <Text
@@ -242,13 +249,13 @@ const Strategy = ({ params }: StrategyParams) => {
                                     balData.data.tokenInfo?.displayDecimals ||
                                       2,
                                   ),
-                                ) == 0
+                                ) === 0 || isRetired
                                 ? '-'
                                 : `${balData.data.amount.toEtherToFixedDecimals(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
                               : 'Connect wallet'}
                           </Text>
                         </Box>
-                        <Tooltip label="Life time earnings">
+                        <Tooltip label={!isRetired && 'Life time earnings'}>
                           <Box>
                             <Text textAlign={'right'} fontWeight={'none'}>
                               <b>Net earnings</b>
@@ -257,7 +264,7 @@ const Strategy = ({ params }: StrategyParams) => {
                               textAlign={'right'}
                               color={profit >= 0 ? 'cyan' : 'red'}
                             >
-                              {address && profit != 0
+                              {address && profit !== 0 && !isRetired
                                 ? `${profit?.toFixed(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
                                 : '-'}
                             </Text>
@@ -313,6 +320,27 @@ const Strategy = ({ params }: StrategyParams) => {
                       </Alert>
                     )}
                 </Box>
+                {isRetired && (
+                  <Alert
+                    fontSize={'14px'}
+                    color={'light_grey'}
+                    borderRadius={'10px'}
+                    bg="color2_50p"
+                    paddingY={'10px'}
+                    px={'14px'}
+                    mt={'5'}
+                  >
+                    <AlertIcon />
+
+                    <Text>
+                      This strategy is retired due to zkLend exploit. You can
+                      recover your partial funds from{' '}
+                      <Link href="/recovery" color={'white'}>
+                        here.
+                      </Link>
+                    </Text>
+                  </Alert>
+                )}
               </Card>
             </GridItem>
 
@@ -357,6 +385,7 @@ const Strategy = ({ params }: StrategyParams) => {
                         strategy={strategy}
                         buttonText="Deposit"
                         callsInfo={strategy.depositMethods}
+                        isRetired={isRetired}
                       />
                       {strategy.settings.alerts != undefined && (
                         <VStack mt={'20px'}>
@@ -389,6 +418,7 @@ const Strategy = ({ params }: StrategyParams) => {
                         strategy={strategy}
                         buttonText="Redeem"
                         callsInfo={strategy.withdrawMethods}
+                        isRetired={isRetired}
                       />
                       {strategy.settings.alerts != undefined && (
                         <VStack mt={'20px'}>

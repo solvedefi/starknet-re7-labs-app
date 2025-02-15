@@ -28,7 +28,17 @@ export default function Strategies() {
   const strkFarmPools = useMemo(() => {
     if (!strkFarmPoolsRes || !strkFarmPoolsRes.data)
       return [] as STRKFarmStrategyAPIResult[];
-    return strkFarmPoolsRes.data.strategies.sort((a, b) => b.apy - a.apy);
+    return strkFarmPoolsRes.data.strategies
+      .sort((a, b) => b.apy - a.apy)
+      .sort((a, _b) => (a.isRetired ? 1 : -1))
+      .map((pool) => {
+        if (pool.id === 'xstrk_sensei' || pool.id === 'endur_strk') {
+          pool.isRetired = false;
+        } else {
+          pool.isRetired = true;
+        }
+        return pool;
+      });
   }, [strkFarmPoolsRes]);
 
   const _filteredPools = useAtomValue(filteredPools);

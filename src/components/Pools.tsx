@@ -185,19 +185,16 @@ export default function Pools() {
           <Tbody>
             {allPools.length > 0 && (
               <>
-                {pools
-                  .sort((a, _b) => (a.isRetired ? 1 : -1))
-                  .map((pool, index) => {
-                    return (
-                      <YieldCard
-                        key={pool.pool.id}
-                        pool={pool}
-                        index={index}
-                        showProtocolName={true}
-                        isRetired={pool.isRetired}
-                      />
-                    );
-                  })}
+                {pools.map((pool, index) => {
+                  return (
+                    <YieldCard
+                      key={pool.pool.id}
+                      pool={pool}
+                      index={index}
+                      showProtocolName={true}
+                    />
+                  );
+                })}
               </>
             )}
           </Tbody>

@@ -44,7 +44,6 @@ interface DepositProps {
   // ? @dev ensure below actionType is updated accordingly
   buttonText: 'Deposit' | 'Redeem';
   callsInfo: (inputs: DepositActionInputs) => IStrategyActionHook[];
-  isRetired?: boolean;
 }
 
 export default function Deposit(props: DepositProps) {
@@ -340,7 +339,7 @@ export default function Deposit(props: DepositProps) {
         />
       </Center>
 
-      {!props.isRetired && (
+      {!props.strategy.isRetired() && (
         <Box width="100%" marginTop={'15px'}>
           <Flex justifyContent="space-between">
             <Text fontSize={'12px'} color="color2" fontWeight={'bold'}>

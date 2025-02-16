@@ -54,7 +54,6 @@ export interface PoolInfo extends PoolMetadata {
   category: Category[];
   type: PoolType;
   isLoading?: boolean;
-  isRetired?: boolean;
   additional: {
     leverage?: number;
     riskFactor: number;
@@ -62,6 +61,10 @@ export interface PoolInfo extends PoolMetadata {
     isAudited: boolean;
     is_promoted?: boolean;
   };
+}
+
+export function isPoolRetired(pool: PoolInfo) {
+  return pool.additional.tags.includes(StrategyLiveStatus.RETIRED);
 }
 
 export function getDefaultPoolInfo(): PoolInfo {

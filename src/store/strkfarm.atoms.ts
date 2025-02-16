@@ -29,7 +29,6 @@ export interface STRKFarmStrategyAPIResult {
   riskFactor: number;
   logo: string;
   isAudited: boolean;
-  isRetired: boolean;
   actions: {
     name: string;
     protocol: {

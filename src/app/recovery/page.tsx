@@ -3,12 +3,8 @@
 import {
   Alert,
   AlertIcon,
-  Avatar,
-  AvatarGroup,
   Box,
   Container,
-  Heading,
-  HStack,
   Skeleton,
   Stack,
   Table,
@@ -21,33 +17,49 @@ import {
 } from '@chakra-ui/react';
 import { useProvider } from '@starknet-react/core';
 import { useAtomValue } from 'jotai';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import strategyAbi from '@/abi/strategy.abi.json';
-import {
-  getLinkProps,
-  getStrategyWiseHoldingsInfo,
-} from '@/components/YieldCard';
 import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
-import { getPoolInfoFromStrategy } from '@/store/protocols';
-import { STRKFarmBaseAPYsAtom } from '@/store/strkfarm.atoms';
-import { userStatsAtom } from '@/store/utils.atoms';
-import { isLive } from '@/strategies/IStrategy';
 import MyNumber from '@/utils/MyNumber';
 import { Contract } from 'starknet';
+import { getDisplayCurrencyAmount } from '@/utils';
 
-const STRATEGY_ADDRESSES = {
-  strk_sensei: CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
-  eth_sensei: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
-  usdc_sensei: CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
-  eth_sensei_xl: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
+const STRATEGY_ADDRESSES: {
+  [key: string]: {
+    address: string;
+    token: string;
+    decimals: number;
+  };
+} = {
+  strk_sensei: {
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
+    token: 'STRK',
+    decimals: 18,
+  },
+  eth_sensei: {
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
+    token: 'ETH',
+    decimals: 18,
+  },
+  usdc_sensei: {
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
+    token: 'USDC',
+    decimals: 6,
+  },
+  eth_sensei_xl: {
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
+    token: 'ETH',
+    decimals: 18,
+  },
 };
 
 export default function Recovery() {
-  const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
-  const { data: userData } = useAtomValue(userStatsAtom);
-  const address = useAtomValue(addressAtom);
+  const _address = useAtomValue(addressAtom);
+  const address = useMemo(() => {
+    return _address || '';
+  }, [_address]);
 
   const [balances, setBalances] = React.useState({
     strk_sensei: '0',
@@ -59,39 +71,26 @@ export default function Recovery() {
 
   const { provider } = useProvider();
 
-  const strkFarmPools = React.useMemo(() => {
-    if (!strkFarmPoolsRes?.data?.strategies || !address) return [];
-
-    return strkFarmPoolsRes.data.strategies
-      .map((pool) => ({
-        ...pool,
-        isRetired: ['xstrk_sensei', 'endur_strk'].includes(pool.id),
-      }))
-      .sort((a, b) =>
-        a.id === 'xstrk_sensei'
-          ? -1
-          : b.id === 'xstrk_sensei'
-            ? 1
-            : b.apy - a.apy,
-      );
-  }, [address, strkFarmPoolsRes]);
-
   React.useEffect(() => {
-    if (!strkFarmPoolsRes?.data?.strategies || !address) return;
-
     (async () => {
       try {
         setIsLoading(true);
 
         const contractCalls = Object.entries(STRATEGY_ADDRESSES).map(
-          async ([key, address]) => {
-            const contract = new Contract(strategyAbi, address, provider);
+          async ([key, strategyInfo]) => {
+            const contract = new Contract(
+              strategyAbi,
+              strategyInfo.address,
+              provider,
+            );
             const res = await contract.call('nostra_position', [address]);
+            console.log(`revoery`, strategyInfo.address, address, res);
             return {
               key,
-              balance: new MyNumber(res.toString(), 18).toEtherToFixedDecimals(
-                2,
-              ),
+              balance: new MyNumber(
+                res.toString(),
+                strategyInfo.decimals,
+              ).toEtherToFixedDecimals(4),
             };
           },
         );
@@ -101,30 +100,49 @@ export default function Recovery() {
           (acc, { key, balance }) => ({ ...acc, [key]: balance }),
           { ...balances },
         );
-
+        console.log('revoery2', updatedBalances);
         setBalances(updatedBalances);
       } catch (error) {
         setIsLoading(false);
-        console.error('Error fetching balances:', error);
+        console.error('revoery Error fetching balances:', error);
       } finally {
         setIsLoading(false);
       }
     })();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address, provider, strkFarmPoolsRes]);
+  }, [address, provider]);
 
-  const poolAmounts: Record<string, string> = {
-    strk_sensei: balances.strk_sensei,
-    eth_sensei: balances.eth_sensei,
-    usdc_sensei: balances.usdc_sensei,
-    eth_sensei_xl: balances.eth_sensei_xl,
-  };
+  const poolAmounts: Record<string, string> = useMemo(
+    () => ({
+      strk_sensei: balances.strk_sensei,
+      eth_sensei: balances.eth_sensei,
+      usdc_sensei: balances.usdc_sensei,
+      eth_sensei_xl: balances.eth_sensei_xl,
+    }),
+    [balances],
+  );
 
+  const sumAmounts = useMemo(() => {
+    return {
+      USDC: poolAmounts.usdc_sensei,
+      ETH: Number(poolAmounts.eth_sensei) + Number(poolAmounts.eth_sensei_xl),
+      STRK: Number(poolAmounts.strk_sensei),
+    };
+  }, [poolAmounts]);
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
-        <Box padding={'15px 0px'} borderRadius="10px" margin={'20px 0px 10px'}>
+      <Box
+        display={{ base: 'block', md: 'flex' }}
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        <Box
+          padding={'15px 0px'}
+          borderRadius="10px"
+          margin={'20px 0px 10px'}
+          width={{ base: '100%', md: '70%' }}
+        >
           <Text
             fontSize={{ base: '28px', md: '35px' }}
             lineHeight={'30px'}
@@ -141,7 +159,7 @@ export default function Recovery() {
             maxW={'70%'}
           >
             We were able to partially recover the funds from affected strategies
-            due to zkLend exploit. You can check and claim this amount here
+            after the zkLend exploit. You can check and claim this amount here.
           </Text>
         </Box>
 
@@ -151,6 +169,7 @@ export default function Recovery() {
           flexDir={'column'}
           gap={'2'}
           w={'140px'}
+          width={{ base: '100%', md: '30%' }}
         >
           <Box
             _disabled={{ opacity: 0.4 }}
@@ -191,106 +210,91 @@ export default function Recovery() {
       </Box>
 
       <Container width="100%" float={'left'} padding={'0px'} marginTop={'16px'}>
-        <Table variant="simple">
-          <Thead display={{ base: 'none', md: 'table-header-group' }}>
-            <Tr fontSize={'18px'} color={'white'} bg="#000">
-              <Th>Strategy name</Th>
-              <Th textAlign={'right'}>Amount</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {strkFarmPools.length > 0 && (
-              <>
-                {strkFarmPools
-                  .sort((a, b) => {
-                    if (a.id === 'xstrk_sensei') return -1;
-                    if (b.id === 'xstrk_sensei') return 1;
-                    return 0;
-                  })
-                  .map((pool, index) => {
-                    const strat = getPoolInfoFromStrategy(pool);
+        {(!isLoading || !address) && (
+          <Table variant="simple">
+            <Thead display={{ base: 'none', md: 'table-header-group' }}>
+              <Tr fontSize={'18px'} color={'white'} bg="#000">
+                <Th textAlign={'left'}>Amount</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              <Tr color={'white'} bg={'color1_50p'}>
+                <Td>
+                  <Box
+                    width={'100%'}
+                    textAlign={'left'}
+                    fontWeight={600}
+                    display={'flex'}
+                    flexDirection={'column'}
+                    justifyContent={'center'}
+                  >
+                    {isLoading && <Skeleton height="20px" />}
 
-                    const holdingsInfo = getStrategyWiseHoldingsInfo(
-                      userData,
-                      strat.pool.id,
-                    );
+                    {address && !isLoading && (
+                      <Box fontSize={'16px'}>
+                        <Text>
+                          {getDisplayCurrencyAmount(sumAmounts.ETH, 4)} ETH
+                        </Text>
+                      </Box>
+                    )}
 
-                    const isPoolLive =
-                      strat.additional &&
-                      strat.additional.tags[0] &&
-                      isLive(strat.additional.tags[0]);
+                    {!address && <Text>-</Text>}
+                  </Box>
+                </Td>
+              </Tr>
+              <Tr color={'white'} bg={'color2_50p'}>
+                <Td>
+                  <Box
+                    width={'100%'}
+                    textAlign={'left'}
+                    fontWeight={600}
+                    display={'flex'}
+                    flexDirection={'column'}
+                    justifyContent={'center'}
+                  >
+                    {isLoading && <Skeleton height="20px" />}
 
-                    return (
-                      <React.Fragment key={index}>
-                        <Tr
-                          color={'white'}
-                          bg={index % 2 === 0 ? 'color1_50p' : 'color2_50p'}
-                          display={{ base: 'none', md: 'table-row' }}
-                          as={'a'}
-                          {...getLinkProps(strat, true)}
-                        >
-                          <Td>
-                            <Box>
-                              <HStack spacing={2}>
-                                <AvatarGroup
-                                  size="xs"
-                                  max={2}
-                                  marginRight={'10px'}
-                                >
-                                  {strat.pool.logos.map((logo) => (
-                                    <Avatar key={logo} src={logo} />
-                                  ))}
-                                </AvatarGroup>
-                                <Box>
-                                  <HStack
-                                    spacing={2}
-                                    display={'flex'}
-                                    alignItems={'center'}
-                                    gap={'2.5'}
-                                  >
-                                    <Heading size="sm" marginTop={'2px'}>
-                                      {strat.pool.name}
-                                    </Heading>
-                                  </HStack>
-                                </Box>
-                              </HStack>
-                            </Box>
-                          </Td>
-                          <Td>
-                            <Box
-                              width={'100%'}
-                              textAlign={'right'}
-                              fontWeight={600}
-                              display={'flex'}
-                              flexDirection={'column'}
-                              justifyContent={'center'}
-                              alignItems={'flex-end'}
-                            >
-                              {isLoading && <Skeleton height="20px" />}
+                    {address && !isLoading && (
+                      <Box fontSize={'16px'}>
+                        <Text>
+                          {getDisplayCurrencyAmount(sumAmounts.USDC, 2)} USDC
+                        </Text>
+                      </Box>
+                    )}
 
-                              {address &&
-                                isPoolLive &&
-                                strat.protocol.name === 'STRKFarm' &&
-                                !isLoading && (
-                                  <Box fontSize={'16px'}>
-                                    {poolAmounts[pool.id] ?? <Text>-</Text>}
-                                  </Box>
-                                )}
+                    {!address && <Text>-</Text>}
+                  </Box>
+                </Td>
+              </Tr>
+              <Tr color={'white'} bg={'color1_50p'}>
+                <Td>
+                  <Box
+                    width={'100%'}
+                    textAlign={'left'}
+                    fontWeight={600}
+                    display={'flex'}
+                    flexDirection={'column'}
+                    justifyContent={'center'}
+                  >
+                    {isLoading && <Skeleton height="20px" />}
 
-                              {(!isPoolLive || !address) && <Text>-</Text>}
-                            </Box>
-                          </Td>
-                        </Tr>
-                      </React.Fragment>
-                    );
-                  })}
-              </>
-            )}
-          </Tbody>
-        </Table>
-        {strkFarmPools.length === 0 && (
+                    {address && !isLoading && (
+                      <Box fontSize={'16px'}>
+                        <Text>
+                          {getDisplayCurrencyAmount(sumAmounts.STRK, 2)} STRK
+                        </Text>
+                      </Box>
+                    )}
+
+                    {!address && <Text>-</Text>}
+                  </Box>
+                </Td>
+              </Tr>
+            </Tbody>
+          </Table>
+        )}
+        {isLoading && address && (
           <Stack>
-            <Skeleton height="70px" />
             <Skeleton height="70px" />
             <Skeleton height="70px" />
             <Skeleton height="70px" />

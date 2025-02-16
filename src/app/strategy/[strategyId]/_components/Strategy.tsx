@@ -161,11 +161,6 @@ const Strategy = ({ params }: StrategyParams) => {
 
   if (!isMounted) return null;
 
-  const isRetired =
-    strategy?.id === 'xstrk_sensei' || strategy?.id === 'endur_xstrk'
-      ? false
-      : true;
-
   return (
     <>
       <Flex marginBottom={'10px'}>
@@ -185,7 +180,7 @@ const Strategy = ({ params }: StrategyParams) => {
           <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
             <GridItem display="flex" colSpan={colSpan1}>
               <Card width="100%" padding={'15px'} color="white" bg="highlight">
-                {!isRetired && (
+                {!strategy?.isRetired() && (
                   <HarvestTime strategy={strategy} balData={balData} />
                 )}
                 <Box display={{ base: 'block', md: 'flex' }} marginTop={'10px'}>
@@ -249,13 +244,15 @@ const Strategy = ({ params }: StrategyParams) => {
                                     balData.data.tokenInfo?.displayDecimals ||
                                       2,
                                   ),
-                                ) === 0 || isRetired
+                                ) === 0 || strategy?.isRetired()
                                 ? '-'
                                 : `${balData.data.amount.toEtherToFixedDecimals(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
                               : 'Connect wallet'}
                           </Text>
                         </Box>
-                        <Tooltip label={!isRetired && 'Life time earnings'}>
+                        <Tooltip
+                          label={!strategy?.isRetired() && 'Life time earnings'}
+                        >
                           <Box>
                             <Text textAlign={'right'} fontWeight={'none'}>
                               <b>Net earnings</b>
@@ -264,7 +261,7 @@ const Strategy = ({ params }: StrategyParams) => {
                               textAlign={'right'}
                               color={profit >= 0 ? 'cyan' : 'red'}
                             >
-                              {address && profit !== 0 && !isRetired
+                              {address && profit !== 0 && !strategy?.isRetired()
                                 ? `${profit?.toFixed(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
                                 : '-'}
                             </Text>
@@ -320,7 +317,7 @@ const Strategy = ({ params }: StrategyParams) => {
                       </Alert>
                     )}
                 </Box>
-                {isRetired && (
+                {strategy?.isRetired() && (
                   <Alert
                     fontSize={'14px'}
                     color={'light_grey'}
@@ -385,7 +382,6 @@ const Strategy = ({ params }: StrategyParams) => {
                         strategy={strategy}
                         buttonText="Deposit"
                         callsInfo={strategy.depositMethods}
-                        isRetired={isRetired}
                       />
                       {strategy.settings.alerts != undefined && (
                         <VStack mt={'20px'}>
@@ -418,7 +414,6 @@ const Strategy = ({ params }: StrategyParams) => {
                         strategy={strategy}
                         buttonText="Redeem"
                         callsInfo={strategy.withdrawMethods}
-                        isRetired={isRetired}
                       />
                       {strategy.settings.alerts != undefined && (
                         <VStack mt={'20px'}>

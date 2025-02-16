@@ -1,7 +1,7 @@
 import shield from '@/assets/shield.svg';
 import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
-import { PoolInfo } from '@/store/pools';
+import { isPoolRetired, PoolInfo } from '@/store/pools';
 import { getPoolInfoFromStrategy, sortAtom } from '@/store/protocols';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 import { UserStats, userStatsAtom } from '@/store/utils.atoms';
@@ -31,6 +31,7 @@ import {
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
+import { useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 import { FaWallet } from 'react-icons/fa';
 
@@ -38,7 +39,6 @@ export interface YieldCardProps {
   pool: PoolInfo;
   index: number;
   showProtocolName?: boolean;
-  isRetired?: boolean;
 }
 
 export function getStratCardBg(status: StrategyLiveStatus, index: number) {
@@ -48,6 +48,9 @@ export function getStratCardBg(status: StrategyLiveStatus, index: number) {
   if (isLive(status)) {
     return index % 2 === 0 ? 'color1_50p' : 'color2_50p';
   }
+  if (status == StrategyLiveStatus.RETIRED) {
+    return 'black';
+  }
   return 'bg';
 }
 
@@ -56,6 +59,8 @@ function getStratCardBadgeBg(status: StrategyLiveStatus) {
     return 'cyan';
   } else if (status === StrategyLiveStatus.COMING_SOON) {
     return 'yellow';
+  } else if (status == StrategyLiveStatus.RETIRED) {
+    return 'grey';
   }
   return 'bg';
 }
@@ -111,19 +116,6 @@ export function StrategyInfo(props: YieldCardProps) {
                   </Box>
                 </Link>
               </Tooltip>
-            )}
-            {props.isRetired && (
-              <Text
-                px="2"
-                py={'1px'}
-                borderRadius={'8px'}
-                bgColor={'color1_50p'}
-                fontSize={'10px'}
-                color={'#fff'}
-                fontWeight={'bold'}
-              >
-                Retired
-              </Text>
             )}
           </HStack>
           {props.showProtocolName && (
@@ -186,10 +178,13 @@ function getAPRWithToolTip(pool: PoolInfo) {
 
 function StrategyAPY(props: YieldCardProps) {
   const { pool } = props;
+  const isRetired = useMemo(() => {
+    return isPoolRetired(pool);
+  }, [pool]);
 
   return (
     <Box width={'100%'} marginBottom={'5px'}>
-      {pool.isRetired ? (
+      {isRetired ? (
         <Text ml="auto" w="fit-content" mr="6">
           -
         </Text>
@@ -499,17 +494,17 @@ export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
   };
 }
 export default function YieldCard(props: YieldCardProps) {
-  const { pool, index, isRetired } = props;
+  const { pool, index } = props;
 
+  const isRetired = useMemo(() => {
+    return isPoolRetired(pool);
+  }, [pool]);
   return (
     <>
       <Tr
         color={'white'}
-        bg={
-          pool.isRetired || isRetired
-            ? '#1d1d2c'
-            : getStratCardBg(pool.additional.tags[0], index)
-        }
+        bg={getStratCardBg(pool.additional.tags[0], index)}
+        borderBottom={'1px solid #313144 !important'}
         display={{ base: 'none', md: 'table-row' }}
         as={'a'}
         {...getLinkProps(pool, props.showProtocolName)}
@@ -519,11 +514,10 @@ export default function YieldCard(props: YieldCardProps) {
             pool={pool}
             index={index}
             showProtocolName={props.showProtocolName}
-            isRetired={props.isRetired}
           />
         </Td>
         <Td>
-          {pool.isRetired || isRetired ? (
+          {isRetired ? (
             <Text ml="auto" w="fit-content" mr="2">
               -
             </Text>
@@ -532,7 +526,7 @@ export default function YieldCard(props: YieldCardProps) {
           )}
         </Td>
         <Td>
-          {pool.isRetired || isRetired ? (
+          {isRetired ? (
             <Text ml="auto" w="fit-content" mr="2">
               -
             </Text>
@@ -543,7 +537,7 @@ export default function YieldCard(props: YieldCardProps) {
           )}
         </Td>
         <Td>
-          {pool.isRetired || isRetired ? (
+          {isRetired ? (
             <Text ml="auto" w="fit-content" mr="2">
               -
             </Text>
@@ -566,14 +560,7 @@ export function YieldStrategyCard(props: {
   index: number;
 }) {
   const strat = getPoolInfoFromStrategy(props.strat);
-  return (
-    <YieldCard
-      pool={strat}
-      index={props.index}
-      showProtocolName={true}
-      isRetired={props.strat.isRetired}
-    />
-  );
+  return <YieldCard pool={strat} index={props.index} showProtocolName={true} />;
 }
 
 export function HeaderSorter(props: {

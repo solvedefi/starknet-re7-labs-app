@@ -20,7 +20,7 @@ export async function GET(_req: Request, context: any) {
   const values = strategies.map(async (strategy) => {
     const balanceInfo = await strategy.getUserTVL(pAddr);
 
-    if (strategy.id === 'xstrk_sensei' || strategy.id === 'endur_strk') {
+    if (strategy.isLive()) {
       return {
         id: strategy.id,
         usdValue: balanceInfo.usdValue,

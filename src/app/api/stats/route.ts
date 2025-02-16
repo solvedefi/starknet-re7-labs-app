@@ -9,7 +9,7 @@ export async function GET(_req: Request) {
   console.log('strategies', strategies.length);
 
   const values = strategies.map(async (strategy, index) => {
-    if (strategy.id === 'xstrk_sensei' || strategy.id === 'endur_strk') {
+    if (strategy.isLive()) {
       let retry = 0;
       while (retry < 3) {
         try {

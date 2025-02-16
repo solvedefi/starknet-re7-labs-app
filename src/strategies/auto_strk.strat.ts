@@ -65,7 +65,7 @@ export class AutoTokenStrategy extends IStrategy {
       description,
       rewardTokens,
       holdingTokens,
-      StrategyLiveStatus.ACTIVE,
+      StrategyLiveStatus.RETIRED,
       settings,
     );
     this.token = getTokenInfoFromName(token);

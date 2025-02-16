@@ -22,6 +22,8 @@ import {
 } from '@/store/strkfarm.atoms';
 
 import { YieldStrategyCard } from './YieldCard';
+import { getLiveStatusEnum } from '@/store/strategies.atoms';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 export default function Strategies() {
   const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
@@ -30,15 +32,11 @@ export default function Strategies() {
       return [] as STRKFarmStrategyAPIResult[];
     return strkFarmPoolsRes.data.strategies
       .sort((a, b) => b.apy - a.apy)
-      .sort((a, _b) => (a.isRetired ? 1 : -1))
-      .map((pool) => {
-        if (pool.id === 'xstrk_sensei' || pool.id === 'endur_strk') {
-          pool.isRetired = false;
-        } else {
-          pool.isRetired = true;
-        }
-        return pool;
-      });
+      .sort((a, _b) =>
+        getLiveStatusEnum(a.status.number) == StrategyLiveStatus.RETIRED
+          ? 1
+          : -1,
+      );
   }, [strkFarmPoolsRes]);
 
   const _filteredPools = useAtomValue(filteredPools);

@@ -1,7 +1,7 @@
 import shield from '@/assets/shield.svg';
 import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
-import { PoolInfo } from '@/store/pools';
+import { isPoolRetired, PoolInfo } from '@/store/pools';
 import { getPoolInfoFromStrategy, sortAtom } from '@/store/protocols';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 import { UserStats, userStatsAtom } from '@/store/utils.atoms';
@@ -31,21 +31,25 @@ import {
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
+import { useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 import { FaWallet } from 'react-icons/fa';
 
-interface YieldCardProps {
+export interface YieldCardProps {
   pool: PoolInfo;
   index: number;
   showProtocolName?: boolean;
 }
 
-function getStratCardBg(status: StrategyLiveStatus, index: number) {
+export function getStratCardBg(status: StrategyLiveStatus, index: number) {
   if (status == StrategyLiveStatus.HOT) {
     return '#414173';
   }
   if (isLive(status)) {
     return index % 2 === 0 ? 'color1_50p' : 'color2_50p';
+  }
+  if (status == StrategyLiveStatus.RETIRED) {
+    return 'black';
   }
   return 'bg';
 }
@@ -55,12 +59,15 @@ function getStratCardBadgeBg(status: StrategyLiveStatus) {
     return 'cyan';
   } else if (status === StrategyLiveStatus.COMING_SOON) {
     return 'yellow';
+  } else if (status == StrategyLiveStatus.RETIRED) {
+    return 'grey';
   }
   return 'bg';
 }
 
-function StrategyInfo(props: YieldCardProps) {
+export function StrategyInfo(props: YieldCardProps) {
   const { pool } = props;
+
   return (
     <Box>
       <HStack spacing={2}>
@@ -171,33 +178,46 @@ function getAPRWithToolTip(pool: PoolInfo) {
 
 function StrategyAPY(props: YieldCardProps) {
   const { pool } = props;
+  const isRetired = useMemo(() => {
+    return isPoolRetired(pool);
+  }, [pool]);
+
   return (
     <Box width={'100%'} marginBottom={'5px'}>
-      {getAPRWithToolTip(pool)}
-      {pool.additional && pool.additional.leverage && (
-        <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
-          <Box width={'100%'}>
-            <Box float={'right'} display={'flex'} fontSize={'13px'}>
-              <Text color="#FCC01E" textAlign={'right'}>
-                ⚡
-              </Text>
-              <Text
-                width="100%"
-                color="cyan"
-                textAlign={'right'}
-                fontWeight={600}
-              >
-                {pool.additional.leverage.toFixed(1)}X
-              </Text>
-            </Box>
-          </Box>
-        </Tooltip>
+      {isRetired ? (
+        <Text ml="auto" w="fit-content" mr="6">
+          -
+        </Text>
+      ) : (
+        <>
+          {getAPRWithToolTip(pool)}
+
+          {pool.additional && pool.additional.leverage && (
+            <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
+              <Box width={'100%'}>
+                <Box float={'right'} display={'flex'} fontSize={'13px'}>
+                  <Text color="#FCC01E" textAlign={'right'}>
+                    ⚡
+                  </Text>
+                  <Text
+                    width="100%"
+                    color="cyan"
+                    textAlign={'right'}
+                    fontWeight={600}
+                  >
+                    {pool.additional.leverage.toFixed(1)}X
+                  </Text>
+                </Box>
+              </Box>
+            </Tooltip>
+          )}
+        </>
       )}
     </Box>
   );
 }
 
-function getStrategyWiseHoldingsInfo(
+export function getStrategyWiseHoldingsInfo(
   userData: UserStats | null | undefined,
   id: string,
 ) {
@@ -222,7 +242,7 @@ function getStrategyWiseHoldingsInfo(
   };
 }
 
-function StrategyTVL(props: YieldCardProps) {
+export function StrategyTVL(props: YieldCardProps) {
   const { pool } = props;
   const address = useAtomValue(addressAtom);
   const { data: userData } = useAtomValue(userStatsAtom);
@@ -233,6 +253,7 @@ function StrategyTVL(props: YieldCardProps) {
     pool.additional &&
     pool.additional.tags[0] &&
     isLive(pool.additional.tags[0]);
+
   return (
     <Box
       width={'100%'}
@@ -456,7 +477,7 @@ function StrategyMobileCard(props: YieldCardProps) {
   );
 }
 
-function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
+export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
   return {
     href: pool.protocol.link,
     target: isMobile ? '_self' : '_blank',
@@ -475,11 +496,15 @@ function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
 export default function YieldCard(props: YieldCardProps) {
   const { pool, index } = props;
 
+  const isRetired = useMemo(() => {
+    return isPoolRetired(pool);
+  }, [pool]);
   return (
     <>
       <Tr
         color={'white'}
         bg={getStratCardBg(pool.additional.tags[0], index)}
+        borderBottom={'1px solid #313144 !important'}
         display={{ base: 'none', md: 'table-row' }}
         as={'a'}
         {...getLinkProps(pool, props.showProtocolName)}
@@ -492,15 +517,33 @@ export default function YieldCard(props: YieldCardProps) {
           />
         </Td>
         <Td>
-          <StrategyAPY pool={pool} index={index} />
+          {isRetired ? (
+            <Text ml="auto" w="fit-content" mr="2">
+              -
+            </Text>
+          ) : (
+            <StrategyAPY pool={pool} index={index} />
+          )}
         </Td>
         <Td>
-          {pool.additional?.riskFactor
-            ? GetRiskLevel(pool.additional?.riskFactor)
-            : '-'}
+          {isRetired ? (
+            <Text ml="auto" w="fit-content" mr="2">
+              -
+            </Text>
+          ) : pool.additional?.riskFactor ? (
+            GetRiskLevel(pool.additional?.riskFactor)
+          ) : (
+            '-'
+          )}
         </Td>
         <Td>
-          <StrategyTVL pool={pool} index={index} />
+          {isRetired ? (
+            <Text ml="auto" w="fit-content" mr="2">
+              -
+            </Text>
+          ) : (
+            <StrategyTVL pool={pool} index={index} />
+          )}
         </Td>
       </Tr>
       <StrategyMobileCard

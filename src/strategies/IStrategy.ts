@@ -166,6 +166,10 @@ export class IStrategyProps {
     return isLive(this.liveStatus);
   }
 
+  isRetired() {
+    return this.liveStatus == StrategyLiveStatus.RETIRED;
+  }
+
   constructor(
     id: string,
     name: string,

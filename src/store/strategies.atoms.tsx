@@ -115,7 +115,7 @@ export function getStrategies() {
     'ETH',
     CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
     [1, 0.615384615, 1, 0.584615385, 0.552509024], // precomputed factors based on strategy math
-    StrategyLiveStatus.ACTIVE,
+    StrategyLiveStatus.RETIRED,
     {
       maxTVL: 1500000,
       isAudited: true,
@@ -131,7 +131,7 @@ export function getStrategies() {
     'USDC',
     CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
     [1, 0.609886, 1, 0.920975, 0.510078], // precomputed factors based on strategy math
-    StrategyLiveStatus.ACTIVE,
+    StrategyLiveStatus.RETIRED,
     {
       maxTVL: 1000,
       alerts,
@@ -146,7 +146,7 @@ export function getStrategies() {
     'ETH',
     CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
     [1, 0.384615, 1, 0.492308, 0.233276], // precomputed factors based on strategy math, last is the excess deposit1 that is happening
-    StrategyLiveStatus.ACTIVE,
+    StrategyLiveStatus.RETIRED,
     {
       maxTVL: 1500000,
       isAudited: true,
@@ -162,7 +162,7 @@ export function getStrategies() {
     'USDC',
     CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
     [1, 0.5846153846, 1, 0.920975, 0.552509], // precomputed factors based on strategy math
-    StrategyLiveStatus.ACTIVE,
+    StrategyLiveStatus.RETIRED,
     {
       maxTVL: 2000,
       alerts,

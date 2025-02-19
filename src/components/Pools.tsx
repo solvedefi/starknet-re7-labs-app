@@ -1,5 +1,20 @@
 'use client';
 
+import { CategoryFilters, ProtocolFilters } from '@/components/Filters';
+import {
+  allPoolsAtomUnSorted,
+  filteredPools,
+  sortAtom,
+} from '@/store/protocols';
+import {
+  Pagination,
+  PaginationContainer,
+  PaginationNext,
+  PaginationPage,
+  PaginationPageGroup,
+  PaginationPrevious,
+  usePagination,
+} from '@ajna/pagination';
 import {
   Box,
   Container,
@@ -14,21 +29,6 @@ import {
 } from '@chakra-ui/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useMemo, useState } from 'react';
-import {
-  Pagination,
-  PaginationContainer,
-  usePagination,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationPage,
-  PaginationPageGroup,
-} from '@ajna/pagination';
-import { CategoryFilters, ProtocolFilters } from '@/components/Filters';
-import {
-  allPoolsAtomUnSorted,
-  filteredPools,
-  sortAtom,
-} from '@/store/protocols';
 import YieldCard, { HeaderSorter } from './YieldCard';
 
 export default function Pools() {

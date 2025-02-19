@@ -339,35 +339,37 @@ export default function Deposit(props: DepositProps) {
         />
       </Center>
 
-      <Box width="100%" marginTop={'15px'}>
-        <Flex justifyContent="space-between">
-          <Text fontSize={'12px'} color="color2" fontWeight={'bold'}>
-            Current TVL Limit:
-          </Text>
-          <Text fontSize={'12px'} color="color2">
-            {!tvlInfo || !tvlInfo?.data ? (
-              <Spinner size="2xs" />
-            ) : (
-              Number(tvlInfo.data?.amount.toFixedStr(2)).toLocaleString()
-            )}
-            {' / '}
-            {props.strategy.settings.maxTVL.toLocaleString()}{' '}
-            {selectedMarket.name}
-          </Text>
-        </Flex>
-        <Progress
-          colorScheme="gray"
-          bg="bg"
-          value={
-            (100 *
-              (Number(tvlInfo.data?.amount.toEtherStr()) ||
-                props.strategy.settings.maxTVL)) /
-            props.strategy.settings.maxTVL
-          }
-          isIndeterminate={!tvlInfo || !tvlInfo?.data}
-        />
-        {/* {tvlInfo.isError ? 1 : 0}{tvlInfo.isLoading ? 1 : 0} {JSON.stringify(tvlInfo.error)} */}
-      </Box>
+      {!props.strategy.isRetired() && (
+        <Box width="100%" marginTop={'15px'}>
+          <Flex justifyContent="space-between">
+            <Text fontSize={'12px'} color="color2" fontWeight={'bold'}>
+              Current TVL Limit:
+            </Text>
+            <Text fontSize={'12px'} color="color2">
+              {!tvlInfo || !tvlInfo?.data ? (
+                <Spinner size="2xs" />
+              ) : (
+                Number(tvlInfo.data?.amount.toFixedStr(2)).toLocaleString()
+              )}
+              {' / '}
+              {props.strategy.settings.maxTVL.toLocaleString()}{' '}
+              {selectedMarket.name}
+            </Text>
+          </Flex>
+          <Progress
+            colorScheme="gray"
+            bg="bg"
+            value={
+              (100 *
+                (Number(tvlInfo.data?.amount.toEtherStr()) ||
+                  props.strategy.settings.maxTVL)) /
+              props.strategy.settings.maxTVL
+            }
+            isIndeterminate={!tvlInfo || !tvlInfo?.data}
+          />
+          {/* {tvlInfo.isError ? 1 : 0}{tvlInfo.isLoading ? 1 : 0} {JSON.stringify(tvlInfo.error)} */}
+        </Box>
+      )}
     </Box>
   );
 }

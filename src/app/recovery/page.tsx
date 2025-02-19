@@ -2,7 +2,6 @@
 
 import {
   Alert,
-  AlertIcon,
   Box,
   Container,
   Skeleton,
@@ -179,11 +178,13 @@ export default function Recovery() {
             padding={'6px 20px'}
             cursor={'pointer'}
             fontWeight={600}
+            width={'100%'}
+            textAlign={'center'}
           >
             Claim
           </Box>
           <Text color="color2" fontSize={'12px'} textAlign={'center'}>
-            Claims opening soon
+            Claim will open after 26th Feb.
           </Text>
         </Box>
       </Box>
@@ -201,11 +202,16 @@ export default function Recovery() {
           marginTop={'10px'}
           px={'16px'}
         >
-          <AlertIcon />
-          Check your eligible claims by connecting your wallet. Please note that
-          approximately 40-50% of your original funds are expected to be
+          1. Check your eligible claims by connecting your wallet. Please note
+          that approximately 40-50% of your original funds are expected to be
           available. If you don&apos;t see the expected amount, kindly reach out
-          to us on Telegram before February 20th (End of Day) for assistance.
+          to us on Telegram before February 26th (End of Day) for assistance.
+          <br />
+          <br />
+          2. Please note that these figures are provisional and subject to
+          change. Based on community feedback or if discrepancies are identified
+          during technical reviews, adjustments may be made after resolving any
+          underlying issues.
         </Alert>
       </Box>
 

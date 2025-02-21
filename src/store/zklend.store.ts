@@ -25,7 +25,8 @@ export class ZkLend extends IDapp<LendingSpace.MyBaseAprDoc[]> {
         logo: this.logo,
       },
       this.commonVaultFilter,
-    );
+    ).map((p) => ({ ...p, additional: { ...p.additional, riskFactor: 5 } }));
+    // due to hack
   }
 
   getBaseAPY(

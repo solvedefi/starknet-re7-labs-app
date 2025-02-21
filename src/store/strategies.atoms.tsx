@@ -181,7 +181,7 @@ export function getStrategies() {
     [1, 1, 0.725, 1.967985], // precomputed factors based on strategy math
     StrategyLiveStatus.HOT,
     {
-      maxTVL: 1000000,
+      maxTVL: 500000,
       alerts: [
         // {
         //   type: 'warning',

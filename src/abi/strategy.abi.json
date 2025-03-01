@@ -1,12 +1,12 @@
 [
   {
-    "name": "LockerImpl",
     "type": "impl",
+    "name": "LockerImpl",
     "interface_name": "ekubo::interfaces::core::ILocker"
   },
   {
-    "name": "core::array::Span::<core::felt252>",
     "type": "struct",
+    "name": "core::array::Span::<core::felt252>",
     "members": [
       {
         "name": "snapshot",
@@ -15,12 +15,12 @@
     ]
   },
   {
-    "name": "ekubo::interfaces::core::ILocker",
     "type": "interface",
+    "name": "ekubo::interfaces::core::ILocker",
     "items": [
       {
-        "name": "locked",
         "type": "function",
+        "name": "locked",
         "inputs": [
           {
             "name": "id",
@@ -41,13 +41,13 @@
     ]
   },
   {
-    "name": "StrategyImpl",
     "type": "impl",
+    "name": "StrategyImpl",
     "interface_name": "strkfarm::interfaces::ERC721Strategy::IStrategy"
   },
   {
-    "name": "strkfarm::interfaces::IEkuboDistributor::Claim",
     "type": "struct",
+    "name": "strkfarm::interfaces::IEkuboDistributor::Claim",
     "members": [
       {
         "name": "id",
@@ -64,8 +64,8 @@
     ]
   },
   {
-    "name": "core::integer::u256",
     "type": "struct",
+    "name": "core::integer::u256",
     "members": [
       {
         "name": "low",
@@ -78,8 +78,8 @@
     ]
   },
   {
-    "name": "strkfarm::components::swap::Route",
     "type": "struct",
+    "name": "strkfarm::components::swap::Route",
     "members": [
       {
         "name": "token_from",
@@ -104,8 +104,8 @@
     ]
   },
   {
-    "name": "strkfarm::components::swap::AvnuMultiRouteSwap",
     "type": "struct",
+    "name": "strkfarm::components::swap::AvnuMultiRouteSwap",
     "members": [
       {
         "name": "token_from_address",
@@ -146,8 +146,8 @@
     ]
   },
   {
-    "name": "core::bool",
     "type": "enum",
+    "name": "core::bool",
     "variants": [
       {
         "name": "False",
@@ -160,8 +160,8 @@
     ]
   },
   {
-    "name": "strkfarm::interfaces::ERC721Strategy::Position",
     "type": "struct",
+    "name": "strkfarm::interfaces::ERC721Strategy::Position",
     "members": [
       {
         "name": "acc1_supply_shares",
@@ -182,8 +182,8 @@
     ]
   },
   {
-    "name": "strkfarm::interfaces::ERC721Strategy::PositionDescription",
     "type": "struct",
+    "name": "strkfarm::interfaces::ERC721Strategy::PositionDescription",
     "members": [
       {
         "name": "estimated_size",
@@ -208,8 +208,8 @@
     ]
   },
   {
-    "name": "strkfarm::interfaces::ERC721Strategy::StrategyConfig",
     "type": "struct",
+    "name": "strkfarm::interfaces::ERC721Strategy::StrategyConfig",
     "members": [
       {
         "name": "main_token",
@@ -230,8 +230,8 @@
     ]
   },
   {
-    "name": "strkfarm::interfaces::ERC721Strategy::Settings",
     "type": "struct",
+    "name": "strkfarm::interfaces::ERC721Strategy::Settings",
     "members": [
       {
         "name": "fee_percent",
@@ -260,12 +260,12 @@
     ]
   },
   {
-    "name": "strkfarm::interfaces::ERC721Strategy::IStrategy",
     "type": "interface",
+    "name": "strkfarm::interfaces::ERC721Strategy::IStrategy",
     "items": [
       {
-        "name": "harvest",
         "type": "function",
+        "name": "harvest",
         "inputs": [
           {
             "name": "protocol1_rewards_contract",
@@ -300,8 +300,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "deposit",
         "type": "function",
+        "name": "deposit",
         "inputs": [
           {
             "name": "amount",
@@ -320,8 +320,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "withdraw",
         "type": "function",
+        "name": "withdraw",
         "inputs": [
           {
             "name": "amount",
@@ -340,8 +340,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "rebalance",
         "type": "function",
+        "name": "rebalance",
         "inputs": [
           {
             "name": "amount",
@@ -356,8 +356,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "describe_position",
         "type": "function",
+        "name": "describe_position",
         "inputs": [
           {
             "name": "token_id",
@@ -372,8 +372,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "get_all_shares",
         "type": "function",
+        "name": "get_all_shares",
         "inputs": [],
         "outputs": [
           {
@@ -383,8 +383,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "config",
         "type": "function",
+        "name": "config",
         "inputs": [],
         "outputs": [
           {
@@ -394,8 +394,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "get_settings",
         "type": "function",
+        "name": "get_settings",
         "inputs": [],
         "outputs": [
           {
@@ -405,8 +405,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "set_settings",
         "type": "function",
+        "name": "set_settings",
         "inputs": [
           {
             "name": "settings",
@@ -417,8 +417,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "health_factors",
         "type": "function",
+        "name": "health_factors",
         "inputs": [],
         "outputs": [
           {
@@ -428,8 +428,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "unwind_dapp2",
         "type": "function",
+        "name": "unwind_dapp2",
         "inputs": [
           {
             "name": "percent_bps",
@@ -444,8 +444,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "withdraw_nostra",
         "type": "function",
+        "name": "withdraw_nostra",
         "inputs": [
           {
             "name": "receiver",
@@ -456,8 +456,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "nostra_position",
         "type": "function",
+        "name": "nostra_position",
         "inputs": [
           {
             "name": "user",
@@ -472,8 +472,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "get_nostra_info",
         "type": "function",
+        "name": "get_nostra_info",
         "inputs": [],
         "outputs": [
           {
@@ -481,17 +481,75 @@
           }
         ],
         "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "swap",
+        "inputs": [
+          {
+            "name": "from",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "to",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "swap_params",
+            "type": "strkfarm::components::swap::AvnuMultiRouteSwap"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "sync_nostra_amount",
+        "inputs": [],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "get_nostra_amount",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "transfer",
+        "inputs": [
+          {
+            "name": "from",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "amount",
+            "type": "core::integer::u256"
+          },
+          {
+            "name": "to",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
       }
     ]
   },
   {
-    "name": "ERC721MixinImpl",
     "type": "impl",
+    "name": "ERC721MixinImpl",
     "interface_name": "openzeppelin_token::erc721::interface::ERC721ABI"
   },
   {
-    "name": "core::byte_array::ByteArray",
     "type": "struct",
+    "name": "core::byte_array::ByteArray",
     "members": [
       {
         "name": "data",
@@ -508,12 +566,12 @@
     ]
   },
   {
-    "name": "openzeppelin_token::erc721::interface::ERC721ABI",
     "type": "interface",
+    "name": "openzeppelin_token::erc721::interface::ERC721ABI",
     "items": [
       {
-        "name": "balance_of",
         "type": "function",
+        "name": "balance_of",
         "inputs": [
           {
             "name": "account",
@@ -528,8 +586,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "owner_of",
         "type": "function",
+        "name": "owner_of",
         "inputs": [
           {
             "name": "token_id",
@@ -544,8 +602,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "safe_transfer_from",
         "type": "function",
+        "name": "safe_transfer_from",
         "inputs": [
           {
             "name": "from",
@@ -568,8 +626,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "transfer_from",
         "type": "function",
+        "name": "transfer_from",
         "inputs": [
           {
             "name": "from",
@@ -588,8 +646,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "approve",
         "type": "function",
+        "name": "approve",
         "inputs": [
           {
             "name": "to",
@@ -604,8 +662,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "set_approval_for_all",
         "type": "function",
+        "name": "set_approval_for_all",
         "inputs": [
           {
             "name": "operator",
@@ -620,8 +678,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "get_approved",
         "type": "function",
+        "name": "get_approved",
         "inputs": [
           {
             "name": "token_id",
@@ -636,8 +694,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "is_approved_for_all",
         "type": "function",
+        "name": "is_approved_for_all",
         "inputs": [
           {
             "name": "owner",
@@ -656,8 +714,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "supports_interface",
         "type": "function",
+        "name": "supports_interface",
         "inputs": [
           {
             "name": "interface_id",
@@ -672,8 +730,8 @@
         "state_mutability": "view"
       },
       {
+        "type": "function",
         "name": "name",
-        "type": "function",
         "inputs": [],
         "outputs": [
           {
@@ -683,8 +741,8 @@
         "state_mutability": "view"
       },
       {
+        "type": "function",
         "name": "symbol",
-        "type": "function",
         "inputs": [],
         "outputs": [
           {
@@ -694,8 +752,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "token_uri",
         "type": "function",
+        "name": "token_uri",
         "inputs": [
           {
             "name": "token_id",
@@ -710,8 +768,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "balanceOf",
         "type": "function",
+        "name": "balanceOf",
         "inputs": [
           {
             "name": "account",
@@ -726,8 +784,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "ownerOf",
         "type": "function",
+        "name": "ownerOf",
         "inputs": [
           {
             "name": "tokenId",
@@ -742,8 +800,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "safeTransferFrom",
         "type": "function",
+        "name": "safeTransferFrom",
         "inputs": [
           {
             "name": "from",
@@ -766,8 +824,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "transferFrom",
         "type": "function",
+        "name": "transferFrom",
         "inputs": [
           {
             "name": "from",
@@ -786,8 +844,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "setApprovalForAll",
         "type": "function",
+        "name": "setApprovalForAll",
         "inputs": [
           {
             "name": "operator",
@@ -802,8 +860,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "getApproved",
         "type": "function",
+        "name": "getApproved",
         "inputs": [
           {
             "name": "tokenId",
@@ -818,8 +876,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "isApprovedForAll",
         "type": "function",
+        "name": "isApprovedForAll",
         "inputs": [
           {
             "name": "owner",
@@ -838,8 +896,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "tokenURI",
         "type": "function",
+        "name": "tokenURI",
         "inputs": [
           {
             "name": "tokenId",
@@ -856,13 +914,13 @@
     ]
   },
   {
-    "name": "RewardShareImpl",
     "type": "impl",
+    "name": "RewardShareImpl",
     "interface_name": "strkfarm::components::harvester::reward_shares::IRewardShare"
   },
   {
-    "name": "strkfarm::components::harvester::reward_shares::UserRewardsInfo",
     "type": "struct",
+    "name": "strkfarm::components::harvester::reward_shares::UserRewardsInfo",
     "members": [
       {
         "name": "pending_round_points",
@@ -883,8 +941,8 @@
     ]
   },
   {
-    "name": "strkfarm::components::harvester::reward_shares::RewardsInfo",
     "type": "struct",
+    "name": "strkfarm::components::harvester::reward_shares::RewardsInfo",
     "members": [
       {
         "name": "amount",
@@ -905,12 +963,12 @@
     ]
   },
   {
-    "name": "strkfarm::components::harvester::reward_shares::IRewardShare",
     "type": "interface",
+    "name": "strkfarm::components::harvester::reward_shares::IRewardShare",
     "items": [
       {
-        "name": "get_user_reward_info",
         "type": "function",
+        "name": "get_user_reward_info",
         "inputs": [
           {
             "name": "user",
@@ -925,8 +983,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "get_rewards_info",
         "type": "function",
+        "name": "get_rewards_info",
         "inputs": [
           {
             "name": "index",
@@ -941,8 +999,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "get_total_rewards",
         "type": "function",
+        "name": "get_total_rewards",
         "inputs": [],
         "outputs": [
           {
@@ -952,8 +1010,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "get_total_unminted_shares",
         "type": "function",
+        "name": "get_total_unminted_shares",
         "inputs": [],
         "outputs": [
           {
@@ -963,8 +1021,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "get_additional_shares",
         "type": "function",
+        "name": "get_additional_shares",
         "inputs": [
           {
             "name": "user",
@@ -981,17 +1039,17 @@
     ]
   },
   {
-    "name": "CommonCompImpl",
     "type": "impl",
+    "name": "CommonCompImpl",
     "interface_name": "strkfarm::interfaces::common::ICommon"
   },
   {
-    "name": "strkfarm::interfaces::common::ICommon",
     "type": "interface",
+    "name": "strkfarm::interfaces::common::ICommon",
     "items": [
       {
-        "name": "upgrade",
         "type": "function",
+        "name": "upgrade",
         "inputs": [
           {
             "name": "new_class",
@@ -1002,22 +1060,22 @@
         "state_mutability": "external"
       },
       {
+        "type": "function",
         "name": "pause",
-        "type": "function",
         "inputs": [],
         "outputs": [],
         "state_mutability": "external"
       },
       {
+        "type": "function",
         "name": "unpause",
-        "type": "function",
         "inputs": [],
         "outputs": [],
         "state_mutability": "external"
       },
       {
-        "name": "is_paused",
         "type": "function",
+        "name": "is_paused",
         "inputs": [],
         "outputs": [
           {
@@ -1027,8 +1085,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "owner",
         "type": "function",
+        "name": "owner",
         "inputs": [],
         "outputs": [
           {
@@ -1038,8 +1096,8 @@
         "state_mutability": "view"
       },
       {
-        "name": "transfer_ownership",
         "type": "function",
+        "name": "transfer_ownership",
         "inputs": [
           {
             "name": "new_owner",
@@ -1050,8 +1108,8 @@
         "state_mutability": "external"
       },
       {
-        "name": "renounce_ownership",
         "type": "function",
+        "name": "renounce_ownership",
         "inputs": [],
         "outputs": [],
         "state_mutability": "external"
@@ -1059,8 +1117,8 @@
     ]
   },
   {
+    "type": "struct",
     "name": "strkfarm::interfaces::zkLend::IZkLendMarketDispatcher",
-    "type": "struct",
     "members": [
       {
         "name": "contract_address",
@@ -1069,8 +1127,8 @@
     ]
   },
   {
+    "type": "struct",
     "name": "strkfarm::interfaces::oracle::IPriceOracleDispatcher",
-    "type": "struct",
     "members": [
       {
         "name": "contract_address",
@@ -1079,8 +1137,8 @@
     ]
   },
   {
-    "name": "strkfarm::components::zkLend::zkLendStruct",
     "type": "struct",
+    "name": "strkfarm::components::zkLend::zkLendStruct",
     "members": [
       {
         "name": "zkLendRouter",
@@ -1093,8 +1151,8 @@
     ]
   },
   {
-    "name": "strkfarm::components::nostra::nostraStruct",
     "type": "struct",
+    "name": "strkfarm::components::nostra::nostraStruct",
     "members": [
       {
         "name": "nostraInterestBearing",
@@ -1115,8 +1173,8 @@
     ]
   },
   {
-    "name": "strkfarm::interfaces::nostra::INostraRouterDispatcher",
     "type": "struct",
+    "name": "strkfarm::interfaces::nostra::INostraRouterDispatcher",
     "members": [
       {
         "name": "contract_address",
@@ -1125,8 +1183,8 @@
     ]
   },
   {
-    "name": "strkfarm::components::nostraSwap::NostraSwapStruct",
     "type": "struct",
+    "name": "strkfarm::components::nostraSwap::NostraSwapStruct",
     "members": [
       {
         "name": "router",
@@ -1139,8 +1197,8 @@
     ]
   },
   {
-    "name": "constructor",
     "type": "constructor",
+    "name": "constructor",
     "inputs": [
       {
         "name": "name",
@@ -1197,448 +1255,448 @@
     ]
   },
   {
-    "kind": "struct",
+    "type": "event",
     "name": "openzeppelin_token::erc721::erc721::ERC721Component::Transfer",
-    "type": "event",
+    "kind": "struct",
     "members": [
       {
-        "kind": "key",
         "name": "from",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        "kind": "key",
         "name": "to",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        "kind": "key",
         "name": "token_id",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "key"
       }
     ]
   },
   {
-    "kind": "struct",
+    "type": "event",
     "name": "openzeppelin_token::erc721::erc721::ERC721Component::Approval",
-    "type": "event",
+    "kind": "struct",
     "members": [
       {
-        "kind": "key",
         "name": "owner",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        "kind": "key",
         "name": "approved",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        "kind": "key",
         "name": "token_id",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "key"
       }
     ]
   },
   {
-    "kind": "struct",
+    "type": "event",
     "name": "openzeppelin_token::erc721::erc721::ERC721Component::ApprovalForAll",
-    "type": "event",
+    "kind": "struct",
     "members": [
       {
-        "kind": "key",
         "name": "owner",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        "kind": "key",
         "name": "operator",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        "kind": "data",
         "name": "approved",
-        "type": "core::bool"
+        "type": "core::bool",
+        "kind": "data"
       }
     ]
   },
   {
-    "kind": "enum",
+    "type": "event",
     "name": "openzeppelin_token::erc721::erc721::ERC721Component::Event",
-    "type": "event",
+    "kind": "enum",
     "variants": [
       {
-        "kind": "nested",
         "name": "Transfer",
-        "type": "openzeppelin_token::erc721::erc721::ERC721Component::Transfer"
+        "type": "openzeppelin_token::erc721::erc721::ERC721Component::Transfer",
+        "kind": "nested"
       },
       {
-        "kind": "nested",
         "name": "Approval",
-        "type": "openzeppelin_token::erc721::erc721::ERC721Component::Approval"
+        "type": "openzeppelin_token::erc721::erc721::ERC721Component::Approval",
+        "kind": "nested"
       },
       {
-        "kind": "nested",
         "name": "ApprovalForAll",
-        "type": "openzeppelin_token::erc721::erc721::ERC721Component::ApprovalForAll"
+        "type": "openzeppelin_token::erc721::erc721::ERC721Component::ApprovalForAll",
+        "kind": "nested"
       }
     ]
   },
   {
-    "kind": "enum",
+    "type": "event",
     "name": "openzeppelin_introspection::src5::SRC5Component::Event",
-    "type": "event",
+    "kind": "enum",
     "variants": []
   },
   {
-    "kind": "struct",
+    "type": "event",
     "name": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Upgraded",
-    "type": "event",
+    "kind": "struct",
     "members": [
       {
-        "kind": "data",
         "name": "class_hash",
-        "type": "core::starknet::class_hash::ClassHash"
+        "type": "core::starknet::class_hash::ClassHash",
+        "kind": "data"
       }
     ]
   },
   {
-    "kind": "enum",
+    "type": "event",
     "name": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Event",
-    "type": "event",
+    "kind": "enum",
     "variants": [
       {
-        "kind": "nested",
         "name": "Upgraded",
-        "type": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Upgraded"
+        "type": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Upgraded",
+        "kind": "nested"
       }
     ]
   },
   {
-    "kind": "struct",
+    "type": "event",
     "name": "openzeppelin_security::pausable::PausableComponent::Paused",
-    "type": "event",
+    "kind": "struct",
     "members": [
       {
-        "kind": "data",
         "name": "account",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
       }
     ]
   },
   {
-    "kind": "struct",
+    "type": "event",
     "name": "openzeppelin_security::pausable::PausableComponent::Unpaused",
-    "type": "event",
+    "kind": "struct",
     "members": [
       {
-        "kind": "data",
         "name": "account",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "data"
       }
     ]
   },
   {
-    "kind": "enum",
+    "type": "event",
     "name": "openzeppelin_security::pausable::PausableComponent::Event",
-    "type": "event",
+    "kind": "enum",
     "variants": [
       {
-        "kind": "nested",
         "name": "Paused",
-        "type": "openzeppelin_security::pausable::PausableComponent::Paused"
+        "type": "openzeppelin_security::pausable::PausableComponent::Paused",
+        "kind": "nested"
       },
       {
-        "kind": "nested",
         "name": "Unpaused",
-        "type": "openzeppelin_security::pausable::PausableComponent::Unpaused"
+        "type": "openzeppelin_security::pausable::PausableComponent::Unpaused",
+        "kind": "nested"
       }
     ]
   },
   {
-    "kind": "enum",
+    "type": "event",
     "name": "openzeppelin_security::reentrancyguard::ReentrancyGuardComponent::Event",
-    "type": "event",
+    "kind": "enum",
     "variants": []
   },
   {
-    "kind": "struct",
+    "type": "event",
     "name": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferred",
-    "type": "event",
-    "members": [
-      {
-        "kind": "key",
-        "name": "previous_owner",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "kind": "key",
-        "name": "new_owner",
-        "type": "core::starknet::contract_address::ContractAddress"
-      }
-    ]
-  },
-  {
     "kind": "struct",
-    "name": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferStarted",
-    "type": "event",
     "members": [
       {
-        "kind": "key",
         "name": "previous_owner",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        "kind": "key",
         "name": "new_owner",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       }
     ]
   },
   {
-    "kind": "enum",
-    "name": "openzeppelin_access::ownable::ownable::OwnableComponent::Event",
     "type": "event",
+    "name": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferStarted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "previous_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "new_owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_access::ownable::ownable::OwnableComponent::Event",
+    "kind": "enum",
     "variants": [
       {
-        "kind": "nested",
         "name": "OwnershipTransferred",
-        "type": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferred"
+        "type": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+        "kind": "nested"
       },
       {
-        "kind": "nested",
         "name": "OwnershipTransferStarted",
-        "type": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferStarted"
+        "type": "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferStarted",
+        "kind": "nested"
       }
     ]
   },
   {
-    "kind": "enum",
-    "name": "strkfarm::components::common::CommonComp::Event",
     "type": "event",
+    "name": "strkfarm::components::common::CommonComp::Event",
+    "kind": "enum",
     "variants": []
   },
   {
-    "kind": "struct",
+    "type": "event",
     "name": "strkfarm::components::harvester::reward_shares::RewardShareComponent::Rewards",
-    "type": "event",
+    "kind": "struct",
     "members": [
       {
-        "kind": "data",
         "name": "index",
-        "type": "core::integer::u32"
+        "type": "core::integer::u32",
+        "kind": "data"
       },
       {
-        "kind": "data",
         "name": "info",
-        "type": "strkfarm::components::harvester::reward_shares::RewardsInfo"
+        "type": "strkfarm::components::harvester::reward_shares::RewardsInfo",
+        "kind": "data"
       },
       {
-        "kind": "data",
         "name": "total_reward_shares",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "data"
       },
       {
-        "kind": "data",
         "name": "timestamp",
-        "type": "core::integer::u64"
+        "type": "core::integer::u64",
+        "kind": "data"
       }
     ]
   },
   {
-    "kind": "struct",
+    "type": "event",
     "name": "strkfarm::components::harvester::reward_shares::RewardShareComponent::UserRewards",
-    "type": "event",
+    "kind": "struct",
     "members": [
       {
-        "kind": "key",
         "name": "user",
-        "type": "core::starknet::contract_address::ContractAddress"
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        "kind": "data",
         "name": "info",
-        "type": "strkfarm::components::harvester::reward_shares::UserRewardsInfo"
+        "type": "strkfarm::components::harvester::reward_shares::UserRewardsInfo",
+        "kind": "data"
       },
       {
-        "kind": "data",
         "name": "total_reward_shares",
-        "type": "core::integer::u256"
+        "type": "core::integer::u256",
+        "kind": "data"
       },
       {
-        "kind": "data",
         "name": "timestamp",
-        "type": "core::integer::u64"
+        "type": "core::integer::u64",
+        "kind": "data"
       }
     ]
   },
   {
-    "kind": "enum",
+    "type": "event",
     "name": "strkfarm::components::harvester::reward_shares::RewardShareComponent::Event",
-    "type": "event",
-    "variants": [
-      {
-        "kind": "nested",
-        "name": "Rewards",
-        "type": "strkfarm::components::harvester::reward_shares::RewardShareComponent::Rewards"
-      },
-      {
-        "kind": "nested",
-        "name": "UserRewards",
-        "type": "strkfarm::components::harvester::reward_shares::RewardShareComponent::UserRewards"
-      }
-    ]
-  },
-  {
-    "kind": "struct",
-    "name": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Deposit",
-    "type": "event",
-    "members": [
-      {
-        "kind": "key",
-        "name": "sender",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "kind": "key",
-        "name": "owner",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "kind": "data",
-        "name": "assets",
-        "type": "core::integer::u256"
-      },
-      {
-        "kind": "data",
-        "name": "net_position",
-        "type": "strkfarm::interfaces::ERC721Strategy::Position"
-      }
-    ]
-  },
-  {
-    "kind": "struct",
-    "name": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Withdraw",
-    "type": "event",
-    "members": [
-      {
-        "kind": "key",
-        "name": "sender",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "kind": "key",
-        "name": "receiver",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "kind": "key",
-        "name": "owner",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "kind": "data",
-        "name": "assets",
-        "type": "core::integer::u256"
-      },
-      {
-        "kind": "data",
-        "name": "net_position",
-        "type": "strkfarm::interfaces::ERC721Strategy::Position"
-      }
-    ]
-  },
-  {
-    "kind": "struct",
-    "name": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Rebalance",
-    "type": "event",
-    "members": [
-      {
-        "kind": "key",
-        "name": "caller",
-        "type": "core::starknet::contract_address::ContractAddress"
-      },
-      {
-        "kind": "data",
-        "name": "amount",
-        "type": "core::integer::u256"
-      },
-      {
-        "kind": "data",
-        "name": "shouldRepay",
-        "type": "core::bool"
-      },
-      {
-        "kind": "data",
-        "name": "hf1",
-        "type": "core::integer::u32"
-      },
-      {
-        "kind": "data",
-        "name": "hf2",
-        "type": "core::integer::u32"
-      }
-    ]
-  },
-  {
     "kind": "enum",
-    "name": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Event",
-    "type": "event",
     "variants": [
       {
-        "kind": "flat",
+        "name": "Rewards",
+        "type": "strkfarm::components::harvester::reward_shares::RewardShareComponent::Rewards",
+        "kind": "nested"
+      },
+      {
+        "name": "UserRewards",
+        "type": "strkfarm::components::harvester::reward_shares::RewardShareComponent::UserRewards",
+        "kind": "nested"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Deposit",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "sender",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "assets",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "net_position",
+        "type": "strkfarm::interfaces::ERC721Strategy::Position",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Withdraw",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "sender",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "receiver",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "assets",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "net_position",
+        "type": "strkfarm::interfaces::ERC721Strategy::Position",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Rebalance",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "caller",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "shouldRepay",
+        "type": "core::bool",
+        "kind": "data"
+      },
+      {
+        "name": "hf1",
+        "type": "core::integer::u32",
+        "kind": "data"
+      },
+      {
+        "name": "hf2",
+        "type": "core::integer::u32",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Event",
+    "kind": "enum",
+    "variants": [
+      {
         "name": "ERC721Event",
-        "type": "openzeppelin_token::erc721::erc721::ERC721Component::Event"
+        "type": "openzeppelin_token::erc721::erc721::ERC721Component::Event",
+        "kind": "flat"
       },
       {
-        "kind": "flat",
         "name": "SRC5Event",
-        "type": "openzeppelin_introspection::src5::SRC5Component::Event"
+        "type": "openzeppelin_introspection::src5::SRC5Component::Event",
+        "kind": "flat"
       },
       {
-        "kind": "flat",
         "name": "UpgradeableEvent",
-        "type": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Event"
+        "type": "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Event",
+        "kind": "flat"
       },
       {
-        "kind": "flat",
         "name": "PausableEvent",
-        "type": "openzeppelin_security::pausable::PausableComponent::Event"
+        "type": "openzeppelin_security::pausable::PausableComponent::Event",
+        "kind": "flat"
       },
       {
-        "kind": "flat",
         "name": "ReentrancyGuardEvent",
-        "type": "openzeppelin_security::reentrancyguard::ReentrancyGuardComponent::Event"
+        "type": "openzeppelin_security::reentrancyguard::ReentrancyGuardComponent::Event",
+        "kind": "flat"
       },
       {
-        "kind": "flat",
         "name": "OwnableEvent",
-        "type": "openzeppelin_access::ownable::ownable::OwnableComponent::Event"
+        "type": "openzeppelin_access::ownable::ownable::OwnableComponent::Event",
+        "kind": "flat"
       },
       {
-        "kind": "flat",
         "name": "CommonCompEvent",
-        "type": "strkfarm::components::common::CommonComp::Event"
+        "type": "strkfarm::components::common::CommonComp::Event",
+        "kind": "flat"
       },
       {
-        "kind": "flat",
         "name": "RewardShareEvent",
-        "type": "strkfarm::components::harvester::reward_shares::RewardShareComponent::Event"
+        "type": "strkfarm::components::harvester::reward_shares::RewardShareComponent::Event",
+        "kind": "flat"
       },
       {
-        "kind": "nested",
         "name": "Deposit",
-        "type": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Deposit"
+        "type": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Deposit",
+        "kind": "nested"
       },
       {
-        "kind": "nested",
         "name": "Withdraw",
-        "type": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Withdraw"
+        "type": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Withdraw",
+        "kind": "nested"
       },
       {
-        "kind": "nested",
         "name": "Rebalance",
-        "type": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Rebalance"
+        "type": "strkfarm::strats::delta_neutral_looping::DeltaNeutralLooping::Rebalance",
+        "kind": "nested"
       }
     ]
   }

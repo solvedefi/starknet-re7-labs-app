@@ -351,7 +351,7 @@ export class IStrategy extends IStrategyProps {
         }
       }
     } catch (err) {
-      console.error(`${this.tag} - unsolved`, err);
+      console.warn(`${this.tag} - unsolved`, err);
       return;
     }
 

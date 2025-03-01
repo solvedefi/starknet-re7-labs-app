@@ -14,7 +14,7 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-import { useProvider } from '@starknet-react/core';
+import { useProvider, useSendTransaction } from '@starknet-react/core';
 import { useAtomValue } from 'jotai';
 import React, { useMemo } from 'react';
 
@@ -24,6 +24,7 @@ import { addressAtom } from '@/store/claims.atoms';
 import MyNumber from '@/utils/MyNumber';
 import { Contract } from 'starknet';
 import { getDisplayCurrencyAmount } from '@/utils';
+import toast from 'react-hot-toast';
 
 const STRATEGY_ADDRESSES: {
   [key: string]: {
@@ -129,6 +130,91 @@ export default function Recovery() {
       STRK: Number(poolAmounts.strk_sensei),
     };
   }, [poolAmounts]);
+
+  const calls = useMemo(() => {
+    const contracts = Object.entries(STRATEGY_ADDRESSES).map(
+      ([key, strategyInfo]) => {
+        const contract = new Contract(
+          strategyAbi,
+          strategyInfo.address,
+          provider,
+        );
+        return contract;
+      },
+    );
+    const calls = contracts
+      .map((contract) => {
+        const strategy_key = Object.keys(STRATEGY_ADDRESSES).find((key) => {
+          return STRATEGY_ADDRESSES[key].address === contract.address;
+        });
+        if (!strategy_key) {
+          return null;
+        }
+        const amount = poolAmounts[strategy_key];
+        if (amount && Number(amount) > 0)
+          return contract.populate('withdraw_nostra', [address]);
+        return null;
+      })
+      .filter((call) => call !== null);
+    return calls;
+  }, [address, poolAmounts, provider]);
+
+  const {
+    sendAsync: writeAsync,
+    data,
+    status,
+    isSuccess,
+    isPending,
+    error,
+    isError,
+  } = useSendTransaction({
+    calls,
+  });
+
+  function handleClaims() {
+    if (!address) {
+      toast('Please connect your wallet to claim your funds.', {
+        position: 'bottom-right',
+      });
+      return;
+    }
+
+    const contracts = Object.entries(STRATEGY_ADDRESSES).map(
+      ([key, strategyInfo]) => {
+        const contract = new Contract(
+          strategyAbi,
+          strategyInfo.address,
+          provider,
+        );
+        return contract;
+      },
+    );
+
+    const calls = contracts
+      .map((contract) => {
+        const strategy_key = Object.keys(STRATEGY_ADDRESSES).find((key) => {
+          return STRATEGY_ADDRESSES[key].address === contract.address;
+        });
+        if (!strategy_key) {
+          return null;
+        }
+        const amount = poolAmounts[strategy_key];
+        if (amount && Number(amount) > 0)
+          return contract.populate('withdraw_nostra', [address]);
+        return null;
+      })
+      .filter((call) => call !== null);
+
+    if (calls.length === 0) {
+      toast('No funds to claim.', {
+        position: 'bottom-right',
+      });
+      return;
+    }
+
+    writeAsync();
+  }
+
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
       <Box
@@ -171,7 +257,6 @@ export default function Recovery() {
           width={{ base: '100%', md: '30%' }}
         >
           <Box
-            _disabled={{ opacity: 0.4 }}
             aria-disabled={true}
             bg={'white'}
             borderRadius="6px"
@@ -180,12 +265,12 @@ export default function Recovery() {
             fontWeight={600}
             width={'100%'}
             textAlign={'center'}
+            onClick={() => {
+              handleClaims();
+            }}
           >
             Claim
           </Box>
-          <Text color="color2" fontSize={'12px'} textAlign={'center'}>
-            Claim will open after 26th Feb.
-          </Text>
         </Box>
       </Box>
 
@@ -202,16 +287,37 @@ export default function Recovery() {
           marginTop={'10px'}
           px={'16px'}
         >
-          1. Check your eligible claims by connecting your wallet. Please note
-          that approximately 40-50% of your original funds are expected to be
-          available. If you don&apos;t see the expected amount, kindly reach out
-          to us on Telegram before February 26th (End of Day) for assistance.
-          <br />
-          <br />
-          2. Please note that these figures are provisional and subject to
-          change. Based on community feedback or if discrepancies are identified
-          during technical reviews, adjustments may be made after resolving any
-          underlying issues.
+          <span>
+            1. Check your eligible claims by connecting your wallet. Please note
+            that approximately 40-50% of your original funds are expected to be
+            available. These amounts are final and will not be adjusted because
+            the time for discussing any discrepancies has passed (Feb 26th) as
+            mentioned{' '}
+            <a
+              href="https://x.com/strkfarm/status/1892304463513125367"
+              style={{ textDecoration: 'underline' }}
+            >
+              here
+            </a>
+            .
+            <br />
+            2. Any newly recovered funds from{' '}
+            <a
+              href="https://x.com/zkLend/status/1892459438881329660"
+              style={{ textDecoration: 'underline' }}
+            >
+              zkLend{"'"}s recovery
+            </a>{' '}
+            will be distributed to the affected users in a similar way after few
+            weeks. The details of the same will be announced on our{' '}
+            <a
+              href="https://x.com/strkfarm"
+              style={{ textDecoration: 'underline' }}
+            >
+              X page
+            </a>
+            .
+          </span>
         </Alert>
       </Box>
 

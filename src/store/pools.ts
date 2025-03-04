@@ -1,10 +1,10 @@
 import CONSTANTS from '@/constants';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
+import { CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
+import fetchWithRetry from '@/utils/fetchWithRetry';
 import { Atom, atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
-import { CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
-import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
-import { StrategyLiveStatus } from '@/strategies/IStrategy';
-import fetchWithRetry from '@/utils/fetchWithRetry';
 
 export enum Category {
   Stable = 'Stable Pools',
@@ -61,6 +61,10 @@ export interface PoolInfo extends PoolMetadata {
     isAudited: boolean;
     is_promoted?: boolean;
   };
+}
+
+export function isPoolRetired(pool: PoolInfo) {
+  return pool.additional.tags.includes(StrategyLiveStatus.RETIRED);
 }
 
 export function getDefaultPoolInfo(): PoolInfo {

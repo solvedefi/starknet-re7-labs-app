@@ -1,7 +1,7 @@
-import { NFTInfo, TokenInfo } from './strategies/IStrategy';
-import MyNumber from './utils/MyNumber';
-import { getEndpoint, standariseAddress } from './utils';
 import { constants, RpcProvider } from 'starknet';
+import { NFTInfo, TokenInfo } from './strategies/IStrategy';
+import { getEndpoint, standariseAddress } from './utils';
+import MyNumber from './utils/MyNumber';
 
 const LOGOS = {
   USDT: '/zklend/icons/tokens/usdt.svg?w=20',
@@ -24,7 +24,7 @@ export type TokenName =
   | 'kSTRK'
   | 'xSTRK';
 
-const CONSTANTS = {
+export const CONSTANTS = {
   DEX_INCENTIVE_URL:
     'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/fetchFile?file=strk_grant.json',
   NOSTRA_DEGEN_INCENTIVE_URL: 'https://api.nostra.finance/query/pool_aprs',

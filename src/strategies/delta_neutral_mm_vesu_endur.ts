@@ -17,6 +17,7 @@ import { fetchQuotes, QuoteRequest } from '@avnu/avnu-sdk';
 
 export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
   vesuPoolName = 'Re7 xSTRK';
+  fee_factor: number = 0.2;
   constructor(
     token: TokenInfo,
     name: string,
@@ -39,6 +40,15 @@ export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
       endur,
       vesu,
     );
+
+    const risks = [this.risks[0], this.risks[2]];
+    if (this.settings.alerts && this.settings.alerts.length > 0) {
+      risks.push(
+        (this.settings.alerts[0].text as string).replace('Note: ', ''),
+      );
+    }
+    risks.push(...this.risks.slice(3));
+    this.risks = risks;
   }
 
   filterMainToken(

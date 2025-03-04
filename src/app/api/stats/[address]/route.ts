@@ -19,17 +19,33 @@ export async function GET(_req: Request, context: any) {
   const strategies = getStrategies();
   const values = strategies.map(async (strategy) => {
     const balanceInfo = await strategy.getUserTVL(pAddr);
+
+    if (strategy.isLive()) {
+      return {
+        id: strategy.id,
+        usdValue: balanceInfo.usdValue,
+        tokenInfo: {
+          name: balanceInfo.tokenInfo.name,
+          symbol: balanceInfo.tokenInfo.name,
+          logo: balanceInfo.tokenInfo.logo,
+          decimals: balanceInfo.tokenInfo.decimals,
+          displayDecimals: balanceInfo.tokenInfo.displayDecimals,
+        },
+        amount: balanceInfo.amount.toEtherStr(),
+      };
+    }
+
     return {
       id: strategy.id,
-      usdValue: balanceInfo.usdValue,
+      usdValue: 0,
       tokenInfo: {
         name: balanceInfo.tokenInfo.name,
         symbol: balanceInfo.tokenInfo.name,
         logo: balanceInfo.tokenInfo.logo,
-        decimals: balanceInfo.tokenInfo.decimals,
-        displayDecimals: balanceInfo.tokenInfo.displayDecimals,
+        decimals: 0,
+        displayDecimals: 0,
       },
-      amount: balanceInfo.amount.toEtherStr(),
+      amount: 0,
     };
   });
 

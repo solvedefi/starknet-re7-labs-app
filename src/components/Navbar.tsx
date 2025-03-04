@@ -215,7 +215,7 @@ export default function Navbar(props: NavbarProps) {
       top="0"
     >
       <TncModal />
-      {/* <Center bg="bg" color="gray" padding={0}>
+      <Center bg="bg" color="gray" padding={0}>
         <Text
           fontSize="12px"
           textAlign={'center'}
@@ -223,19 +223,24 @@ export default function Navbar(props: NavbarProps) {
           color="#a5a5d9"
         >
           <b>
-            STRKFarm just got <span className="orange">audited</span> by one of
-            the top auditors in the ecosystem.
+            Strategies with{' '}
             <Link
+              href="https://x.com/strkfarm/status/1889933140657053786"
               target="_blank"
-              href="https://x.com/strkfarm/status/1833071604856987678"
-              color="orange"
+              textDecoration={'underline'}
             >
               {' '}
-              Read more
+              zkLend exploit
+            </Link>{' '}
+            exposure have been retired. You can check your partially recovered
+            funds
+            <Link href="/recovery" color="orange">
+              {' '}
+              here.
             </Link>
           </b>
         </Text>
-      </Center> */}
+      </Center>
       <Box
         width={'100%'}
         maxWidth="1400px"

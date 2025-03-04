@@ -26,16 +26,16 @@ import {
   Wrap,
   WrapItem,
 } from '@chakra-ui/react';
-import { useAccount } from '@starknet-react/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Deposit from '@/components/Deposit';
-import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
-import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import { transactionsAtom, TxHistoryAtom } from '@/store/transactions.atom';
 import HarvestTime from '@/components/HarvestTime';
+import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
+import { addressAtom } from '@/store/claims.atoms';
+import { strategiesAtom, StrategyInfo } from '@/store/strategies.atoms';
+import { transactionsAtom, TxHistoryAtom } from '@/store/transactions.atom';
 import {
   capitalize,
   getTokenInfoFromAddr,
@@ -43,12 +43,12 @@ import {
   shortAddress,
   timeAgo,
 } from '@/utils';
-import { StrategyParams } from '../page';
 import MyNumber from '@/utils/MyNumber';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { StrategyParams } from '../page';
 
 const Strategy = ({ params }: StrategyParams) => {
-  const { address } = useAccount();
+  const address = useAtomValue(addressAtom);
   const strategies = useAtomValue(strategiesAtom);
   const transactions = useAtomValue(transactionsAtom);
   const [isMounted, setIsMounted] = useState(false);
@@ -180,7 +180,9 @@ const Strategy = ({ params }: StrategyParams) => {
           <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
             <GridItem display="flex" colSpan={colSpan1}>
               <Card width="100%" padding={'15px'} color="white" bg="highlight">
-                <HarvestTime strategy={strategy} balData={balData} />
+                {!strategy?.isRetired() && (
+                  <HarvestTime strategy={strategy} balData={balData} />
+                )}
                 <Box display={{ base: 'block', md: 'flex' }} marginTop={'10px'}>
                   <Box width={{ base: '100%', md: '100%' }}>
                     <Text
@@ -242,13 +244,15 @@ const Strategy = ({ params }: StrategyParams) => {
                                     balData.data.tokenInfo?.displayDecimals ||
                                       2,
                                   ),
-                                ) == 0
+                                ) === 0 || strategy?.isRetired()
                                 ? '-'
                                 : `${balData.data.amount.toEtherToFixedDecimals(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
                               : 'Connect wallet'}
                           </Text>
                         </Box>
-                        <Tooltip label="Life time earnings">
+                        <Tooltip
+                          label={!strategy?.isRetired() && 'Life time earnings'}
+                        >
                           <Box>
                             <Text textAlign={'right'} fontWeight={'none'}>
                               <b>Net earnings</b>
@@ -257,7 +261,7 @@ const Strategy = ({ params }: StrategyParams) => {
                               textAlign={'right'}
                               color={profit >= 0 ? 'cyan' : 'red'}
                             >
-                              {address && profit != 0
+                              {address && profit !== 0 && !strategy?.isRetired()
                                 ? `${profit?.toFixed(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
                                 : '-'}
                             </Text>
@@ -282,7 +286,58 @@ const Strategy = ({ params }: StrategyParams) => {
                       <b>Your Holdings: Error</b>
                     </Text>
                   )}
+                  {address &&
+                    balData.data &&
+                    strategy.id == 'xstrk_sensei' &&
+                    profit < 0 &&
+                    profit /
+                      Number(balData.data.amount.toEtherToFixedDecimals(6)) <
+                      -0.01 && (
+                      <Alert
+                        status={'info'}
+                        fontSize={'12px'}
+                        color={'light_grey'}
+                        borderRadius={'10px'}
+                        bg="color2_50p"
+                        padding={'10px'}
+                        marginTop={'10px'}
+                      >
+                        <AlertIcon />
+                        Why did my holdings drop?{' '}
+                        <a
+                          href="https://docs.strkfarm.com/p/faq#q.-why-did-my-holdings-decrease-in-the-xstrk-sensei-strategy"
+                          style={{
+                            marginLeft: '5px',
+                            textDecoration: 'underline',
+                          }}
+                          target="_blank"
+                        >
+                          Learn more
+                        </a>
+                      </Alert>
+                    )}
                 </Box>
+                {strategy?.isRetired() && (
+                  <Alert
+                    fontSize={'14px'}
+                    color={'light_grey'}
+                    borderRadius={'10px'}
+                    bg="color2_50p"
+                    paddingY={'10px'}
+                    px={'14px'}
+                    mt={'5'}
+                  >
+                    <AlertIcon />
+
+                    <Text>
+                      This strategy is retired due to zkLend exploit. You can
+                      recover your partial funds from{' '}
+                      <Link href="/recovery" color={'white'}>
+                        here.
+                      </Link>
+                    </Text>
+                  </Alert>
+                )}
               </Card>
             </GridItem>
 
@@ -331,7 +386,7 @@ const Strategy = ({ params }: StrategyParams) => {
                       {strategy.settings.alerts != undefined && (
                         <VStack mt={'20px'}>
                           {strategy.settings.alerts
-                            .filter((a) => a.tab == 'deposit')
+                            .filter((a) => a.tab == 'deposit' || a.tab == 'all')
                             .map((alert, index) => (
                               <Alert
                                 status={alert.type}
@@ -363,7 +418,9 @@ const Strategy = ({ params }: StrategyParams) => {
                       {strategy.settings.alerts != undefined && (
                         <VStack mt={'20px'}>
                           {strategy.settings.alerts
-                            .filter((a) => a.tab == 'withdraw')
+                            .filter(
+                              (a) => a.tab == 'withdraw' || a.tab == 'all',
+                            )
                             .map((alert, index) => (
                               <Alert
                                 status={alert.type}

@@ -22,13 +22,21 @@ import {
 } from '@/store/strkfarm.atoms';
 
 import { YieldStrategyCard } from './YieldCard';
+import { getLiveStatusEnum } from '@/store/strategies.atoms';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 export default function Strategies() {
   const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
   const strkFarmPools = useMemo(() => {
     if (!strkFarmPoolsRes || !strkFarmPoolsRes.data)
       return [] as STRKFarmStrategyAPIResult[];
-    return strkFarmPoolsRes.data.strategies.sort((a, b) => b.apy - a.apy);
+    return strkFarmPoolsRes.data.strategies
+      .sort((a, b) => b.apy - a.apy)
+      .sort((a, _b) =>
+        getLiveStatusEnum(a.status.number) == StrategyLiveStatus.RETIRED
+          ? 1
+          : -1,
+      );
   }, [strkFarmPoolsRes]);
 
   const _filteredPools = useAtomValue(filteredPools);

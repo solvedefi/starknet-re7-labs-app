@@ -14,12 +14,51 @@ import { AutoTokenStrategy } from '@/strategies/auto_strk.strat';
 import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
 import { DeltaNeutralMM2 } from '@/strategies/delta_neutral_mm_2';
 import { DeltaNeutralMMVesuEndur } from '@/strategies/delta_neutral_mm_vesu_endur';
+import { Box, Link } from '@chakra-ui/react';
 
 export interface StrategyInfo extends IStrategyProps {
   name: string;
 }
 
 export function getStrategies() {
+  const alerts2: any[] = [
+    {
+      type: 'warning',
+      text: (
+        <Box>
+          Deposits are expected to fail for this strategy due to an ongoing
+          zkLend security incident until further notice.{' '}
+          <Link
+            href="https://x.com/strkfarm/status/1889526043733794979"
+            color="white"
+            fontWeight={'bold'}
+          >
+            Learn more
+          </Link>
+        </Box>
+      ),
+      tab: 'deposit',
+    },
+    {
+      type: 'warning',
+      text: (
+        <Box>
+          You will receive withdrawals as zTokens, redeemable on zkLend.
+          However, redemptions may be affected due to an ongoing security
+          incident.{' '}
+          <Link
+            href="https://x.com/strkfarm/status/1889526043733794979"
+            color="white"
+            fontWeight={'bold'}
+          >
+            Learn more
+          </Link>
+        </Box>
+      ),
+      tab: 'withdraw',
+    },
+  ];
+
   const autoStrkStrategy = new AutoTokenStrategy(
     'STRK',
     'Auto Compounding STRK',
@@ -29,6 +68,8 @@ export function getStrategies() {
     {
       maxTVL: 2000000,
       isAudited: true,
+      isPaused: false,
+      alerts: alerts2,
     },
   );
   const autoUSDCStrategy = new AutoTokenStrategy(
@@ -40,13 +81,28 @@ export function getStrategies() {
     {
       maxTVL: 2000000,
       isAudited: true,
+      isPaused: false,
+      alerts: alerts2,
     },
   );
 
   const alerts: any[] = [
     {
       type: 'warning',
-      text: 'Deposits may fail due to debt limit on zkLend. We are working with them to increase the limit. Please check back later.',
+      text: (
+        <Box>
+          Deposits and Withdraws are paused for this strategy due to zkLend
+          security incident until further notice.{' '}
+          <Link
+            href="https://x.com/strkfarm/status/1889526043733794979"
+            color="white"
+            fontWeight={'bold'}
+          >
+            Learn more
+          </Link>
+        </Box>
+      ),
+      tab: 'all',
     },
   ];
 
@@ -59,11 +115,12 @@ export function getStrategies() {
     'ETH',
     CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
     [1, 0.615384615, 1, 0.584615385, 0.552509024], // precomputed factors based on strategy math
-    StrategyLiveStatus.NEW,
+    StrategyLiveStatus.RETIRED,
     {
       maxTVL: 1500000,
       isAudited: true,
-      // alerts,
+      alerts,
+      isPaused: true,
     },
   );
 
@@ -74,17 +131,12 @@ export function getStrategies() {
     'USDC',
     CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
     [1, 0.609886, 1, 0.920975, 0.510078], // precomputed factors based on strategy math
-    StrategyLiveStatus.ACTIVE,
+    StrategyLiveStatus.RETIRED,
     {
       maxTVL: 1000,
-      alerts: [
-        {
-          type: 'info',
-          text: 'Pro tip: Try to split your deposit between this strategy and ETH Sensei XL to avoid impact of yield fluctuations',
-          tab: 'deposit',
-        },
-      ],
+      alerts,
       isAudited: true,
+      isPaused: true,
     },
   );
   const deltaNeutralMMSTRKETH = new DeltaNeutralMM(
@@ -94,11 +146,12 @@ export function getStrategies() {
     'ETH',
     CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
     [1, 0.384615, 1, 0.492308, 0.233276], // precomputed factors based on strategy math, last is the excess deposit1 that is happening
-    StrategyLiveStatus.NEW,
+    StrategyLiveStatus.RETIRED,
     {
       maxTVL: 1500000,
       isAudited: true,
-      // alerts,
+      alerts,
+      isPaused: true,
     },
   );
 
@@ -109,17 +162,12 @@ export function getStrategies() {
     'USDC',
     CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
     [1, 0.5846153846, 1, 0.920975, 0.552509], // precomputed factors based on strategy math
-    StrategyLiveStatus.NEW,
+    StrategyLiveStatus.RETIRED,
     {
       maxTVL: 2000,
-      alerts: [
-        {
-          type: 'info',
-          text: 'Pro tip: Try to split your deposit between this strategy and ETH Sensei to avoid impact of yield fluctuations',
-          tab: 'deposit',
-        },
-      ],
+      alerts,
       isAudited: false,
+      isPaused: true,
     },
   );
 
@@ -133,12 +181,17 @@ export function getStrategies() {
     [1, 1, 0.725, 1.967985], // precomputed factors based on strategy math
     StrategyLiveStatus.HOT,
     {
-      maxTVL: 1000000,
+      maxTVL: 500000,
       alerts: [
+        // {
+        //   type: 'warning',
+        //   text: 'Note: Deposits may fail sometimes due to high utilisation on Vesu. We are working to add a dynamic TVL limit to better show limits.',
+        //   tab: 'deposit',
+        // },
         {
           type: 'info',
-          text: 'Note: On withdrawal, you will receive xSTRK. You can use xSTRK as STRK for most use-cases, however, you can redeem it for STRK anytime on endur.fi',
-          tab: 'withdraw',
+          text: 'Depeg-risk: If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
+          tab: 'all',
         },
       ],
       isAudited: false,

@@ -65,7 +65,7 @@ export class AutoTokenStrategy extends IStrategy {
       description,
       rewardTokens,
       holdingTokens,
-      StrategyLiveStatus.ACTIVE,
+      StrategyLiveStatus.RETIRED,
       settings,
     );
     this.token = getTokenInfoFromName(token);
@@ -87,7 +87,7 @@ export class AutoTokenStrategy extends IStrategy {
       this.getSafetyFactorLine(),
       `Your original investment is safe. If you deposit 100 tokens, you will always get at least 100 tokens back, unless due to below reasons.`,
       `Transfering excess ${lpTokenName} may take your borrows in zkLend near liquidaton. It's safer to deposit ${token} directly.`,
-      ..._risks.slice(1),
+      ..._risks,
     ];
     this.lpTokenName = lpTokenName;
     this.strategyAddress = strategyAddress;

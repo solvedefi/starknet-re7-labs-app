@@ -7,6 +7,7 @@ import { zkLend } from '@/store/zklend.store';
 import MyNumber from '@/utils/MyNumber';
 import { Atom, atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
+import { ReactNode } from 'react';
 import { Call, ProviderInterface } from 'starknet';
 
 export interface Step {
@@ -77,12 +78,13 @@ export interface IStrategySettings {
   maxTVL: number;
   alerts?: {
     type: 'warning' | 'info';
-    text: string;
+    text: string | ReactNode;
     tab: 'all' | 'deposit' | 'withdraw';
   }[];
   hideHarvestInfo?: boolean;
   is_promoted?: boolean;
   isAudited?: boolean;
+  isPaused?: boolean;
 }
 
 export interface AmountInfo {
@@ -162,6 +164,10 @@ export class IStrategyProps {
 
   isLive() {
     return isLive(this.liveStatus);
+  }
+
+  isRetired() {
+    return this.liveStatus == StrategyLiveStatus.RETIRED;
   }
 
   constructor(
@@ -345,7 +351,7 @@ export class IStrategy extends IStrategyProps {
         }
       }
     } catch (err) {
-      console.error(`${this.tag} - unsolved`, err);
+      console.warn(`${this.tag} - unsolved`, err);
       return;
     }
 

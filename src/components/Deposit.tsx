@@ -10,6 +10,8 @@ import { MyMenuItemProps, MyMenuListProps } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Center,
@@ -112,10 +114,13 @@ export default function Deposit(props: DepositProps) {
     return balData.data?.amount || MyNumber.fromZero();
   }, [balData]);
   // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
+
   const maxAmount: MyNumber = useMemo(() => {
     const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
     const maxAllowed =
-      props.strategy.settings.maxTVL - Number(currentTVl.toEtherStr());
+      props.buttonText == 'Deposit'
+        ? props.strategy.settings.maxTVL - Number(currentTVl.toEtherStr())
+        : Number(balance.toEtherToFixedDecimals(8));
     const adjustedMaxAllowed = MyNumber.fromEther(
       maxAllowed.toFixed(6),
       selectedMarket.decimals,
@@ -136,6 +141,13 @@ export default function Deposit(props: DepositProps) {
     const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
     return MyNumber.max(min, MyNumber.fromEther('0', selectedMarket.decimals));
   }, [balance, props.strategy, selectedMarket]);
+
+  const isTVLFull = useMemo(() => {
+    return tvlInfo.data?.amount.compare(
+      props.strategy.settings.maxTVL.toFixed(6),
+      'gt',
+    );
+  }, [tvlInfo]);
 
   useEffect(() => {
     if (isMaxClicked) {
@@ -339,35 +351,50 @@ export default function Deposit(props: DepositProps) {
         />
       </Center>
 
-      <Box width="100%" marginTop={'15px'}>
-        <Flex justifyContent="space-between">
-          <Text fontSize={'12px'} color="color2" fontWeight={'bold'}>
-            Current TVL Limit:
-          </Text>
-          <Text fontSize={'12px'} color="color2">
-            {!tvlInfo || !tvlInfo?.data ? (
-              <Spinner size="2xs" />
-            ) : (
-              Number(tvlInfo.data?.amount.toFixedStr(2)).toLocaleString()
-            )}
-            {' / '}
-            {props.strategy.settings.maxTVL.toLocaleString()}{' '}
-            {selectedMarket.name}
-          </Text>
-        </Flex>
-        <Progress
-          colorScheme="gray"
-          bg="bg"
-          value={
-            (100 *
-              (Number(tvlInfo.data?.amount.toEtherStr()) ||
-                props.strategy.settings.maxTVL)) /
-            props.strategy.settings.maxTVL
-          }
-          isIndeterminate={!tvlInfo || !tvlInfo?.data}
-        />
-        {/* {tvlInfo.isError ? 1 : 0}{tvlInfo.isLoading ? 1 : 0} {JSON.stringify(tvlInfo.error)} */}
-      </Box>
+      {!props.strategy.isRetired() && (
+        <Box width="100%" marginTop={'15px'}>
+          <Flex justifyContent="space-between">
+            <Text fontSize={'12px'} color="color2" fontWeight={'bold'}>
+              Current TVL Limit:
+            </Text>
+            <Text fontSize={'12px'} color="color2">
+              {!tvlInfo || !tvlInfo?.data ? (
+                <Spinner size="2xs" />
+              ) : (
+                Number(tvlInfo.data?.amount.toFixedStr(2)).toLocaleString()
+              )}
+              {' / '}
+              {props.strategy.settings.maxTVL.toLocaleString()}{' '}
+              {selectedMarket.name}
+            </Text>
+          </Flex>
+          <Progress
+            colorScheme="gray"
+            bg="bg"
+            value={
+              (100 *
+                (Number(tvlInfo.data?.amount.toEtherStr()) ||
+                  props.strategy.settings.maxTVL)) /
+              props.strategy.settings.maxTVL
+            }
+            isIndeterminate={!tvlInfo || !tvlInfo?.data}
+          />
+          {isTVLFull && isDeposit && (
+            <Alert
+              status="warning"
+              bg="bg"
+              marginTop={'20px'}
+              borderRadius={'10px'}
+            >
+              <AlertIcon />
+              <Text fontSize={'12px'} color={'color2'}>
+                TVL limit reached. Please wait for increase in limits.
+              </Text>
+            </Alert>
+          )}
+          {/* {tvlInfo.isError ? 1 : 0}{tvlInfo.isLoading ? 1 : 0} {JSON.stringify(tvlInfo.error)} */}
+        </Box>
+      )}
     </Box>
   );
 }

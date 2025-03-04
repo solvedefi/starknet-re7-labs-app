@@ -9,7 +9,7 @@ import MySwapAtoms, { mySwap } from './myswap.store';
 import NostraDegenAtoms, { nostraDegen } from './nostradegen.store';
 import NostraDexAtoms, { nostraDex } from './nostradex.store';
 import NostraLendingAtoms, { nostraLending } from './nostralending.store';
-import { Category, PoolInfo, PoolType } from './pools';
+import { Category, isPoolRetired, PoolInfo, PoolType } from './pools';
 import { getLiveStatusEnum } from './strategies.atoms';
 import STRKFarmAtoms, {
   strkfarm,
@@ -299,6 +299,9 @@ export const filteredPools = atom((get) => {
   console.log(`sorting`, 'filter pools');
 
   return pools.filter((pool) => {
+    if (isPoolRetired(pool)) {
+      return false;
+    }
     // category filter
     if (
       !categories.includes(ALL_FILTER) &&

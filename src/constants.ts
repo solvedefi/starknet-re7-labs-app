@@ -12,7 +12,6 @@ const LOGOS = {
   DAI: '/zklend/icons/tokens/dai.svg?w=20',
   kSTRK: '/zklend/icons/tokens/kstrk.svg?w=20',
   xSTRK: '/imagedelivery/c1f44170-c1b0-4531-3d3b-5f0bacfe1300/logo',
-  sSTRK: '/imagedelivery/e28697ac-a8ba-462f-0d40-ad33b285c200/logo',
 };
 
 export type TokenName =
@@ -23,7 +22,6 @@ export type TokenName =
   | 'WBTC'
   | 'DAI'
   | 'kSTRK'
-  | 'sSTRK'
   | 'xSTRK';
 
 export const CONSTANTS = {
@@ -39,16 +37,14 @@ export const CONSTANTS = {
   AUDIT_REPORT:
     'https://static-assets-8zct.onrender.com/strkfarm/audit_report.pdf',
   NOSTRA: {
-    LENDING_GRAPH_URL:
-      'https://us-east-2.aws.data.mongodb-api.com/app/data-yqlpb/endpoint/data/v1/action/find',
+    LENDING_GRAPH_URL: '/nostra/app/data-yqlpb/endpoint/data/v1/action/find',
   },
   ZKLEND: {
     BASE_APR_API: '/zklend/api/pools',
   },
   NIMBORA: {
     DEX_APR_API: '/nimbora/yield-dex/strategies',
-    AGGREGATOR_APR_API: '/nimbora/aggregator/strategies',
-    LIQUIDITY_APR_API: '/nimbora/liquity/strategies',
+    STAKING_APR_API: '/nimbora/staking/strategy',
   },
   JEDI: {
     BASE_API: '/jediswap/graphql',

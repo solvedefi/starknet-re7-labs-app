@@ -42,10 +42,6 @@ const nextConfig = {
         destination: 'https://myswap-cl-charts.s3.amazonaws.com/:path*',
       },
       {
-        source: '/nimbora/:path*',
-        destination: 'https://stats.nimbora.io/:path*',
-      },
-      {
         source: '/imagedelivery/:path*',
         destination: 'https://imagedelivery.net/0xPAQaDtnQhBs8IzYRIlNg/:path*',
       },

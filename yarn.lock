@@ -2103,20 +2103,21 @@
     "@stablelib/random" "^1.0.2"
     "@stablelib/wipe" "^1.0.1"
 
-"@starknet-io/get-starknet-core@4.0.0", "@starknet-io/get-starknet-core@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@starknet-io/get-starknet-core/-/get-starknet-core-4.0.0.tgz#a9e64959569de54c493a76a846f44b575a495520"
-  integrity sha512-M++JTbMxZJ5wCkw1f4vAXCY3BTlRMdxFScqsIgZonLXD3GKHPyM/pFi/JqorPO1o4RKHLnFX6M7r0izZ/NWpvA==
+"@starknet-io/get-starknet-core@4.0.5", "@starknet-io/get-starknet-core@^4.0.2":
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/@starknet-io/get-starknet-core/-/get-starknet-core-4.0.5.tgz#d67b5703cc2f52e8d28f43f5a56168f7659b1003"
+  integrity sha512-aMnDHhWO0IMdwusZcoyPPnvAxzREWv+XkPMAtB2O1h64x1QKvpR/oVoDl/ZY81JKS4YlUWqcuD+sMGGUVZAa7w==
   dependencies:
     "@module-federation/runtime" "^0.1.2"
     "@starknet-io/types-js" "^0.7.7"
+    async-mutex "^0.5.0"
 
-"@starknet-io/get-starknet@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@starknet-io/get-starknet/-/get-starknet-4.0.0.tgz#1dbb2c16146c2dab2710aa7856d78ac1a4b3fd45"
-  integrity sha512-SmnRzBewS0BVjtKzViSrWXi+SvOnSrj9hnvlx8B3ZnCq9A2NuX8pNI550lDBLl/ilIr587FH2VNAj6jdgsyhJQ==
+"@starknet-io/get-starknet@^4.0.2":
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/@starknet-io/get-starknet/-/get-starknet-4.0.5.tgz#7dbf5ce149244034c69438bd8ad432f0d2c9c975"
+  integrity sha512-eAj3Zh9PVrn3E2jC9N7E+HxU7VlMxiUckGpL9lrWLa7vnORJkZg/3tDmjfqzgVNGN9d7ElcjIXeJB6/5d5CUCg==
   dependencies:
-    "@starknet-io/get-starknet-core" "4.0.0"
+    "@starknet-io/get-starknet-core" "4.0.5"
     bowser "^2.11.0"
 
 "@starknet-io/types-js@^0.7.7":
@@ -2953,6 +2954,13 @@ ast-types-flow@^0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/ast-types-flow/-/ast-types-flow-0.0.8.tgz#0a85e1c92695769ac13a428bb653e7538bea27d6"
   integrity sha512-OH/2E5Fg20h2aPrbe+QL8JZQFko0YZaF+j4mnQ7BGhfavO7OpSLa8a0y9sBwomHdSbkhTS8TQNayBfnW5DwbvQ==
+
+async-mutex@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/async-mutex/-/async-mutex-0.5.0.tgz#353c69a0b9e75250971a64ac203b0ebfddd75482"
+  integrity sha512-1A94B18jkJ3DYq284ohPxoXbfTA5HsQ7/Mf4DEhcyLx3Bz27Rh59iScbB6EPiP+B+joue6YCxcMXSbFC1tZKwA==
+  dependencies:
+    tslib "^2.4.0"
 
 async@^3.2.3:
   version "3.2.6"
@@ -6972,13 +6980,13 @@ starknet@6.11.0, starknet@^6.11.0:
     ts-mixer "^6.0.3"
     url-join "^4.0.1"
 
-starknetkit@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/starknetkit/-/starknetkit-2.3.2.tgz#1af14c90bcdd725a0767c818601c712ff838f968"
-  integrity sha512-qedc6m8r5c5lqn6Ovf+TdDnGtoIYsx2A+VYyHAD9vxTVrRDKightKJB5jN2A/dTEewZoCgssqmjdsAoAiCdcdQ==
+starknetkit@2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/starknetkit/-/starknetkit-2.4.0.tgz#922dacd4686755bdabe2dc1825c990aa5bf0195a"
+  integrity sha512-k6an2qrr3OUS9QaUVmjfikEMYLppyLvy0V4DRX8MKYEIGZ0VBG5dNAj9uuBIWyjlNlJPY9RwmmHhOMNazbgBmg==
   dependencies:
-    "@starknet-io/get-starknet" "^4.0.0"
-    "@starknet-io/get-starknet-core" "^4.0.0"
+    "@starknet-io/get-starknet" "^4.0.2"
+    "@starknet-io/get-starknet-core" "^4.0.2"
     "@starknet-io/types-js" "^0.7.7"
     "@trpc/client" "^10.38.1"
     "@trpc/server" "^10.38.1"

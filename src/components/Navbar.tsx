@@ -58,6 +58,10 @@ import {
   ArgentMobileConnector,
   isInArgentMobileAppBrowser,
 } from 'starknetkit/argentMobile';
+import {
+  BraavosMobileConnector,
+  isInBraavosMobileAppBrowser,
+} from 'starknetkit/braavosMobile';
 import { WebWalletConnector } from 'starknetkit/webwallet';
 import TncModal from './TncModal';
 
@@ -68,6 +72,10 @@ export function getConnectors(isMobile: boolean) {
       url: getEndpoint(),
       chainId: constants.NetworkName.SN_MAIN,
     },
+    inAppBrowserOptions: {},
+  }) as StarknetkitConnector;
+
+  const mobileBraavosConnector = BraavosMobileConnector.init({
     inAppBrowserOptions: {},
   }) as StarknetkitConnector;
 
@@ -92,22 +100,61 @@ export function getConnectors(isMobile: boolean) {
     },
   });
 
+  const isInstalled = [argentXConnector, braavosConnector, keplrConnector].map(
+    (wallet) => {
+      return {
+        id: wallet.id,
+        isInstalled:
+          typeof window === 'undefined'
+            ? false
+            : window[`starknet_${wallet.id}`] !== undefined,
+      };
+    },
+  );
+
   const webWalletConnector = new WebWalletConnector({
     url: 'https://web.argent.xyz',
   }) as StarknetkitConnector;
 
   if (isInArgentMobileAppBrowser()) {
     return [mobileConnector];
+  } else if (isInBraavosMobileAppBrowser()) {
+    return [mobileBraavosConnector];
   } else if (isMobile) {
-    return [braavosConnector, mobileConnector, webWalletConnector];
+    return [
+      braavosConnector,
+      mobileConnector,
+      mobileBraavosConnector,
+      webWalletConnector,
+    ];
   }
-  return [
+
+  const defaultConnectors = [
     argentXConnector,
     braavosConnector,
     keplrConnector,
-    mobileConnector,
-    webWalletConnector,
   ];
+
+  // put uninstall wallets at the end
+  const sortedConnectors: any[] = defaultConnectors.sort((a, b) => {
+    const aInstalled = isInstalled.find(
+      (wallet) => wallet.id === a.id,
+    )?.isInstalled;
+    const bInstalled = isInstalled.find(
+      (wallet) => wallet.id === b.id,
+    )?.isInstalled;
+
+    if (aInstalled && bInstalled) {
+      return 0;
+    } else if (aInstalled) {
+      return -1;
+    }
+    return 1;
+  });
+
+  sortedConnectors.push(mobileConnector);
+  sortedConnectors.push(webWalletConnector);
+  return sortedConnectors;
 }
 
 interface NavbarProps {

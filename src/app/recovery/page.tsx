@@ -13,7 +13,7 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-import { useProvider, useSendTransaction } from '@starknet-react/core';
+import { useSendTransaction } from '@starknet-react/core';
 import { useAtomValue } from 'jotai';
 import React, { useMemo } from 'react';
 
@@ -23,7 +23,10 @@ import MyNumber from '@/utils/MyNumber';
 import { Contract } from 'starknet';
 import { getDisplayCurrencyAmount } from '@/utils';
 import toast from 'react-hot-toast';
-import { STRATEGY_ADDRESSES } from './_components/zkLendRecoveryComp';
+import ZklendRecoveryComp, {
+  STRATEGY_ADDRESSES,
+} from './_components/zkLendRecoveryComp';
+import { provider } from '@/constants';
 
 export default function Recovery() {
   const _address = useAtomValue(addressAtom);
@@ -39,11 +42,10 @@ export default function Recovery() {
   });
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const { provider } = useProvider();
-
   React.useEffect(() => {
     (async () => {
       try {
+        if (!address) return;
         setIsLoading(true);
 
         const contractCalls = Object.entries(STRATEGY_ADDRESSES).map(
@@ -394,8 +396,8 @@ export default function Recovery() {
         )}
       </Container>
 
-      {/* <hr style={{float: 'left', width: '100%', margin: '50px 0'}}/>
-      <ZklendRecoveryComp/> */}
+      <hr style={{ float: 'left', width: '100%', margin: '50px 0' }} />
+      <ZklendRecoveryComp />
     </Container>
   );
 }

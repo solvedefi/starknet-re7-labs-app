@@ -19,11 +19,39 @@ import { useAtomValue } from 'jotai';
 import { useProvider, useSendTransaction } from '@starknet-react/core';
 import strategyAbi from '@/abi/autoStrk.abi.json';
 import { addressAtom } from '@/store/claims.atoms';
-import { STRATEGY_ADDRESSES } from '../page';
 import { Contract, uint256 } from 'starknet';
 import MyNumber from '@/utils/MyNumber';
 import toast from 'react-hot-toast';
 import { getDisplayCurrencyAmount } from '@/utils';
+
+export const STRATEGY_ADDRESSES: {
+  [key: string]: {
+    address: string;
+    token: string;
+    decimals: number;
+  };
+} = {
+  strk_sensei: {
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
+    token: 'STRK',
+    decimals: 18,
+  },
+  eth_sensei: {
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
+    token: 'ETH',
+    decimals: 18,
+  },
+  usdc_sensei: {
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
+    token: 'USDC',
+    decimals: 6,
+  },
+  eth_sensei_xl: {
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
+    token: 'ETH',
+    decimals: 18,
+  },
+};
 
 const AUTO_COMPOUNDING: {
   [key: string]: {

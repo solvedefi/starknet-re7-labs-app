@@ -18,41 +18,12 @@ import { useAtomValue } from 'jotai';
 import React, { useMemo } from 'react';
 
 import strategyAbi from '@/abi/strategy.abi.json';
-import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import MyNumber from '@/utils/MyNumber';
 import { Contract } from 'starknet';
 import { getDisplayCurrencyAmount } from '@/utils';
 import toast from 'react-hot-toast';
-
-export const STRATEGY_ADDRESSES: {
-  [key: string]: {
-    address: string;
-    token: string;
-    decimals: number;
-  };
-} = {
-  strk_sensei: {
-    address: CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
-    token: 'STRK',
-    decimals: 18,
-  },
-  eth_sensei: {
-    address: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
-    token: 'ETH',
-    decimals: 18,
-  },
-  usdc_sensei: {
-    address: CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
-    token: 'USDC',
-    decimals: 6,
-  },
-  eth_sensei_xl: {
-    address: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
-    token: 'ETH',
-    decimals: 18,
-  },
-};
+import { STRATEGY_ADDRESSES } from './_components/zkLendRecoveryComp';
 
 export default function Recovery() {
   const _address = useAtomValue(addressAtom);

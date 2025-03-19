@@ -31,7 +31,13 @@ type StratInfo = {
   decimals: number;
 };
 
-type STRATEGY_KEY = 'strk_auto' | 'eth_auto';
+export type STRATEGY_KEY =
+  | 'strk_auto'
+  | 'eth_auto'
+  | 'strk_sensei'
+  | 'eth_sensei'
+  | 'usdc_sensei'
+  | 'eth_sensei_xl';
 export const STRATEGY_ADDRESSES = {
   strk_sensei: {
     address: CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,

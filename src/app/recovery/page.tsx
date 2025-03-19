@@ -117,9 +117,14 @@ export default function Recovery() {
     );
     const calls = contracts
       .map((contract) => {
-        const strategy_key = Object.keys(STRATEGY_ADDRESSES).find((key) => {
-          return STRATEGY_ADDRESSES[key].address === contract.address;
-        });
+        const strategy_key = Object.keys(STRATEGY_ADDRESSES).find(
+          (_key: any) => {
+            const key: any = _key;
+            return (
+              (STRATEGY_ADDRESSES as any)[key].address === contract.address
+            );
+          },
+        );
         if (!strategy_key) {
           return null;
         }
@@ -166,7 +171,7 @@ export default function Recovery() {
     const calls = contracts
       .map((contract) => {
         const strategy_key = Object.keys(STRATEGY_ADDRESSES).find((key) => {
-          return STRATEGY_ADDRESSES[key].address === contract.address;
+          return (STRATEGY_ADDRESSES as any)[key].address === contract.address;
         });
         if (!strategy_key) {
           return null;

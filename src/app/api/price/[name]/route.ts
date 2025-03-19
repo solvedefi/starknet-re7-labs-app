@@ -38,10 +38,15 @@ export async function GET(req: Request, context: any) {
     const priceInfo = await redisClient.getPrice(tokenName);
     console.log('getPrice redis', priceInfo, tokenName);
     await redisClient.close();
-    return NextResponse.json({
+    const resp = NextResponse.json({
       ...priceInfo,
       name: tokenName,
     });
+    resp.headers.set(
+      'Cache-Control',
+      `s-maxage=${revalidate}, stale-while-revalidate=120`,
+    );
+    return resp;
   } catch (err) {
     console.error('Error /api/price/:name', err);
     return NextResponse.json(

@@ -1,31 +1,31 @@
 'use client';
 import {
-  Alert,
   Box,
-  Container,
-  Skeleton,
-  Stack,
-  Table,
-  Tbody,
-  Td,
   Text,
-  Th,
+  Alert,
+  Stack,
+  Skeleton,
+  Container,
+  Table,
   Thead,
   Tr,
+  Th,
+  Tbody,
+  Td,
 } from '@chakra-ui/react';
-import { useProvider, useSendTransaction } from '@starknet-react/core';
-import { useAtomValue } from 'jotai';
-import React, { useMemo } from 'react';
-
-import strategyAbi from '@/abi/strategy.abi.json';
 import CONSTANTS from '@/constants';
+import React, { useMemo } from 'react';
+import { useAtomValue } from 'jotai';
+import { useProvider, useSendTransaction } from '@starknet-react/core';
+import strategyAbi from '@/abi/autoStrk.abi.json';
 import { addressAtom } from '@/store/claims.atoms';
+import { STRATEGY_ADDRESSES } from '../page';
+import { Contract, uint256 } from 'starknet';
 import MyNumber from '@/utils/MyNumber';
-import { Contract } from 'starknet';
-import { getDisplayCurrencyAmount } from '@/utils';
 import toast from 'react-hot-toast';
+import { getDisplayCurrencyAmount } from '@/utils';
 
-export const STRATEGY_ADDRESSES: {
+const AUTO_COMPOUNDING: {
   [key: string]: {
     address: string;
     token: string;
@@ -33,28 +33,20 @@ export const STRATEGY_ADDRESSES: {
   };
 } = {
   strk_sensei: {
-    address: CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
+    address: CONSTANTS.CONTRACTS.AutoStrkFarm,
     token: 'STRK',
     decimals: 18,
   },
   eth_sensei: {
-    address: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
-    token: 'ETH',
-    decimals: 18,
-  },
-  usdc_sensei: {
-    address: CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
+    address: CONSTANTS.CONTRACTS.AutoUsdcFarm,
     token: 'USDC',
     decimals: 6,
   },
-  eth_sensei_xl: {
-    address: CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
-    token: 'ETH',
-    decimals: 18,
-  },
 };
 
-export default function Recovery() {
+const BATCH_ID = 1;
+
+export default function ZklendRecoveryComp() {
   const _address = useAtomValue(addressAtom);
   const address = useMemo(() => {
     return _address || '';
@@ -70,19 +62,23 @@ export default function Recovery() {
 
   const { provider } = useProvider();
 
+  const ALL_STRATS = { ...STRATEGY_ADDRESSES, ...AUTO_COMPOUNDING };
   React.useEffect(() => {
     (async () => {
       try {
         setIsLoading(true);
 
-        const contractCalls = Object.entries(STRATEGY_ADDRESSES).map(
+        const contractCalls = Object.entries(ALL_STRATS).map(
           async ([key, strategyInfo]) => {
             const contract = new Contract(
               strategyAbi,
               strategyInfo.address,
               provider,
             );
-            const res = await contract.call('nostra_position', [address]);
+            const res = await contract.call('zklend_position', [
+              address,
+              uint256.bnToUint256(BATCH_ID),
+            ]);
             console.log(`revoery`, strategyInfo.address, address, res);
             return {
               key,
@@ -132,20 +128,18 @@ export default function Recovery() {
   }, [poolAmounts]);
 
   const calls = useMemo(() => {
-    const contracts = Object.entries(STRATEGY_ADDRESSES).map(
-      ([key, strategyInfo]) => {
-        const contract = new Contract(
-          strategyAbi,
-          strategyInfo.address,
-          provider,
-        );
-        return contract;
-      },
-    );
+    const contracts = Object.entries(ALL_STRATS).map(([key, strategyInfo]) => {
+      const contract = new Contract(
+        strategyAbi,
+        strategyInfo.address,
+        provider,
+      );
+      return contract;
+    });
     const calls = contracts
       .map((contract) => {
-        const strategy_key = Object.keys(STRATEGY_ADDRESSES).find((key) => {
-          return STRATEGY_ADDRESSES[key].address === contract.address;
+        const strategy_key = Object.keys(ALL_STRATS).find((key) => {
+          return ALL_STRATS[key].address === contract.address;
         });
         if (!strategy_key) {
           return null;
@@ -179,21 +173,19 @@ export default function Recovery() {
       return;
     }
 
-    const contracts = Object.entries(STRATEGY_ADDRESSES).map(
-      ([key, strategyInfo]) => {
-        const contract = new Contract(
-          strategyAbi,
-          strategyInfo.address,
-          provider,
-        );
-        return contract;
-      },
-    );
+    const contracts = Object.entries(ALL_STRATS).map(([key, strategyInfo]) => {
+      const contract = new Contract(
+        strategyAbi,
+        strategyInfo.address,
+        provider,
+      );
+      return contract;
+    });
 
     const calls = contracts
       .map((contract) => {
-        const strategy_key = Object.keys(STRATEGY_ADDRESSES).find((key) => {
-          return STRATEGY_ADDRESSES[key].address === contract.address;
+        const strategy_key = Object.keys(ALL_STRATS).find((key) => {
+          return ALL_STRATS[key].address === contract.address;
         });
         if (!strategy_key) {
           return null;
@@ -216,47 +208,15 @@ export default function Recovery() {
   }
 
   return (
-    <Container maxWidth={'1000px'} margin={'0 auto'}>
-      <Box
-        display={{ base: 'block', md: 'flex' }}
-        alignItems="center"
-        justifyContent="space-between"
-      >
-        <Box
-          padding={'15px 0px'}
-          borderRadius="10px"
-          margin={'20px 0px 10px'}
-          width={{ base: '100%', md: '70%' }}
-        >
-          <Text
-            fontSize={{ base: '28px', md: '35px' }}
-            lineHeight={'30px'}
-            marginBottom={'10px'}
-            textAlign={'start'}
-          >
-            <b className="theme-gradient-text">Claim your amount</b>
-          </Text>
-          <Text
-            color="color2"
-            textAlign={'start'}
-            fontSize={{ base: '12px', md: '14px' }}
-            marginBottom={'0px'}
-            maxW={'70%'}
-          >
-            Here you can claim partially recovered funds from the affected
-            strategies.
-          </Text>
-        </Box>
-      </Box>
-
-      <Box my="3">
+    <Box width={'100%'} float={'left'}>
+      <Box my="3" width={'100%'} float={'left'}>
         <Box
           display={{ base: 'block', md: 'flex' }}
           justifyContent={'space-between'}
           marginBottom={{ base: '20px', md: '0' }}
         >
           <Text as="h3" color="white">
-            Recovery from Nostra{"'"}s portion of position:
+            Recovery from zkLend:
           </Text>
           <Box
             display={'flex'}
@@ -298,15 +258,14 @@ export default function Recovery() {
         >
           <span>
             1. Check your eligible claims by connecting your wallet. Please note
-            that approximately 40-50% of your original funds are expected to be
-            available. These amounts are final and will not be adjusted because
-            the time for discussing any discrepancies has passed (Feb 26th) as
-            mentioned{' '}
+            that approximately 1-5% of your original funds are expected to be
+            available. Please let us know of any descrepresies before 28th March
+            on our{' '}
             <a
-              href="https://x.com/strkfarm/status/1892304463513125367"
+              href={CONSTANTS.COMMUNITY_TG}
               style={{ textDecoration: 'underline' }}
             >
-              here
+              Telegram
             </a>
             .
             <br />
@@ -317,8 +276,8 @@ export default function Recovery() {
             >
               zkLend{"'"}s recovery
             </a>{' '}
-            will be distributed to the affected users in a similar way after few
-            weeks. The details of the same will be announced on our{' '}
+            will be distributed to the affected users in a similar way in
+            future. The details of the same will be announced on our{' '}
             <a
               href="https://x.com/strkfarm"
               style={{ textDecoration: 'underline' }}
@@ -330,7 +289,13 @@ export default function Recovery() {
         </Alert>
       </Box>
 
-      <Container width="100%" float={'left'} padding={'0px'} marginTop={'16px'}>
+      <Container
+        width="100%"
+        float={'left'}
+        padding={'0px'}
+        marginTop={'16px'}
+        marginBottom={'100px'}
+      >
         {(!isLoading || !address) && (
           <Table variant="simple">
             <Thead display={{ base: 'none', md: 'table-header-group' }}>
@@ -422,9 +387,6 @@ export default function Recovery() {
           </Stack>
         )}
       </Container>
-
-      {/* <hr style={{float: 'left', width: '100%', margin: '50px 0'}}/>
-      <ZklendRecoveryComp/> */}
-    </Container>
+    </Box>
   );
 }

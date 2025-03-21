@@ -12,25 +12,33 @@ import {
   Th,
   Tbody,
   Td,
+  Button,
 } from '@chakra-ui/react';
-import CONSTANTS from '@/constants';
+import CONSTANTS, { provider, TOKENS } from '@/constants';
 import React, { useMemo } from 'react';
 import { useAtomValue } from 'jotai';
-import { useProvider, useSendTransaction } from '@starknet-react/core';
+import { useSendTransaction } from '@starknet-react/core';
 import strategyAbi from '@/abi/autoStrk.abi.json';
 import { addressAtom } from '@/store/claims.atoms';
-import { Contract, uint256 } from 'starknet';
+import { Contract, num, uint256 } from 'starknet';
 import MyNumber from '@/utils/MyNumber';
 import toast from 'react-hot-toast';
-import { getDisplayCurrencyAmount } from '@/utils';
+import { getDisplayCurrencyAmount, standariseAddress } from '@/utils';
 
-export const STRATEGY_ADDRESSES: {
-  [key: string]: {
-    address: string;
-    token: string;
-    decimals: number;
-  };
-} = {
+type StratInfo = {
+  address: string;
+  token: string;
+  decimals: number;
+};
+
+export type STRATEGY_KEY =
+  | 'strk_auto'
+  | 'eth_auto'
+  | 'strk_sensei'
+  | 'eth_sensei'
+  | 'usdc_sensei'
+  | 'eth_sensei_xl';
+export const STRATEGY_ADDRESSES = {
   strk_sensei: {
     address: CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
     token: 'STRK',
@@ -53,19 +61,13 @@ export const STRATEGY_ADDRESSES: {
   },
 };
 
-const AUTO_COMPOUNDING: {
-  [key: string]: {
-    address: string;
-    token: string;
-    decimals: number;
-  };
-} = {
-  strk_sensei: {
+const AUTO_COMPOUNDING = {
+  strk_auto: {
     address: CONSTANTS.CONTRACTS.AutoStrkFarm,
     token: 'STRK',
     decimals: 18,
   },
-  eth_sensei: {
+  eth_auto: {
     address: CONSTANTS.CONTRACTS.AutoUsdcFarm,
     token: 'USDC',
     decimals: 6,
@@ -80,20 +82,25 @@ export default function ZklendRecoveryComp() {
     return _address || '';
   }, [_address]);
 
-  const [balances, setBalances] = React.useState({
-    strk_sensei: '0',
-    eth_sensei: '0',
-    usdc_sensei: '0',
-    eth_sensei_xl: '0',
-  });
+  const ALL_STRATS: Record<STRATEGY_KEY, StratInfo> = {
+    ...AUTO_COMPOUNDING,
+    ...STRATEGY_ADDRESSES,
+  };
+
+  const [balances, setBalances] = React.useState(
+    Object.entries(ALL_STRATS).reduce(
+      (acc, [key, value]) => {
+        return { ...acc, [key]: { balance: '0', token: value.token } };
+      },
+      {} as Record<STRATEGY_KEY, { balance: '0'; token: '' }>,
+    ),
+  );
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const { provider } = useProvider();
-
-  const ALL_STRATS = { ...STRATEGY_ADDRESSES, ...AUTO_COMPOUNDING };
   React.useEffect(() => {
     (async () => {
       try {
+        if (!address) return;
         setIsLoading(true);
 
         const contractCalls = Object.entries(ALL_STRATS).map(
@@ -103,17 +110,23 @@ export default function ZklendRecoveryComp() {
               strategyInfo.address,
               provider,
             );
-            const res = await contract.call('zklend_position', [
+            const res: any = await contract.call('zklend_position', [
               address,
               uint256.bnToUint256(BATCH_ID),
             ]);
-            console.log(`revoery`, strategyInfo.address, address, res);
+            const token = num.getHexString(res[0].toString());
+            const tokenInfo = TOKENS.find(
+              (t) => standariseAddress(t.token) === standariseAddress(token),
+            );
+            const tokenName = tokenInfo?.name;
+            const amt = res[1];
+            console.log(`revoery`, strategyInfo.address, tokenInfo, res);
             return {
               key,
-              token: strategyInfo.token,
+              token: tokenName,
               balance: new MyNumber(
-                res.toString(),
-                strategyInfo.decimals,
+                amt.toString(),
+                tokenInfo?.decimals || 0,
               ).toEtherToFixedDecimals(4),
             };
           },
@@ -121,14 +134,20 @@ export default function ZklendRecoveryComp() {
 
         const results = await Promise.all(contractCalls);
         const updatedBalances = results.reduce(
-          (acc, { key, balance }) => ({ ...acc, [key]: balance }),
+          (acc, { key, balance, token }) => ({
+            ...acc,
+            [key]: {
+              balance,
+              token,
+            },
+          }),
           { ...balances },
         );
         console.log('revoery2', updatedBalances);
         setBalances(updatedBalances);
       } catch (error) {
         setIsLoading(false);
-        console.error('revoery Error fetching balances:', error);
+        console.error('revoery Error fetchingg balances:', error);
       } finally {
         setIsLoading(false);
       }
@@ -137,23 +156,21 @@ export default function ZklendRecoveryComp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address, provider]);
 
-  const poolAmounts: Record<string, string> = useMemo(
-    () => ({
-      strk_sensei: balances.strk_sensei,
-      eth_sensei: balances.eth_sensei,
-      usdc_sensei: balances.usdc_sensei,
-      eth_sensei_xl: balances.eth_sensei_xl,
-    }),
-    [balances],
-  );
-
   const sumAmounts = useMemo(() => {
-    return {
-      USDC: poolAmounts.usdc_sensei,
-      ETH: Number(poolAmounts.eth_sensei) + Number(poolAmounts.eth_sensei_xl),
-      STRK: Number(poolAmounts.strk_sensei),
-    };
-  }, [poolAmounts]);
+    const obj = Object.entries(balances).reduce(
+      (acc, [key, value]) => {
+        const tokenName: 'ETH' | 'USDC' | 'STRK' = value.token as any;
+        if (!['ETH', 'USDC', 'STRK'].includes(tokenName)) {
+          console.error('Invalid token name:', tokenName);
+          throw new Error('Invalid token name');
+        }
+        acc[tokenName] += Number(value.balance);
+        return acc;
+      },
+      { ETH: 0, USDC: 0, STRK: 0 },
+    );
+    return obj;
+  }, [balances]);
 
   const calls = useMemo(() => {
     const contracts = Object.entries(ALL_STRATS).map(([key, strategyInfo]) => {
@@ -166,20 +183,24 @@ export default function ZklendRecoveryComp() {
     });
     const calls = contracts
       .map((contract) => {
-        const strategy_key = Object.keys(ALL_STRATS).find((key) => {
+        const strategy_key = Object.keys(ALL_STRATS).find((_key: any) => {
+          const key: STRATEGY_KEY = _key;
           return ALL_STRATS[key].address === contract.address;
-        });
+        }) as STRATEGY_KEY | undefined;
         if (!strategy_key) {
           return null;
         }
-        const amount = poolAmounts[strategy_key];
+        const amount = balances[strategy_key].balance;
         if (amount && Number(amount) > 0)
-          return contract.populate('withdraw_nostra', [address]);
+          return contract.populate('withdraw_zklend', [
+            uint256.bnToUint256(BATCH_ID),
+            address,
+          ]);
         return null;
       })
       .filter((call) => call !== null);
     return calls;
-  }, [address, poolAmounts, provider]);
+  }, [address, balances, provider]);
 
   const {
     sendAsync: writeAsync,
@@ -200,30 +221,6 @@ export default function ZklendRecoveryComp() {
       });
       return;
     }
-
-    const contracts = Object.entries(ALL_STRATS).map(([key, strategyInfo]) => {
-      const contract = new Contract(
-        strategyAbi,
-        strategyInfo.address,
-        provider,
-      );
-      return contract;
-    });
-
-    const calls = contracts
-      .map((contract) => {
-        const strategy_key = Object.keys(ALL_STRATS).find((key) => {
-          return ALL_STRATS[key].address === contract.address;
-        });
-        if (!strategy_key) {
-          return null;
-        }
-        const amount = poolAmounts[strategy_key];
-        if (amount && Number(amount) > 0)
-          return contract.populate('withdraw_nostra', [address]);
-        return null;
-      })
-      .filter((call) => call !== null);
 
     if (calls.length === 0) {
       toast('No funds to claim.', {
@@ -247,7 +244,6 @@ export default function ZklendRecoveryComp() {
             Recovery from zkLend:
           </Text>
           <Box
-            display={'flex'}
             alignItems={'center'}
             flexDir={'column'}
             gap={'2'}
@@ -255,7 +251,7 @@ export default function ZklendRecoveryComp() {
             width={{ base: '100%', md: '30%' }}
             marginTop={{ base: '10px', md: '0' }}
           >
-            <Box
+            <Button
               aria-disabled={true}
               bg={'white'}
               borderRadius="6px"
@@ -267,9 +263,14 @@ export default function ZklendRecoveryComp() {
               onClick={() => {
                 handleClaims();
               }}
+              disabled={true}
+              _disabled={{ backgroundColor: 'gray', cursor: 'not-allowed' }}
             >
               Claim
-            </Box>
+            </Button>
+            <Text color="gray" textAlign={'center'}>
+              Claims open after 28th Mar
+            </Text>
           </Box>
         </Box>
         <Alert

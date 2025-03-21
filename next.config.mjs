@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
   // output: 'export',
-  compiler: {
+  compiler: process.env.NODE_ENV == 'development' ? {} : {
     removeConsole: {
       exclude: ['error'],
     },

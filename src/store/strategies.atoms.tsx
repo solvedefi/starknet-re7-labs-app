@@ -15,6 +15,9 @@ import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
 import { DeltaNeutralMM2 } from '@/strategies/delta_neutral_mm_2';
 import { DeltaNeutralMMVesuEndur } from '@/strategies/delta_neutral_mm_vesu_endur';
 import { Box, Link } from '@chakra-ui/react';
+import { VesuRebalanceStrategies } from '@strkfarm/sdk';
+import { VesuRebalanceStrategy } from '@/strategies/vesu_rebalance';
+import { atomWithQuery } from 'jotai-tanstack-query';
 
 export interface StrategyInfo extends IStrategyProps {
   name: string;
@@ -198,6 +201,22 @@ export function getStrategies() {
     },
   );
 
+  const vesuRebalanceStrats = VesuRebalanceStrategies.map((v) => {
+    return new VesuRebalanceStrategy(
+      getTokenInfoFromName(v.depositTokens[0].symbol),
+      v.name,
+      v.description,
+      v,
+      StrategyLiveStatus.ACTIVE,
+      {
+        maxTVL: 0,
+        isAudited: v.auditUrl ? true : false,
+        auditUrl: v.auditUrl,
+        isPaused: false,
+      },
+    );
+  });
+
   // const xSTRKStrategy = new AutoXSTRKStrategy(
   //   'Stake STRK',
   //   'Endur is Starknet’s dedicated staking platform, where you can stake STRK to earn staking rewards. This strategy, built on Endur, is an incentivized vault that boosts returns by offering additional rewards. In the future, it may transition to auto-compounding on DeFi Spring, reinvesting rewards for maximum growth. Changes will be announced at least three days in advance on our socials.',
@@ -217,6 +236,7 @@ export function getStrategies() {
     deltaNeutralMMSTRKETH,
     deltaNeutralMMETHUSDCReverse,
     deltaNeutralxSTRKSTRK,
+    ...vesuRebalanceStrats,
     // xSTRKStrategy,
   ];
 
@@ -241,28 +261,43 @@ export const getPrivatePools = (get: any) => {
   return [endurRewardPoolInfo];
 };
 
+const strategiesAtomAsync = atomWithQuery((get) => {
+  return {
+    queryKey: ['strategies'],
+    queryFn: async () => {
+      const strategies = getStrategies();
+      const allPools = get(allPoolsAtomUnSorted);
+      const requiredPools = allPools.filter(
+        (p) =>
+          p.protocol.name === 'zkLend' ||
+          p.protocol.name === 'Nostra' ||
+          p.protocol.name === 'Vesu' ||
+          p.protocol.name === endur.name,
+      );
+
+      const privatePools: PoolInfo[] = get(privatePoolsAtom);
+      const proms = strategies.map((s) =>
+        s.solve([...requiredPools, ...privatePools], '1000'),
+      );
+      await Promise.all(proms);
+
+      strategies.sort((a, b) => {
+        const status1 = getLiveStatusNumber(a.liveStatus);
+        const status2 = getLiveStatusNumber(b.liveStatus);
+        return status1 - status2 || b.netYield - a.netYield;
+      });
+      return strategies;
+    },
+  };
+});
+
 export const strategiesAtom = atom<StrategyInfo[]>((get) => {
-  const strategies = getStrategies();
-  const allPools = get(allPoolsAtomUnSorted);
-  const requiredPools = allPools.filter(
-    (p) =>
-      p.protocol.name === 'zkLend' ||
-      p.protocol.name === 'Nostra' ||
-      p.protocol.name === 'Vesu' ||
-      p.protocol.name === endur.name,
-  );
-
-  const privatePools: PoolInfo[] = get(privatePoolsAtom);
-  for (const s of strategies) {
-    s.solve([...requiredPools, ...privatePools], '1000');
+  const { data } = get(strategiesAtomAsync);
+  if (!data) {
+    const strategies = getStrategies();
+    return strategies;
   }
-
-  strategies.sort((a, b) => {
-    const status1 = getLiveStatusNumber(a.liveStatus);
-    const status2 = getLiveStatusNumber(b.liveStatus);
-    return status1 - status2 || b.netYield - a.netYield;
-  });
-  return strategies;
+  return data;
 });
 
 export function getLiveStatusNumber(status: StrategyLiveStatus) {

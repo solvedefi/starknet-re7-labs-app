@@ -118,7 +118,7 @@ export default function Deposit(props: DepositProps) {
   const maxAmount: MyNumber = useMemo(() => {
     const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
     const maxAllowed =
-      props.buttonText == 'Deposit'
+      props.buttonText == 'Deposit' && props.strategy.settings.maxTVL != 0
         ? props.strategy.settings.maxTVL - Number(currentTVl.toEtherStr())
         : Number(balance.toEtherToFixedDecimals(8));
     const adjustedMaxAllowed = MyNumber.fromEther(
@@ -143,9 +143,12 @@ export default function Deposit(props: DepositProps) {
   }, [balance, props.strategy, selectedMarket]);
 
   const isTVLFull = useMemo(() => {
-    return tvlInfo.data?.amount.compare(
-      props.strategy.settings.maxTVL.toFixed(6),
-      'gt',
+    return (
+      props.strategy.settings.maxTVL != 0 &&
+      tvlInfo.data?.amount.compare(
+        props.strategy.settings.maxTVL.toFixed(6),
+        'gt',
+      )
     );
   }, [tvlInfo]);
 
@@ -351,7 +354,7 @@ export default function Deposit(props: DepositProps) {
         />
       </Center>
 
-      {!props.strategy.isRetired() && (
+      {!props.strategy.isRetired() && props.strategy.settings.maxTVL != 0 && (
         <Box width="100%" marginTop={'15px'}>
           <Flex justifyContent="space-between">
             <Text fontSize={'12px'} color="color2" fontWeight={'bold'}>

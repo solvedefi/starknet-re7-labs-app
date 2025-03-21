@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getMainnetConfig, PricerRedis } from '@strkfarm/sdk';
 
 export const revalidate = 300; // 5 mins
 
@@ -7,9 +8,8 @@ async function initRedis() {
   try {
     console.log('initRedis server');
     // eslint-disable-next-line
-    const strkFarmSdk = require('strkfarm-sdk');
-    console.log('strkFarmSdk', strkFarmSdk);
-    const pricer = new strkFarmSdk.PricerRedis(null, []);
+    const config = getMainnetConfig();
+    const pricer = new PricerRedis(config, []);
     if (!process.env.REDIS_URL) {
       console.warn('REDIS_URL not set');
       return;

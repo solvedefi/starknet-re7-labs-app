@@ -101,6 +101,7 @@ async function getStrategyInfo(
         apy: action.isDeposit ? action.pool.apr : -action.pool.borrow.apr,
       };
     }),
+    investmentFlows: strategy.investmentFlows,
   };
 }
 
@@ -108,13 +109,18 @@ export async function GET(req: Request) {
   const allPools = await getPools(MY_STORE);
   const strategies = getStrategies();
 
-  strategies.forEach((strategy) => {
-    try {
-      strategy.solve(allPools, '1000');
-    } catch (err) {
-      console.error('Error solving strategy', strategy.name, err);
-    }
+  const proms = strategies.map((strategy) => {
+    return strategy.solve(allPools, '1000');
   });
+
+  await Promise.all(proms);
+  // strategies.forEach((strategy) => {
+  //   try {
+  //     strategy.solve(allPools, '1000');
+  //   } catch (err) {
+  //     console.error('Error solving strategy', strategy.name, err);
+  //   }
+  // });
 
   const stratsDataProms: any[] = [];
   for (let i = 0; i < strategies.length; i++) {

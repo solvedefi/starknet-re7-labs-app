@@ -240,7 +240,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
             over <b>{harvestTime?.data?.totalHarvestsByContract} claims.</b>{' '}
             {lastHarvest && (
               <span>
-                Last harvested <b>{timeAgo(lastHarvest)}</b>.
+                Last harvested <b>{timeAgo(lastHarvest)}</b> (Across all users).
               </span>
             )}
           </Text>

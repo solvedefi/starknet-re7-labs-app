@@ -5,6 +5,7 @@ import { LendingSpace } from '@/store/lending.base';
 import { Category, PoolInfo } from '@/store/pools';
 import { zkLend } from '@/store/zklend.store';
 import MyNumber from '@/utils/MyNumber';
+import { IInvestmentFlow } from '@strkfarm/sdk';
 import { Atom, atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { ReactNode } from 'react';
@@ -84,6 +85,7 @@ export interface IStrategySettings {
   hideHarvestInfo?: boolean;
   is_promoted?: boolean;
   isAudited?: boolean;
+  auditUrl?: string;
   isPaused?: boolean;
 }
 
@@ -118,7 +120,9 @@ export class IStrategyProps {
   readonly settings: IStrategySettings;
   exchanges: IDapp<any>[] = [];
 
+  // @deprecated Not used in new strats. instead use investmentFlows
   steps: Step[] = [];
+  investmentFlows: IInvestmentFlow[] = [];
 
   actions: StrategyAction[] = [];
   netYield: number = 0;
@@ -308,7 +312,7 @@ export class IStrategy extends IStrategyProps {
     return [...actions, { pool: bestPool, amount, isDeposit: true }];
   }
 
-  solve(pools: PoolInfo[], amount: string) {
+  async solve(pools: PoolInfo[], amount: string) {
     this.actions = [];
     let _amount: string = amount;
     let netYield = 0;

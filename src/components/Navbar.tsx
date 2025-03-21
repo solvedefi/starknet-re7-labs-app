@@ -185,7 +185,7 @@ export default function Navbar(props: NavbarProps) {
 
   const connectorConfig: ConnectOptionsWithConnectors = useMemo(() => {
     return {
-      modalMode: 'canAsk',
+      modalMode: 'alwaysAsk',
       modalTheme: 'dark',
       webWalletUrl: 'https://web.argent.xyz',
       argentMobileOptions: {

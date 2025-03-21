@@ -13,6 +13,7 @@ import {
   ProtocolAtoms,
 } from './pools';
 import { getLiveStatusEnum } from './strategies.atoms';
+import { IInvestmentFlow } from '@strkfarm/sdk';
 
 export interface STRKFarmStrategyAPIResult {
   name: string;
@@ -43,6 +44,7 @@ export interface STRKFarmStrategyAPIResult {
     isDeposit: boolean;
     apy: number;
   }[];
+  investmentFlows: IInvestmentFlow[];
 }
 
 export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {

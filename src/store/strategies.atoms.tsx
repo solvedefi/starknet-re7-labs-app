@@ -182,7 +182,7 @@ export function getStrategies() {
     'xSTRK',
     CONSTANTS.CONTRACTS.DeltaNeutralxSTRKSTRKXL,
     [1, 1, 0.725, 1.967985], // precomputed factors based on strategy math
-    StrategyLiveStatus.HOT,
+    StrategyLiveStatus.ACTIVE,
     {
       maxTVL: 500000,
       alerts: [
@@ -207,7 +207,7 @@ export function getStrategies() {
       v.name,
       v.description,
       v,
-      StrategyLiveStatus.ACTIVE,
+      StrategyLiveStatus.HOT,
       {
         maxTVL: 0,
         isAudited: v.auditUrl ? true : false,

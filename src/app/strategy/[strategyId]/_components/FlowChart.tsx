@@ -263,15 +263,15 @@ function InternalFlowChart(props: FlowChartProps) {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          minZoom={1}
-          maxZoom={1}
+          // minZoom={1}
+          // maxZoom={1}
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={false}
-          panOnScroll={false}
-          zoomOnScroll={false}
-          zoomOnDoubleClick={false}
-          panOnDrag={false}
+          // panOnScroll={false}
+          // zoomOnScroll={false}
+          // zoomOnDoubleClick={false}
+          // panOnDrag={false}
           proOptions={proOptions}
         />
       </div>

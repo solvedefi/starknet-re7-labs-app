@@ -2,11 +2,9 @@ import React, { useMemo } from 'react';
 import {
   Box,
   Flex,
-  Spinner,
   Stat,
   StatLabel,
   StatNumber,
-  Tag,
   Text,
   Tooltip,
 } from '@chakra-ui/react';
@@ -109,7 +107,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
               </StatNumber>
             </Stat>
           </Tooltip>
-          <Flex flexDirection={'column'} justifyContent={'flex-end'}>
+          {/* <Flex flexDirection={'column'} justifyContent={'flex-end'}>
             <Tooltip label="This shows how much higher your yield is compared to zKLend">
               <Tag
                 bg="bg"
@@ -123,7 +121,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                 )}
               </Tag>
             </Tooltip>
-          </Flex>
+          </Flex> */}
         </Flex>
 
         {!isMobile && !strategy.settings.hideHarvestInfo && (

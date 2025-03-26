@@ -42,7 +42,7 @@ import TxButton from './TxButton';
 import { provider } from '@/constants';
 
 interface DepositProps {
-  strategy: StrategyInfo;
+  strategy: StrategyInfo<any>;
   // ? If you want to add more button text, you can add here
   // ? @dev ensure below actionType is updated accordingly
   buttonText: 'Deposit' | 'Redeem';
@@ -161,7 +161,7 @@ export default function Deposit(props: DepositProps) {
 
   function BalanceComponent(props: {
     token: TokenInfo;
-    strategy: StrategyInfo;
+    strategy: StrategyInfo<any>;
     buttonText: string;
   }) {
     return (

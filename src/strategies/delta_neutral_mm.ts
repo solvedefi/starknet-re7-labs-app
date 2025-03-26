@@ -80,6 +80,7 @@ export class DeltaNeutralMM extends IStrategy<void> {
       risk: {
         riskFactor: [],
         netRisk: 0,
+        notARisks: [],
       },
       additionalInfo: undefined,
     };

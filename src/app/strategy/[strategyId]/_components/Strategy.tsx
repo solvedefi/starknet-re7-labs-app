@@ -57,7 +57,7 @@ const Strategy = ({ params }: StrategyParams) => {
   const transactions = useAtomValue(transactionsAtom);
   const [isMounted, setIsMounted] = useState(false);
 
-  const strategy: StrategyInfo | undefined = useMemo(() => {
+  const strategy: StrategyInfo<any> | undefined = useMemo(() => {
     const id = params.strategyId;
 
     console.log('id', id);

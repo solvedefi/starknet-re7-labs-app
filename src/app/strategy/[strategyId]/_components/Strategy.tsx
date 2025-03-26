@@ -4,6 +4,7 @@ import {
   Alert,
   AlertIcon,
   Avatar,
+  Badge,
   Box,
   Card,
   Center,
@@ -48,6 +49,7 @@ import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { StrategyParams } from '../page';
 import FlowChart from './FlowChart';
 import { isMobile } from 'react-device-detect';
+import { getRiskExplaination } from '@strkfarm/sdk';
 
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
@@ -591,6 +593,23 @@ const Strategy = ({ params }: StrategyParams) => {
                     </ListItem>
                   ))}
                 </OrderedList>
+                <Box>
+                  {strategy.metadata.risk.riskFactor.map(
+                    (r: any, i: number) => (
+                      <Tooltip label={getRiskExplaination(r.type)} key={i}>
+                        <Badge
+                          padding={'5px 10px'}
+                          borderRadius={'10px'}
+                          opacity={0.8}
+                          marginRight={'5px'}
+                          marginTop={'10px'}
+                        >
+                          {r.type.valueOf()}
+                        </Badge>
+                      </Tooltip>
+                    ),
+                  )}
+                </Box>
               </Card>
             </GridItem>
             <GridItem colSpan={colSpan2} bg={'highlight'}>

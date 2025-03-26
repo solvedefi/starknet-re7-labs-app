@@ -19,7 +19,7 @@ import STRKFarmAtoms, {
 } from '@/store/strkfarm.atoms';
 
 interface HarvestTimeProps {
-  strategy: StrategyInfo;
+  strategy: StrategyInfo<any>;
   balData: any;
 }
 

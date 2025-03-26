@@ -19,7 +19,7 @@ import { VesuRebalanceStrategies } from '@strkfarm/sdk';
 import { VesuRebalanceStrategy } from '@/strategies/vesu_rebalance';
 import { atomWithQuery } from 'jotai-tanstack-query';
 
-export interface StrategyInfo extends IStrategyProps {
+export interface StrategyInfo<T> extends IStrategyProps<T> {
   name: string;
 }
 
@@ -228,7 +228,7 @@ export function getStrategies() {
   //   },
   // );
 
-  const strategies: IStrategy[] = [
+  const strategies: IStrategy<any>[] = [
     autoStrkStrategy,
     autoUSDCStrategy,
     deltaNeutralMMUSDCETH,
@@ -291,7 +291,7 @@ const strategiesAtomAsync = atomWithQuery((get) => {
   };
 });
 
-export const strategiesAtom = atom<StrategyInfo[]>((get) => {
+export const strategiesAtom = atom<StrategyInfo<any>[]>((get) => {
   const { data } = get(strategiesAtomAsync);
   if (!data) {
     const strategies = getStrategies();

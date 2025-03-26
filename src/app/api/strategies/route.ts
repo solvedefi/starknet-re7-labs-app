@@ -51,7 +51,7 @@ const provider = new RpcProvider({
 });
 
 async function getStrategyInfo(
-  strategy: IStrategy,
+  strategy: IStrategy<any>,
 ): Promise<STRKFarmStrategyAPIResult> {
   const tvl = await strategy.getTVL();
 

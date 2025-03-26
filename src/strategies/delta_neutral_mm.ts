@@ -25,8 +25,9 @@ import {
 } from '@/store/balance.atoms';
 import { atom } from 'jotai';
 import { IDapp } from '@/store/IDapp.store';
+import { ContractAddr, IStrategyMetadata, Web3Number } from '@strkfarm/sdk';
 
-export class DeltaNeutralMM extends IStrategy {
+export class DeltaNeutralMM extends IStrategy<void> {
   riskFactor = 0.75;
   token: TokenInfo;
   readonly secondaryToken: string;
@@ -58,6 +59,31 @@ export class DeltaNeutralMM extends IStrategy {
       throw new Error('DeltaMM: NFT not found');
     }
     const holdingTokens: (TokenInfo | NFTInfo)[] = [nftInfo];
+
+    const tokenInfo = getTokenInfoFromName('STRK');
+    const metadata: IStrategyMetadata<void> = {
+      name,
+      description,
+      address: ContractAddr.from(strategyAddress),
+      type: 'Other',
+      depositTokens: [
+        {
+          name: tokenInfo.name,
+          symbol: tokenInfo.name,
+          decimals: tokenInfo.decimals,
+          address: ContractAddr.from(tokenInfo.token),
+          logo: '',
+        },
+      ],
+      protocols: [],
+      maxTVL: new Web3Number('0', tokenInfo.decimals),
+      risk: {
+        riskFactor: [],
+        netRisk: 0,
+      },
+      additionalInfo: undefined,
+    };
+
     super(
       name.toLowerCase().replaceAll(' ', '_'),
       'DeltaNeutralMM',
@@ -67,6 +93,7 @@ export class DeltaNeutralMM extends IStrategy {
       holdingTokens,
       liveStatus,
       settings,
+      metadata,
     );
     this.token = token;
     this.protocol1 = protocol1;

@@ -23,6 +23,7 @@ import {
 } from '@/store/balance.atoms';
 import { getPrice, getTokenInfoFromName } from '@/utils';
 import { endur } from '@/store/endur.store';
+import { ContractAddr, IStrategyMetadata, Web3Number } from '@strkfarm/sdk';
 
 interface Step {
   name: string;
@@ -38,7 +39,7 @@ interface Step {
   ) => PoolInfo[])[];
 }
 
-export class AutoXSTRKStrategy extends IStrategy {
+export class AutoXSTRKStrategy extends IStrategy<void> {
   riskFactor = 0.5;
   token: TokenInfo;
   readonly lpTokenName: string;
@@ -55,6 +56,30 @@ export class AutoXSTRKStrategy extends IStrategy {
     if (!frmToken) throw new Error('frmToken undefined');
     const holdingTokens = [frmToken];
 
+    const tokenInfo = getTokenInfoFromName('STRK');
+    const metadata: IStrategyMetadata<void> = {
+      name,
+      description,
+      address: ContractAddr.from(strategyAddress),
+      type: 'ERC4626',
+      depositTokens: [
+        {
+          name: tokenInfo.name,
+          symbol: tokenInfo.name,
+          decimals: tokenInfo.decimals,
+          address: ContractAddr.from(tokenInfo.token),
+          logo: '',
+        },
+      ],
+      protocols: [],
+      maxTVL: new Web3Number('0', tokenInfo.decimals),
+      risk: {
+        riskFactor: [],
+        netRisk: 0,
+      },
+      additionalInfo: undefined,
+    };
+
     const token = 'STRK';
     super(
       `stake_${token.toLowerCase()}`,
@@ -65,6 +90,7 @@ export class AutoXSTRKStrategy extends IStrategy {
       holdingTokens,
       StrategyLiveStatus.HOT,
       settings,
+      metadata,
     );
     this.token = getTokenInfoFromName(token);
     // ! Change this to xSTRK later

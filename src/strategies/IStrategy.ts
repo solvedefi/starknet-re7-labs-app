@@ -5,6 +5,7 @@ import { LendingSpace } from '@/store/lending.base';
 import { Category, PoolInfo } from '@/store/pools';
 import { zkLend } from '@/store/zklend.store';
 import MyNumber from '@/utils/MyNumber';
+import { IInvestmentFlow, IStrategyMetadata } from '@strkfarm/sdk';
 import { Atom, atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { ReactNode } from 'react';
@@ -84,6 +85,7 @@ export interface IStrategySettings {
   hideHarvestInfo?: boolean;
   is_promoted?: boolean;
   isAudited?: boolean;
+  auditUrl?: string;
   isPaused?: boolean;
 }
 
@@ -110,15 +112,18 @@ export function isLive(status: StrategyLiveStatus) {
 
 export interface WithdrawActionInputs extends DepositActionInputs {}
 
-export class IStrategyProps {
+export class IStrategyProps<T> {
   readonly liveStatus: StrategyLiveStatus;
   readonly id: string;
   readonly name: string;
   readonly description: string;
   readonly settings: IStrategySettings;
+  readonly metadata: IStrategyMetadata<T>;
   exchanges: IDapp<any>[] = [];
 
+  // @deprecated Not used in new strats. instead use investmentFlows
   steps: Step[] = [];
+  investmentFlows: IInvestmentFlow[] = [];
 
   actions: StrategyAction[] = [];
   netYield: number = 0;
@@ -178,6 +183,7 @@ export class IStrategyProps {
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus: StrategyLiveStatus,
     settings: IStrategySettings,
+    metadata: IStrategyMetadata<T>,
   ) {
     this.id = id;
     this.name = name;
@@ -188,6 +194,7 @@ export class IStrategyProps {
     this.balanceAtom = getBalanceAtom(holdingTokens[0], this.balEnabled);
     this.liveStatus = liveStatus;
     this.settings = settings;
+    this.metadata = metadata;
     this.tvlAtom = atomWithQuery((get) => {
       return {
         queryKey: ['tvl', this.id],
@@ -200,7 +207,7 @@ export class IStrategyProps {
   }
 }
 
-export class IStrategy extends IStrategyProps {
+export class IStrategy<T> extends IStrategyProps<T> {
   readonly tag: string;
 
   constructor(
@@ -212,6 +219,7 @@ export class IStrategy extends IStrategyProps {
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus = StrategyLiveStatus.ACTIVE,
     settings: IStrategySettings,
+    metadata: IStrategyMetadata<T>,
   ) {
     super(
       id,
@@ -221,6 +229,7 @@ export class IStrategy extends IStrategyProps {
       holdingTokens,
       liveStatus,
       settings,
+      metadata,
     );
     this.tag = tag;
   }
@@ -308,7 +317,7 @@ export class IStrategy extends IStrategyProps {
     return [...actions, { pool: bestPool, amount, isDeposit: true }];
   }
 
-  solve(pools: PoolInfo[], amount: string) {
+  async solve(pools: PoolInfo[], amount: string) {
     this.actions = [];
     let _amount: string = amount;
     let netYield = 0;

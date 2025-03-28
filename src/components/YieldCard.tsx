@@ -1,5 +1,4 @@
 import shield from '@/assets/shield.svg';
-import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import { isPoolRetired, PoolInfo } from '@/store/pools';
 import { getPoolInfoFromStrategy, sortAtom } from '@/store/protocols';
@@ -99,10 +98,9 @@ export function StrategyInfo(props: YieldCardProps) {
                     </Badge>
                   );
                 })}
-            ;
-            {pool.additional && pool.additional.isAudited && (
+            {pool.additional && pool.additional.auditUrl && (
               <Tooltip label="Audited smart contract. Click to view the audit report.">
-                <Link href={CONSTANTS.AUDIT_REPORT} target="_blank">
+                <Link href={pool.additional.auditUrl} target="_blank">
                   <Box
                     width={'24px'}
                     height={'24px'}
@@ -192,7 +190,7 @@ function StrategyAPY(props: YieldCardProps) {
         <>
           {getAPRWithToolTip(pool)}
 
-          {pool.additional && pool.additional.leverage && (
+          {/* {pool.additional && pool.additional.leverage && (
             <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
               <Box width={'100%'}>
                 <Box float={'right'} display={'flex'} fontSize={'13px'}>
@@ -210,7 +208,7 @@ function StrategyAPY(props: YieldCardProps) {
                 </Box>
               </Box>
             </Tooltip>
-          )}
+          )} */}
         </>
       )}
     </Box>

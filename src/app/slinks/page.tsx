@@ -27,7 +27,7 @@ const metadata: Metadata = {
     'Find and invest in high yield pools. STRKFarm is the best yield aggregator on Starknet.',
 };
 
-function GetCardSimple(strat: StrategyInfo) {
+function GetCardSimple(strat: StrategyInfo<any>) {
   const [amount, setAmount] = useState(MyNumber.fromZero());
   const address = useAtomValue(addressAtom);
   const { provider } = useProvider();

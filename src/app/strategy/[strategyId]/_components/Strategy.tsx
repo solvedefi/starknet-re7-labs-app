@@ -4,6 +4,7 @@ import {
   Alert,
   AlertIcon,
   Avatar,
+  Badge,
   Box,
   Card,
   Center,
@@ -46,6 +47,9 @@ import {
 import MyNumber from '@/utils/MyNumber';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { StrategyParams } from '../page';
+import FlowChart from './FlowChart';
+import { isMobile } from 'react-device-detect';
+import { getRiskExplaination } from '@strkfarm/sdk';
 
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
@@ -53,7 +57,7 @@ const Strategy = ({ params }: StrategyParams) => {
   const transactions = useAtomValue(transactionsAtom);
   const [isMounted, setIsMounted] = useState(false);
 
-  const strategy: StrategyInfo | undefined = useMemo(() => {
+  const strategy: StrategyInfo<any> | undefined = useMemo(() => {
     const id = params.strategyId;
 
     console.log('id', id);
@@ -444,101 +448,122 @@ const Strategy = ({ params }: StrategyParams) => {
             </GridItem>
           </Grid>
 
-          <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
-            <Text fontSize={'20px'} marginBottom={'0px'} fontWeight={'bold'}>
-              Behind the scenes
-            </Text>
-            <Text fontSize={'15px'} marginBottom={'10px'}>
-              Actions done automatically by the strategy (smart-contract) with
-              an investment of $1000
-            </Text>
-            <Flex
-              color="white"
-              width={'100%'}
-              className="text-cell"
-              display={{ base: 'none', md: 'flex' }}
-            >
-              <Text width={'50%'} padding={'5px 10px'}>
-                Action
+          {!isMobile && (
+            <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
+              <Text fontSize={'20px'} marginBottom={'0px'} fontWeight={'bold'}>
+                Behind the scenes
               </Text>
-              <Text width={'30%'} textAlign={'left'} padding={'5px 10px'}>
-                Protocol
+              <Text fontSize={'15px'} marginBottom={'10px'}>
+                Actions done automatically by the strategy (smart-contract) with
+                an investment of $1000
               </Text>
-              <Text width={'10%'} textAlign={'right'} padding={'5px 10px'}>
-                Amount
-              </Text>
-              <Text width={'10%'} textAlign={'right'} padding={'5px 10px'}>
-                Yield
-              </Text>
-            </Flex>
-            {strategy.actions.map((action, index) => (
-              <Box
-                className="text-cell"
-                display={{ base: 'block', md: 'flex' }}
-                key={index}
-                width={'100%'}
-                color="light_grey"
-                fontSize={'14px'}
-              >
-                <Text width={{ base: '100%', md: '50%' }} padding={'5px 10px'}>
-                  {index + 1}
-                  {')'} {action.name}
-                </Text>
-                <Text width={{ base: '100%', md: '30%' }} padding={'5px 10px'}>
-                  <Avatar
-                    size="2xs"
-                    bg={'black'}
-                    src={action.pool.pool.logos[0]}
-                    marginRight={'2px'}
-                  />{' '}
-                  {action.pool.pool.name} on
-                  <Avatar
-                    size="2xs"
-                    bg={'black'}
-                    src={action.pool.protocol.logo}
-                    marginRight={'2px'}
-                    marginLeft={'5px'}
-                  />{' '}
-                  {action.pool.protocol.name}
-                </Text>
-                <Text
-                  display={{ base: 'block', md: 'none' }}
-                  width={{ base: '100%', md: '10%' }}
-                  padding={'5px 10px'}
-                >
-                  ${Number(action.amount).toLocaleString()} yields{' '}
-                  {action.isDeposit
-                    ? (action.pool.apr * 100).toFixed(2)
-                    : -(action.pool.borrow.apr * 100).toFixed(2)}
-                  %
-                </Text>
-                <Text
-                  display={{ base: 'none', md: 'block' }}
-                  width={{ base: '100%', md: '10%' }}
-                  textAlign={'right'}
-                  padding={'5px 10px'}
-                >
-                  ${Number(action.amount).toLocaleString()}
-                </Text>
-                <Text
-                  display={{ base: 'none', md: 'block' }}
-                  width={{ base: '100%', md: '10%' }}
-                  textAlign={'right'}
-                  padding={'5px 10px'}
-                >
-                  {action.isDeposit
-                    ? (action.pool.apr * 100).toFixed(2)
-                    : -(action.pool.borrow.apr * 100).toFixed(2)}
-                  %
-                </Text>
-              </Box>
-            ))}
-            {strategy.actions.length == 0 && (
-              <Center width={'100%'} padding={'10px'}>
-                <Spinner size={'xs'} color="white" />
-              </Center>
-            )}
-          </Card>
+              {strategy.steps.length > 0 && (
+                <div>
+                  <Flex
+                    color="white"
+                    width={'100%'}
+                    className="text-cell"
+                    display={{ base: 'none', md: 'flex' }}
+                  >
+                    <Text width={'50%'} padding={'5px 10px'}>
+                      Action
+                    </Text>
+                    <Text width={'30%'} textAlign={'left'} padding={'5px 10px'}>
+                      Protocol
+                    </Text>
+                    <Text
+                      width={'10%'}
+                      textAlign={'right'}
+                      padding={'5px 10px'}
+                    >
+                      Amount
+                    </Text>
+                    <Text
+                      width={'10%'}
+                      textAlign={'right'}
+                      padding={'5px 10px'}
+                    >
+                      Yield
+                    </Text>
+                  </Flex>
+                  {strategy.actions.map((action, index) => (
+                    <Box
+                      className="text-cell"
+                      display={{ base: 'block', md: 'flex' }}
+                      key={index}
+                      width={'100%'}
+                      color="light_grey"
+                      fontSize={'14px'}
+                    >
+                      <Text
+                        width={{ base: '100%', md: '50%' }}
+                        padding={'5px 10px'}
+                      >
+                        {index + 1}
+                        {')'} {action.name}
+                      </Text>
+                      <Text
+                        width={{ base: '100%', md: '30%' }}
+                        padding={'5px 10px'}
+                      >
+                        <Avatar
+                          size="2xs"
+                          bg={'black'}
+                          src={action.pool.pool.logos[0]}
+                          marginRight={'2px'}
+                        />{' '}
+                        {action.pool.pool.name} on
+                        <Avatar
+                          size="2xs"
+                          bg={'black'}
+                          src={action.pool.protocol.logo}
+                          marginRight={'2px'}
+                          marginLeft={'5px'}
+                        />{' '}
+                        {action.pool.protocol.name}
+                      </Text>
+                      <Text
+                        display={{ base: 'block', md: 'none' }}
+                        width={{ base: '100%', md: '10%' }}
+                        padding={'5px 10px'}
+                      >
+                        ${Number(action.amount).toLocaleString()} yields{' '}
+                        {action.isDeposit
+                          ? (action.pool.apr * 100).toFixed(2)
+                          : -(action.pool.borrow.apr * 100).toFixed(2)}
+                        %
+                      </Text>
+                      <Text
+                        display={{ base: 'none', md: 'block' }}
+                        width={{ base: '100%', md: '10%' }}
+                        textAlign={'right'}
+                        padding={'5px 10px'}
+                      >
+                        ${Number(action.amount).toLocaleString()}
+                      </Text>
+                      <Text
+                        display={{ base: 'none', md: 'block' }}
+                        width={{ base: '100%', md: '10%' }}
+                        textAlign={'right'}
+                        padding={'5px 10px'}
+                      >
+                        {action.isDeposit
+                          ? (action.pool.apr * 100).toFixed(2)
+                          : -(action.pool.borrow.apr * 100).toFixed(2)}
+                        %
+                      </Text>
+                    </Box>
+                  ))}
+                  {strategy.actions.length == 0 && (
+                    <Center width={'100%'} padding={'10px'}>
+                      <Spinner size={'xs'} color="white" />
+                    </Center>
+                  )}
+                </div>
+              )}
+              <FlowChart strategyId={strategy.id} />
+            </Card>
+          )}
           <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
             <GridItem colSpan={colSpan1} bg="highlight">
               {/* Risks card */}
@@ -568,6 +593,23 @@ const Strategy = ({ params }: StrategyParams) => {
                     </ListItem>
                   ))}
                 </OrderedList>
+                <Box>
+                  {strategy.metadata.risk.riskFactor.map(
+                    (r: any, i: number) => (
+                      <Tooltip label={getRiskExplaination(r.type)} key={i}>
+                        <Badge
+                          padding={'5px 10px'}
+                          borderRadius={'10px'}
+                          opacity={0.8}
+                          marginRight={'5px'}
+                          marginTop={'10px'}
+                        >
+                          {r.type.valueOf()}
+                        </Badge>
+                      </Tooltip>
+                    ),
+                  )}
+                </Box>
               </Card>
             </GridItem>
             <GridItem colSpan={colSpan2} bg={'highlight'}>

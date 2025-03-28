@@ -196,6 +196,11 @@ export function getStrategies() {
           text: 'Depeg-risk: If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
           tab: 'all',
         },
+        {
+          type: 'info',
+          text: 'There is an ongoing issue with Braavos, because of which your transactions may fail. We will update here once it is resolved.',
+          tab: 'all',
+        },
       ],
       isAudited: false,
     },
@@ -213,6 +218,13 @@ export function getStrategies() {
         isAudited: v.auditUrl ? true : false,
         auditUrl: v.auditUrl,
         isPaused: false,
+        alerts: [
+          {
+            type: 'info',
+            text: 'There is an ongoing issue with Braavos that may cause your transactions to fail. We will provide an update here once it is resolved.',
+            tab: 'all',
+          },
+        ],
       },
     );
   });

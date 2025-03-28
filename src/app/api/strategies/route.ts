@@ -120,8 +120,18 @@ export async function GET(req: Request) {
   // });
 
   const stratsDataProms: any[] = [];
-  for (let i = 0; i < strategies.length; i++) {
-    stratsDataProms.push(getStrategyInfo(strategies[i]));
+  const _strats = strategies.sort((a, b) => {
+    // sort based on risk factor, live status and apy
+    const aRisk = a.riskFactor;
+    const bRisk = b.riskFactor;
+    const aLive = getLiveStatusNumber(a.liveStatus);
+    const bLive = getLiveStatusNumber(b.liveStatus);
+    if (aLive !== bLive) return aLive - bLive;
+    if (aRisk !== bRisk) return aRisk - bRisk;
+    return b.netYield - a.netYield;
+  });
+  for (let i = 0; i < _strats.length; i++) {
+    stratsDataProms.push(getStrategyInfo(_strats[i]));
   }
 
   const stratsData = await Promise.all(stratsDataProms);

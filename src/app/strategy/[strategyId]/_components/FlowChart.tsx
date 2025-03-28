@@ -181,7 +181,7 @@ function getNodesAndEdges(
         <table style={{ width: '100%', fontSize: '11px' }}>
           {flow.subItems.map((item) => (
             <tr key={item.key}>
-              <td style={{ textAlign: 'right', width: '50%' }}>{item.key}:</td>
+              <td style={{ textAlign: 'right', width: '70%' }}>{item.key}:</td>
               <td style={{ textAlign: 'left', width: '50%' }}>{item.value}</td>
             </tr>
           ))}

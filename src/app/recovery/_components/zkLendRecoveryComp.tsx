@@ -252,7 +252,7 @@ export default function ZklendRecoveryComp() {
             marginTop={{ base: '10px', md: '0' }}
           >
             <Button
-              aria-disabled={true}
+              // aria-disabled={true}
               bg={'white'}
               borderRadius="6px"
               padding={'6px 20px'}
@@ -263,14 +263,14 @@ export default function ZklendRecoveryComp() {
               onClick={() => {
                 handleClaims();
               }}
-              disabled={true}
-              _disabled={{ backgroundColor: 'gray', cursor: 'not-allowed' }}
+              // disabled={true}
+              // _disabled={{ backgroundColor: 'gray', cursor: 'not-allowed' }}
             >
               Claim
             </Button>
-            <Text color="gray" textAlign={'center'}>
+            {/* <Text color="gray" textAlign={'center'}>
               Claims open after 28th Mar
-            </Text>
+            </Text> */}
           </Box>
         </Box>
         <Alert

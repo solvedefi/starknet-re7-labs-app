@@ -50,6 +50,10 @@ import { StrategyParams } from '../page';
 import FlowChart from './FlowChart';
 import { isMobile } from 'react-device-detect';
 import { getRiskExplaination } from '@strkfarm/sdk';
+import {
+  STRKFarmBaseAPYsAtom,
+  STRKFarmStrategyAPIResult,
+} from '@/store/strkfarm.atoms';
 
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
@@ -162,6 +166,14 @@ const Strategy = ({ params }: StrategyParams) => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const strategiesInfo = useAtomValue(STRKFarmBaseAPYsAtom);
+  const strategyCached = useMemo(() => {
+    if (!strategiesInfo || !strategiesInfo.data) return null;
+    const strategiesList: STRKFarmStrategyAPIResult[] =
+      strategiesInfo.data.strategies;
+    return strategiesList.find((s: any) => s.id === params.strategyId);
+  }, [strategiesInfo, params.strategyId]);
 
   if (!isMounted) return null;
 
@@ -486,75 +498,70 @@ const Strategy = ({ params }: StrategyParams) => {
                       Yield
                     </Text>
                   </Flex>
-                  {strategy.actions.map((action, index) => (
-                    <Box
-                      className="text-cell"
-                      display={{ base: 'block', md: 'flex' }}
-                      key={index}
-                      width={'100%'}
-                      color="light_grey"
-                      fontSize={'14px'}
-                    >
-                      <Text
-                        width={{ base: '100%', md: '50%' }}
-                        padding={'5px 10px'}
+                  {strategyCached &&
+                    strategyCached.actions.map((action, index) => (
+                      <Box
+                        className="text-cell"
+                        display={{ base: 'block', md: 'flex' }}
+                        key={index}
+                        width={'100%'}
+                        color="light_grey"
+                        fontSize={'14px'}
                       >
-                        {index + 1}
-                        {')'} {action.name}
-                      </Text>
-                      <Text
-                        width={{ base: '100%', md: '30%' }}
-                        padding={'5px 10px'}
-                      >
-                        <Avatar
-                          size="2xs"
-                          bg={'black'}
-                          src={action.pool.pool.logos[0]}
-                          marginRight={'2px'}
-                        />{' '}
-                        {action.pool.pool.name} on
-                        <Avatar
-                          size="2xs"
-                          bg={'black'}
-                          src={action.pool.protocol.logo}
-                          marginRight={'2px'}
-                          marginLeft={'5px'}
-                        />{' '}
-                        {action.pool.protocol.name}
-                      </Text>
-                      <Text
-                        display={{ base: 'block', md: 'none' }}
-                        width={{ base: '100%', md: '10%' }}
-                        padding={'5px 10px'}
-                      >
-                        ${Number(action.amount).toLocaleString()} yields{' '}
-                        {action.isDeposit
-                          ? (action.pool.apr * 100).toFixed(2)
-                          : -(action.pool.borrow.apr * 100).toFixed(2)}
-                        %
-                      </Text>
-                      <Text
-                        display={{ base: 'none', md: 'block' }}
-                        width={{ base: '100%', md: '10%' }}
-                        textAlign={'right'}
-                        padding={'5px 10px'}
-                      >
-                        ${Number(action.amount).toLocaleString()}
-                      </Text>
-                      <Text
-                        display={{ base: 'none', md: 'block' }}
-                        width={{ base: '100%', md: '10%' }}
-                        textAlign={'right'}
-                        padding={'5px 10px'}
-                      >
-                        {action.isDeposit
-                          ? (action.pool.apr * 100).toFixed(2)
-                          : -(action.pool.borrow.apr * 100).toFixed(2)}
-                        %
-                      </Text>
-                    </Box>
-                  ))}
-                  {strategy.actions.length == 0 && (
+                        <Text
+                          width={{ base: '100%', md: '50%' }}
+                          padding={'5px 10px'}
+                        >
+                          {index + 1}
+                          {')'} {action.name}
+                        </Text>
+                        <Text
+                          width={{ base: '100%', md: '30%' }}
+                          padding={'5px 10px'}
+                        >
+                          <Avatar
+                            size="2xs"
+                            bg={'black'}
+                            src={action.token.logo}
+                            marginRight={'2px'}
+                          />{' '}
+                          {action.token.name} on
+                          <Avatar
+                            size="2xs"
+                            bg={'black'}
+                            src={action.protocol.logo}
+                            marginRight={'2px'}
+                            marginLeft={'5px'}
+                          />{' '}
+                          {action.protocol.name}
+                        </Text>
+                        <Text
+                          display={{ base: 'block', md: 'none' }}
+                          width={{ base: '100%', md: '10%' }}
+                          padding={'5px 10px'}
+                        >
+                          ${Number(action.amount).toLocaleString()} yields{' '}
+                          {(action.apy * 100).toFixed(2)}%
+                        </Text>
+                        <Text
+                          display={{ base: 'none', md: 'block' }}
+                          width={{ base: '100%', md: '10%' }}
+                          textAlign={'right'}
+                          padding={'5px 10px'}
+                        >
+                          ${Number(action.amount).toLocaleString()}
+                        </Text>
+                        <Text
+                          display={{ base: 'none', md: 'block' }}
+                          width={{ base: '100%', md: '10%' }}
+                          textAlign={'right'}
+                          padding={'5px 10px'}
+                        >
+                          {(action.apy * 100).toFixed(2)}%
+                        </Text>
+                      </Box>
+                    ))}
+                  {(!strategyCached || strategyCached.actions.length == 0) && (
                     <Center width={'100%'} padding={'10px'}>
                       <Spinner size={'xs'} color="white" />
                     </Center>

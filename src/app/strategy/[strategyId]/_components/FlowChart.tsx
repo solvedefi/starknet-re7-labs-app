@@ -254,6 +254,10 @@ function InternalFlowChart(props: FlowChartProps) {
 
   const proOptions = { hideAttribution: true };
 
+  if (strategyCached && strategyCached.investmentFlows.length == 0) {
+    return null;
+  }
+
   if (strategyCached && strategyCached.investmentFlows.length > 0)
     return (
       <div style={{ width: '100%', height: '350px' }}>

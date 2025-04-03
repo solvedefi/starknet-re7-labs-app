@@ -70,7 +70,9 @@ const EndurAtoms = {
             .operate('mul', 365 * 24 * 60 * 60)
             .toEtherToFixedDecimals(2),
         ) / Number(tvl.amount.toEtherToFixedDecimals(2));
-      return apy;
+      const fee = 0.15;
+      const netApy = apy * (1 - fee);
+      return netApy;
     },
   }),
   pools: atom((get) => {

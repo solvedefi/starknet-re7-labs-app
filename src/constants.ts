@@ -56,7 +56,8 @@ export const CONSTANTS = {
     BASE_APR_API: '/haiko/markets?network=mainnet',
   },
   STRKFarm: {
-    BASE_APR_API: '/api/strategies',
+    // BASE_APR_API: '/api/strategies',
+    BASE_APR_API: 'https://app.strkfarm.com/api/strategies',
   },
   MY_SWAP: {
     POOLS_API: '/myswap/data/pools/all.json',

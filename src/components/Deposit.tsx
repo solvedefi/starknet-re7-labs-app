@@ -33,15 +33,16 @@ import {
   Text,
   Tooltip,
 } from '@chakra-ui/react';
-import { useAccount, useProvider } from '@starknet-react/core';
+import { useAccount } from '@starknet-react/core';
 import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo, useState } from 'react';
 import LoadingWrap from './LoadingWrap';
 import TxButton from './TxButton';
+import { provider } from '@/constants';
 
 interface DepositProps {
-  strategy: StrategyInfo;
+  strategy: StrategyInfo<any>;
   // ? If you want to add more button text, you can add here
   // ? @dev ensure below actionType is updated accordingly
   buttonText: 'Deposit' | 'Redeem';
@@ -50,7 +51,6 @@ interface DepositProps {
 
 export default function Deposit(props: DepositProps) {
   const { address } = useAccount();
-  const { provider } = useProvider();
   const [dirty, setDirty] = useState(false);
   const [isMaxClicked, setIsMaxClicked] = useState(false);
 
@@ -161,7 +161,7 @@ export default function Deposit(props: DepositProps) {
 
   function BalanceComponent(props: {
     token: TokenInfo;
-    strategy: StrategyInfo;
+    strategy: StrategyInfo<any>;
     buttonText: string;
   }) {
     return (

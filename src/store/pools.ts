@@ -59,6 +59,7 @@ export interface PoolInfo extends PoolMetadata {
     riskFactor: number;
     tags: StrategyLiveStatus[];
     isAudited: boolean;
+    auditUrl?: string;
     is_promoted?: boolean;
   };
 }

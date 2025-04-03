@@ -17,20 +17,21 @@ import {
   VesuRebalance,
   PricerFromApi,
   Web3Number,
+  VesuRebalanceSettings,
 } from '@strkfarm/sdk';
 import MyNumber from '@/utils/MyNumber';
 import { PoolInfo } from '@/store/pools';
 import { DUMMY_BAL_ATOM, getBalanceAtom } from '@/store/balance.atoms';
 import { atom } from 'jotai';
 
-export class VesuRebalanceStrategy extends IStrategy {
+export class VesuRebalanceStrategy extends IStrategy<VesuRebalanceSettings> {
   vesuRebalance: VesuRebalance;
   asset: TokenInfo;
   constructor(
     token: TokenInfo,
     name: string,
     description: string,
-    strategy: IStrategyMetadata,
+    strategy: IStrategyMetadata<VesuRebalanceSettings>,
     liveStatus: StrategyLiveStatus,
     settings: IStrategySettings,
   ) {
@@ -44,8 +45,17 @@ export class VesuRebalanceStrategy extends IStrategy {
         isERC4626: true,
       },
     ];
+
+    const config = getMainnetConfig(
+      process.env.NEXT_PUBLIC_RPC_URL!,
+      'pending',
+    );
+    const tokens = Global.getDefaultTokens();
+    const pricer = new PricerFromApi(config, tokens);
+    const vesuRebalance = new VesuRebalance(config, pricer, strategy);
+
     super(
-      `vesu_rebalance_${holdingTokens[0].name.toLowerCase()}`,
+      `vesu_fusion_${holdingTokens[0].name.toLowerCase()}`,
       name,
       name,
       description,
@@ -53,16 +63,11 @@ export class VesuRebalanceStrategy extends IStrategy {
       holdingTokens,
       liveStatus,
       settings,
+      vesuRebalance.metadata,
     );
 
     this.asset = token;
-    const config = getMainnetConfig(
-      process.env.NEXT_PUBLIC_RPC_URL!,
-      'pending',
-    );
-    const tokens = Global.getDefaultTokens();
-    const pricer = new PricerFromApi(config, tokens);
-    this.vesuRebalance = new VesuRebalance(config, pricer, strategy);
+    this.vesuRebalance = vesuRebalance;
     this.riskFactor = strategy.risk.netRisk;
 
     const risks = [...this.risks];
@@ -106,7 +111,10 @@ export class VesuRebalanceStrategy extends IStrategy {
 
     const amt = Web3Number.fromWei(amount.toString(), amount.decimals);
     const calls = this.vesuRebalance.depositCall(
-      amt,
+      {
+        tokenInfo: this.vesuRebalance.asset(),
+        amount: amt,
+      },
       ContractAddr.from(address),
     );
 
@@ -133,7 +141,10 @@ export class VesuRebalanceStrategy extends IStrategy {
 
     const amt = Web3Number.fromWei(amount.toString(), amount.decimals);
     const calls = this.vesuRebalance.withdrawCall(
-      amt,
+      {
+        tokenInfo: this.vesuRebalance.asset(),
+        amount: amt,
+      },
       ContractAddr.from(address),
       ContractAddr.from(address),
     );

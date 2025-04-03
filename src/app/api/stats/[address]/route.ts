@@ -18,9 +18,8 @@ export async function GET(_req: Request, context: any) {
 
   const strategies = getStrategies();
   const values = strategies.map(async (strategy) => {
-    const balanceInfo = await strategy.getUserTVL(pAddr);
-
     if (strategy.isLive()) {
+      const balanceInfo = await strategy.getUserTVL(pAddr);
       return {
         id: strategy.id,
         usdValue: balanceInfo.usdValue,
@@ -39,9 +38,9 @@ export async function GET(_req: Request, context: any) {
       id: strategy.id,
       usdValue: 0,
       tokenInfo: {
-        name: balanceInfo.tokenInfo.name,
-        symbol: balanceInfo.tokenInfo.name,
-        logo: balanceInfo.tokenInfo.logo,
+        name: '',
+        symbol: '',
+        logo: '',
         decimals: 0,
         displayDecimals: 0,
       },

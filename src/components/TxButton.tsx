@@ -31,7 +31,7 @@ interface TxButtonProps {
   buttonProps: ButtonProps;
   justDisableIfNoWalletConnect?: boolean;
   selectedMarket?: TokenInfo;
-  strategy?: IStrategyProps;
+  strategy?: IStrategyProps<any>;
   resetDepositForm: () => void;
 }
 

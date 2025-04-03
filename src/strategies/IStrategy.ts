@@ -5,7 +5,7 @@ import { LendingSpace } from '@/store/lending.base';
 import { Category, PoolInfo } from '@/store/pools';
 import { zkLend } from '@/store/zklend.store';
 import MyNumber from '@/utils/MyNumber';
-import { IInvestmentFlow } from '@strkfarm/sdk';
+import { IInvestmentFlow, IStrategyMetadata } from '@strkfarm/sdk';
 import { Atom, atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { ReactNode } from 'react';
@@ -112,12 +112,13 @@ export function isLive(status: StrategyLiveStatus) {
 
 export interface WithdrawActionInputs extends DepositActionInputs {}
 
-export class IStrategyProps {
+export class IStrategyProps<T> {
   readonly liveStatus: StrategyLiveStatus;
   readonly id: string;
   readonly name: string;
   readonly description: string;
   readonly settings: IStrategySettings;
+  readonly metadata: IStrategyMetadata<T>;
   exchanges: IDapp<any>[] = [];
 
   // @deprecated Not used in new strats. instead use investmentFlows
@@ -182,6 +183,7 @@ export class IStrategyProps {
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus: StrategyLiveStatus,
     settings: IStrategySettings,
+    metadata: IStrategyMetadata<T>,
   ) {
     this.id = id;
     this.name = name;
@@ -192,6 +194,7 @@ export class IStrategyProps {
     this.balanceAtom = getBalanceAtom(holdingTokens[0], this.balEnabled);
     this.liveStatus = liveStatus;
     this.settings = settings;
+    this.metadata = metadata;
     this.tvlAtom = atomWithQuery((get) => {
       return {
         queryKey: ['tvl', this.id],
@@ -204,7 +207,7 @@ export class IStrategyProps {
   }
 }
 
-export class IStrategy extends IStrategyProps {
+export class IStrategy<T> extends IStrategyProps<T> {
   readonly tag: string;
 
   constructor(
@@ -216,6 +219,7 @@ export class IStrategy extends IStrategyProps {
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus = StrategyLiveStatus.ACTIVE,
     settings: IStrategySettings,
+    metadata: IStrategyMetadata<T>,
   ) {
     super(
       id,
@@ -225,6 +229,7 @@ export class IStrategy extends IStrategyProps {
       holdingTokens,
       liveStatus,
       settings,
+      metadata,
     );
     this.tag = tag;
   }

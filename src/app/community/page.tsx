@@ -7,11 +7,7 @@ import { useAtomValue } from 'jotai';
 import { referralCodeAtom } from '@/store/referral.store';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import {
-  useReadContract,
-  useSendTransaction,
-  useProvider,
-} from '@starknet-react/core';
+import { useReadContract, useSendTransaction } from '@starknet-react/core';
 import { Contract } from 'starknet';
 import NFTAbi from '../../abi/nft.abi.json';
 import { atomWithQuery } from 'jotai-tanstack-query';
@@ -36,6 +32,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import fetchWithRetry from '@/utils/fetchWithRetry';
+import { provider } from '@/constants';
 
 interface OGNFTUserData {
   address: string;
@@ -72,7 +69,6 @@ const CommunityPage = () => {
   const referralCode = useAtomValue(referralCodeAtom);
   const isOGNFTEligible = useAtomValue(isOGNFTEligibleAtom);
   const address = useAtomValue(addressAtom);
-  const { provider } = useProvider();
   const isOGNFTLoading = useMemo(() => {
     return (
       isOGNFTEligible.isLoading ||

@@ -24,6 +24,7 @@ import {
 } from '@/store/balance.atoms';
 import { getPrice, getTokenInfoFromName } from '@/utils';
 import { zkLend } from '@/store/zklend.store';
+import { ContractAddr, IStrategyMetadata, Web3Number } from '@strkfarm/sdk';
 
 interface Step {
   name: string;
@@ -39,7 +40,7 @@ interface Step {
   ) => PoolInfo[])[];
 }
 
-export class AutoTokenStrategy extends IStrategy {
+export class AutoTokenStrategy extends IStrategy<void> {
   riskFactor = 0.5;
   token: TokenInfo;
   readonly lpTokenName: string;
@@ -58,6 +59,31 @@ export class AutoTokenStrategy extends IStrategy {
     if (!frmToken) throw new Error('frmToken undefined');
     const holdingTokens = [frmToken];
 
+    const tokenInfo = getTokenInfoFromName(token);
+    // not giving all data, as this is retired
+    const metadata: IStrategyMetadata<void> = {
+      name,
+      description,
+      address: ContractAddr.from(strategyAddress),
+      type: 'ERC4626',
+      depositTokens: [
+        {
+          name: tokenInfo.name,
+          symbol: tokenInfo.name,
+          decimals: tokenInfo.decimals,
+          address: ContractAddr.from(tokenInfo.token),
+          logo: '',
+        },
+      ],
+      protocols: [],
+      maxTVL: new Web3Number('0', tokenInfo.decimals),
+      risk: {
+        riskFactor: [],
+        netRisk: 0,
+        notARisks: [],
+      },
+      additionalInfo: undefined,
+    };
     super(
       `auto_token_${token.toLowerCase()}`,
       'AutoSTRK',
@@ -67,8 +93,9 @@ export class AutoTokenStrategy extends IStrategy {
       holdingTokens,
       StrategyLiveStatus.RETIRED,
       settings,
+      metadata,
     );
-    this.token = getTokenInfoFromName(token);
+    this.token = tokenInfo;
 
     this.steps = [
       {

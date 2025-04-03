@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { atom } from 'jotai';
-import ZkLendAtoms, { zkLend } from '@/store/zklend.store';
+import ZkLendAtoms from '@/store/zklend.store';
 import { PoolInfo, PoolType } from '@/store/pools';
-import NostraLendingAtoms, { nostraLending } from '@/store/nostralending.store';
+import NostraLendingAtoms from '@/store/nostralending.store';
 import { RpcProvider } from 'starknet';
 import { getLiveStatusNumber, getStrategies } from '@/store/strategies.atoms';
 import { MY_STORE } from '@/store';
@@ -24,12 +24,7 @@ async function getPools(store: any, retry = 0) {
   const allPools: PoolInfo[] | undefined = store.get(allPoolsAtom);
 
   console.log('allPools', allPools?.length);
-  const minProtocolsRequired = [
-    zkLend.name,
-    nostraLending.name,
-    vesu.name,
-    endur.name,
-  ];
+  const minProtocolsRequired = [vesu.name, endur.name];
   const hasRequiredPools = minProtocolsRequired.every((p) => {
     if (!allPools) return false;
     return allPools.some((pool) => {
@@ -56,7 +51,7 @@ const provider = new RpcProvider({
 });
 
 async function getStrategyInfo(
-  strategy: IStrategy,
+  strategy: IStrategy<any>,
 ): Promise<STRKFarmStrategyAPIResult> {
   const tvl = await strategy.getTVL();
 
@@ -84,7 +79,8 @@ async function getStrategyInfo(
     },
     riskFactor: strategy.riskFactor,
     logo: strategy.holdingTokens[0].logo,
-    isAudited: strategy.settings.isAudited || false,
+    isAudited: strategy.settings.auditUrl ? true : false,
+    auditUrl: strategy.settings.auditUrl,
     actions: strategy.actions.map((action) => {
       return {
         name: action.name || '',
@@ -110,6 +106,7 @@ export async function GET(req: Request) {
   const strategies = getStrategies();
 
   const proms = strategies.map((strategy) => {
+    if (!strategy.isLive()) return;
     return strategy.solve(allPools, '1000');
   });
 
@@ -123,8 +120,18 @@ export async function GET(req: Request) {
   // });
 
   const stratsDataProms: any[] = [];
-  for (let i = 0; i < strategies.length; i++) {
-    stratsDataProms.push(getStrategyInfo(strategies[i]));
+  const _strats = strategies.sort((a, b) => {
+    // sort based on risk factor, live status and apy
+    const aRisk = a.riskFactor;
+    const bRisk = b.riskFactor;
+    const aLive = getLiveStatusNumber(a.liveStatus);
+    const bLive = getLiveStatusNumber(b.liveStatus);
+    if (aLive !== bLive) return aLive - bLive;
+    if (aRisk !== bRisk) return aRisk - bRisk;
+    return b.netYield - a.netYield;
+  });
+  for (let i = 0; i < _strats.length; i++) {
+    stratsDataProms.push(getStrategyInfo(_strats[i]));
   }
 
   const stratsData = await Promise.all(stratsDataProms);

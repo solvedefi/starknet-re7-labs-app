@@ -181,7 +181,7 @@ function getNodesAndEdges(
         <table style={{ width: '100%', fontSize: '11px' }}>
           {flow.subItems.map((item) => (
             <tr key={item.key}>
-              <td style={{ textAlign: 'right', width: '50%' }}>{item.key}:</td>
+              <td style={{ textAlign: 'right', width: '70%' }}>{item.key}:</td>
               <td style={{ textAlign: 'left', width: '50%' }}>{item.value}</td>
             </tr>
           ))}
@@ -263,15 +263,15 @@ function InternalFlowChart(props: FlowChartProps) {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          minZoom={1}
-          maxZoom={1}
+          // minZoom={1}
+          // maxZoom={1}
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={false}
-          panOnScroll={false}
-          zoomOnScroll={false}
-          zoomOnDoubleClick={false}
-          panOnDrag={false}
+          // panOnScroll={false}
+          // zoomOnScroll={false}
+          // zoomOnDoubleClick={false}
+          // panOnDrag={false}
           proOptions={proOptions}
         />
       </div>

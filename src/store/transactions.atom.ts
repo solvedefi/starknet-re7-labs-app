@@ -268,7 +268,7 @@ function StrategyTxPropsToMessage(tx: StrategyTxProps, get: Getter) {
 
 export function StrategyTxPropsToMessageWithStrategies(
   tx: StrategyTxProps,
-  strategies: StrategyInfo[],
+  strategies: StrategyInfo<any>[],
 ) {
   const tokenInfo = TOKENS.find(
     (t) => standariseAddress(t.token) === standariseAddress(tx.tokenAddr),

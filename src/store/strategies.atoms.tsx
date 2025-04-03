@@ -19,7 +19,7 @@ import { VesuRebalanceStrategies } from '@strkfarm/sdk';
 import { VesuRebalanceStrategy } from '@/strategies/vesu_rebalance';
 import { atomWithQuery } from 'jotai-tanstack-query';
 
-export interface StrategyInfo extends IStrategyProps {
+export interface StrategyInfo<T> extends IStrategyProps<T> {
   name: string;
 }
 
@@ -182,7 +182,7 @@ export function getStrategies() {
     'xSTRK',
     CONSTANTS.CONTRACTS.DeltaNeutralxSTRKSTRKXL,
     [1, 1, 0.725, 1.967985], // precomputed factors based on strategy math
-    StrategyLiveStatus.HOT,
+    StrategyLiveStatus.ACTIVE,
     {
       maxTVL: 500000,
       alerts: [
@@ -196,6 +196,11 @@ export function getStrategies() {
           text: 'Depeg-risk: If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
           tab: 'all',
         },
+        {
+          type: 'info',
+          text: 'There is an ongoing issue with Braavos, because of which your transactions may fail. We will update here once it is resolved.',
+          tab: 'all',
+        },
       ],
       isAudited: false,
     },
@@ -207,12 +212,19 @@ export function getStrategies() {
       v.name,
       v.description,
       v,
-      StrategyLiveStatus.ACTIVE,
+      StrategyLiveStatus.HOT,
       {
         maxTVL: 0,
         isAudited: v.auditUrl ? true : false,
         auditUrl: v.auditUrl,
         isPaused: false,
+        alerts: [
+          {
+            type: 'info',
+            text: 'There is an ongoing issue with Braavos that may cause your transactions to fail. We will provide an update here once it is resolved.',
+            tab: 'all',
+          },
+        ],
       },
     );
   });
@@ -228,7 +240,7 @@ export function getStrategies() {
   //   },
   // );
 
-  const strategies: IStrategy[] = [
+  const strategies: IStrategy<any>[] = [
     autoStrkStrategy,
     autoUSDCStrategy,
     deltaNeutralMMUSDCETH,
@@ -291,7 +303,7 @@ const strategiesAtomAsync = atomWithQuery((get) => {
   };
 });
 
-export const strategiesAtom = atom<StrategyInfo[]>((get) => {
+export const strategiesAtom = atom<StrategyInfo<any>[]>((get) => {
   const { data } = get(strategiesAtomAsync);
   if (!data) {
     const strategies = getStrategies();
@@ -301,27 +313,29 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
 });
 
 export function getLiveStatusNumber(status: StrategyLiveStatus) {
-  if (status == StrategyLiveStatus.NEW) {
+  if (status == StrategyLiveStatus.HOT) {
     return 1;
-  } else if (status == StrategyLiveStatus.ACTIVE) {
-    return 2;
-  } else if (status == StrategyLiveStatus.COMING_SOON) {
-    return 3;
-  } else if (status == StrategyLiveStatus.HOT) {
-    return 5;
   }
-  return 4;
+  if (status == StrategyLiveStatus.NEW) {
+    return 2;
+  } else if (status == StrategyLiveStatus.ACTIVE) {
+    return 3;
+  } else if (status == StrategyLiveStatus.COMING_SOON) {
+    return 4;
+  }
+  return 5;
 }
 
 export function getLiveStatusEnum(status: number) {
   if (status == 1) {
-    return StrategyLiveStatus.NEW;
-  } else if (status == 2) {
-    return StrategyLiveStatus.ACTIVE;
-  } else if (status == 3) {
-    return StrategyLiveStatus.COMING_SOON;
-  } else if (status == 5) {
     return StrategyLiveStatus.HOT;
+  }
+  if (status == 2) {
+    return StrategyLiveStatus.NEW;
+  } else if (status == 3) {
+    return StrategyLiveStatus.ACTIVE;
+  } else if (status == 4) {
+    return StrategyLiveStatus.COMING_SOON;
   }
   return StrategyLiveStatus.RETIRED;
 }

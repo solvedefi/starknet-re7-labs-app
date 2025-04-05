@@ -1,9 +1,27 @@
 import { MenuItemProps, MenuListProps } from '@chakra-ui/react';
-import { num } from 'starknet';
+import { Call, num } from 'starknet';
 import { TOKENS } from './constants';
 import toast from 'react-hot-toast';
-import { TokenInfo } from './strategies/IStrategy';
+import {
+  AmountsInfo,
+  IStrategyActionHook,
+  TokenInfo,
+} from './strategies/IStrategy';
+import {
+  ContractAddr,
+  TokenInfo as TokenInfoV2,
+  Web3Number,
+} from '@strkfarm/sdk';
 import fetchWithRetry from './utils/fetchWithRetry';
+import {
+  BalanceResult,
+  DUMMY_BAL_ATOM,
+  getBalanceAtom,
+} from './store/balance.atoms';
+import { Atom, atom } from 'jotai';
+import { AtomWithQueryResult } from 'jotai-tanstack-query';
+import assert from 'assert';
+import MyNumber from './utils/MyNumber';
 
 export function getUniqueStrings(arr: Array<string>) {
   const _arr: string[] = [];
@@ -84,7 +102,7 @@ export function getTokenInfoFromName(tokenName: string) {
     (t) => t.name.toLowerCase() === tokenName.toLowerCase(),
   );
   if (!info) {
-    throw new Error('Token not found');
+    throw new Error(`Token not found: ${tokenName}`);
   }
   return info;
 }
@@ -150,7 +168,7 @@ export function copyReferralLink(refCode: string) {
   });
 }
 
-export async function getPrice(tokenInfo: TokenInfo) {
+export async function getPrice(tokenInfo: MyMultiTokenInfo) {
   try {
     return await getPriceFromMyAPI(tokenInfo);
   } catch (e) {
@@ -158,7 +176,7 @@ export async function getPrice(tokenInfo: TokenInfo) {
   }
   console.log('getPrice coinbase', tokenInfo.name);
   const priceInfo = await fetchWithRetry(
-    `https://api.coinbase.com/v2/prices/${tokenInfo.name}-USDT/spot`,
+    `https://api.coinbase.com/v2/prices/${convertToV2TokenInfo(tokenInfo).symbol}-USDT/spot`,
     {},
     `Error fetching price for ${tokenInfo.name}`,
   );
@@ -191,11 +209,11 @@ export function getHosturl() {
   }
 }
 
-export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
+export async function getPriceFromMyAPI(tokenInfo: MyMultiTokenInfo) {
   console.log('getPrice from redis', tokenInfo.name);
 
   const endpoint = getEndpoint();
-  const url = `${endpoint}/api/price/${tokenInfo.name}`;
+  const url = `${endpoint}/api/price/${convertToV2TokenInfo(tokenInfo).symbol}`;
   console.log('getPrice url', url);
   const priceInfoRes = await fetch(url);
   const priceInfo = await priceInfoRes.json();
@@ -203,6 +221,8 @@ export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
   const priceTime = new Date(priceInfo.timestamp);
   if (now.getTime() - priceTime.getTime() > 900000) {
     // 15 mins
+    console.log('getPrice priceInfo', priceInfo);
+    console.log('getPrice priceTime', now, tokenInfo.name);
     throw new Error('Price is stale');
   }
   const price = Number(priceInfo.price);
@@ -230,4 +250,130 @@ export function timeAgo(date: Date): string {
     month: 'short',
     year: '2-digit',
   });
+}
+
+export type MyMultiTokenInfo = TokenInfo | TokenInfoV2;
+export type MyTokenInfo = TokenInfoV2;
+
+export function convertToV2TokenInfo(token: MyMultiTokenInfo): MyTokenInfo {
+  const _token: any = token;
+  const isTokenInfoV1 = _token.token !== undefined;
+  if (!isTokenInfoV1) {
+    return token as TokenInfoV2;
+  }
+  return {
+    name: token.name,
+    symbol: token.name,
+    address: ContractAddr.from((token as TokenInfo).token),
+    decimals: token.decimals,
+    logo: token.logo,
+    displayDecimals: token.displayDecimals,
+  };
+}
+
+export function convertToV1TokenInfo(
+  token: MyMultiTokenInfo,
+  isERC4626 = false,
+): TokenInfo {
+  const _token: any = token;
+  const isTokenInfoV1 = _token.token !== undefined;
+  if (isTokenInfoV1) {
+    return token as TokenInfo;
+  }
+
+  const v2Token = token as TokenInfoV2;
+  return {
+    name: v2Token.symbol,
+    address: v2Token.address.address,
+    decimals: v2Token.decimals,
+    logo: v2Token.logo,
+    displayDecimals: v2Token.displayDecimals,
+    token: v2Token.address.address,
+    isERC4626,
+    minAmount: MyNumber.fromEther('0', v2Token.decimals),
+    maxAmount: MyNumber.fromEther('0', v2Token.decimals),
+    stepAmount: new MyNumber('1', v2Token.decimals),
+  };
+}
+
+export type MyMultiWeb3Number = Web3Number | MyNumber;
+export type MyWeb3Number = Web3Number;
+export function convertToV2Web3Number(amount: MyMultiWeb3Number): MyWeb3Number {
+  console.log(
+    'convertToV2Web3Number',
+    typeof amount,
+    amount instanceof Web3Number,
+  );
+  if (amount instanceof Web3Number) {
+    return amount;
+  }
+  return Web3Number.fromWei(amount.toString(), amount.decimals);
+}
+
+export function convertToMyNumber(amount: MyWeb3Number): MyNumber {
+  return new MyNumber(amount.toWei(), amount.decimals);
+}
+
+export function ZeroAmountsInfo(tokens: MyMultiTokenInfo[]): AmountsInfo {
+  const res: AmountsInfo = {
+    usdValue: 0,
+    amounts: [],
+  };
+  for (let i = 0; i < tokens.length; i++) {
+    const token: any = tokens[i];
+    const isTokenInfoV1 = token.token !== undefined;
+    res.amounts.push({
+      amount: Web3Number.fromWei('0', tokens[i].decimals),
+      tokenInfo: isTokenInfoV1
+        ? convertToV2TokenInfo(TOKENS[i])
+        : (tokens[i] as TokenInfoV2),
+      usdValue: 0,
+    });
+  }
+  return res;
+}
+
+export function DummyStrategyActionHook(
+  tokens: MyMultiTokenInfo[],
+): IStrategyActionHook {
+  return buildStrategyActionHook([], tokens, null, true);
+}
+
+export function buildStrategyActionHook(
+  calls: Call[],
+  tokens: MyMultiTokenInfo[],
+  balanceAtoms: Atom<AtomWithQueryResult<BalanceResult, Error>>[] | null = null,
+  isDummy: boolean = false,
+): IStrategyActionHook {
+  if (balanceAtoms) {
+    assert(
+      balanceAtoms.length === tokens.length,
+      'balanceAtoms length mismatch',
+    );
+  }
+  return {
+    calls,
+    amounts: tokens.map((token, index) => {
+      const _token: any = token;
+      const isTokenInfoV1 = _token.token !== undefined;
+      const tokenInfoV1 = getTokenInfoFromName(_token.symbol || _token.name);
+      if (!tokenInfoV1) {
+        if (!tokenInfoV1) {
+          throw new Error('Token not found');
+        }
+      }
+      let balanceAtom = balanceAtoms ? balanceAtoms[index] : null;
+      if (!balanceAtom) {
+        balanceAtom = isDummy
+          ? DUMMY_BAL_ATOM
+          : getBalanceAtom(tokenInfoV1, atom(true));
+      }
+      return {
+        balanceAtom,
+        tokenInfo: isTokenInfoV1
+          ? convertToV2TokenInfo(_token)
+          : (token as TokenInfoV2),
+      };
+    }),
+  };
 }

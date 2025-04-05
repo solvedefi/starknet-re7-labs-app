@@ -90,11 +90,15 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
     return strategyInfo.leverage || 0;
   }, [strategyInfo]);
 
+  const defaultAPYTooltip =
+    'Current APY including any fees. Net returns subject to change based on market conditions.';
   return (
     <Box>
       <Flex justifyContent="space-between">
         <Flex>
-          <Tooltip label="Current APY including any fees. Net returns subject to change based on market conditions.">
+          <Tooltip
+            label={strategy.metadata.apyMethodology || defaultAPYTooltip}
+          >
             <Stat
               marginRight={'5px'}
               display={'flex'}

@@ -187,11 +187,14 @@ async function waitForTransaction(
   set(transactionsAtom, txs);
 
   let newTxs = get(newTxsAtom);
+  console.log('waitForTransaction newTxs', newTxs);
   const txExists = newTxs.find(
     (t) => t.txHash.toLowerCase() === tx.txHash.toLowerCase(),
   );
+  console.log('waitForTransaction txExists', txExists);
   if (!txExists) {
     newTxs = [...newTxs, tx];
+    console.log('waitForTransaction newTxs2', newTxs);
     set(newTxsAtom, newTxs);
   }
 }
@@ -240,6 +243,8 @@ async function isTxAccepted(txHash: string) {
 }
 
 async function initToast(tx: TransactionInfo, get: Getter, set: Setter) {
+  console.log('Deposit txInfo 2', tx, tx.info.amount.toEtherStr());
+
   const msg = StrategyTxPropsToMessage(tx.info, get);
   await toast.promise(
     waitForTransaction(tx, get, set),

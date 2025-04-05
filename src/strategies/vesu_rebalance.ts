@@ -1,8 +1,9 @@
 import CONSTANTS from '@/constants';
 import {
-  AmountInfo,
+  AmountsInfo,
   DepositActionInputs,
   IStrategy,
+  IStrategyActionHook,
   IStrategySettings,
   StrategyLiveStatus,
   StrategyStatus,
@@ -19,9 +20,13 @@ import {
   Web3Number,
   VesuRebalanceSettings,
 } from '@strkfarm/sdk';
-import MyNumber from '@/utils/MyNumber';
 import { PoolInfo } from '@/store/pools';
-import { DUMMY_BAL_ATOM, getBalanceAtom } from '@/store/balance.atoms';
+import {
+  buildStrategyActionHook,
+  DummyStrategyActionHook,
+  ZeroAmountsInfo,
+} from '@/utils';
+import { getBalanceAtom } from '@/store/balance.atoms';
 import { atom } from 'jotai';
 
 export class VesuRebalanceStrategy extends IStrategy<VesuRebalanceSettings> {
@@ -79,38 +84,35 @@ export class VesuRebalanceStrategy extends IStrategy<VesuRebalanceSettings> {
     ];
   }
 
-  getTVL = async (): Promise<AmountInfo> => {
+  getTVL = async (): Promise<AmountsInfo> => {
     const res = await this.vesuRebalance.getTVL();
     return {
-      amount: new MyNumber(res.amount.toWei(), res.amount.decimals),
       usdValue: res.usdValue,
-      tokenInfo: this.asset,
+      amounts: [res],
     };
   };
 
-  getUserTVL = async (user: string): Promise<AmountInfo> => {
-    const res = await this.vesuRebalance.getUserTVL(ContractAddr.from(user));
-    return {
-      amount: new MyNumber(res.amount.toWei(), res.amount.decimals),
-      usdValue: res.usdValue,
-      tokenInfo: this.asset,
-    };
+  getUserTVL = async (user: string): Promise<AmountsInfo> => {
+    try {
+      const res = await this.vesuRebalance.getUserTVL(ContractAddr.from(user));
+      return {
+        usdValue: res.usdValue,
+        amounts: [res],
+      };
+    } catch (e) {
+      console.error('Error getting user TVL:', e);
+      return ZeroAmountsInfo([this.asset]);
+    }
   };
 
-  depositMethods = (inputs: DepositActionInputs) => {
+  depositMethods = async (inputs: DepositActionInputs) => {
     const { amount, address, provider } = inputs;
     if (!address || address == '0x0') {
-      return [
-        {
-          tokenInfo: this.asset,
-          calls: [],
-          balanceAtom: DUMMY_BAL_ATOM,
-        },
-      ];
+      return [DummyStrategyActionHook([this.asset])];
     }
 
     const amt = Web3Number.fromWei(amount.toString(), amount.decimals);
-    const calls = this.vesuRebalance.depositCall(
+    const calls = await this.vesuRebalance.depositCall(
       {
         tokenInfo: this.vesuRebalance.asset(),
         amount: amt,
@@ -118,29 +120,19 @@ export class VesuRebalanceStrategy extends IStrategy<VesuRebalanceSettings> {
       ContractAddr.from(address),
     );
 
-    return [
-      {
-        tokenInfo: this.asset,
-        calls,
-        balanceAtom: getBalanceAtom(this.asset, atom(true)),
-      },
-    ];
+    return [buildStrategyActionHook(calls, [this.asset])];
   };
 
-  withdrawMethods = (inputs: WithdrawActionInputs) => {
+  withdrawMethods = async (
+    inputs: WithdrawActionInputs,
+  ): Promise<IStrategyActionHook[]> => {
     const { amount, address, provider } = inputs;
     if (!address || address == '0x0') {
-      return [
-        {
-          tokenInfo: this.holdingTokens[0] as TokenInfo,
-          calls: [],
-          balanceAtom: DUMMY_BAL_ATOM,
-        },
-      ];
+      return [DummyStrategyActionHook([this.holdingTokens[0] as TokenInfo])];
     }
 
     const amt = Web3Number.fromWei(amount.toString(), amount.decimals);
-    const calls = this.vesuRebalance.withdrawCall(
+    const calls = await this.vesuRebalance.withdrawCall(
       {
         tokenInfo: this.vesuRebalance.asset(),
         amount: amt,
@@ -151,9 +143,13 @@ export class VesuRebalanceStrategy extends IStrategy<VesuRebalanceSettings> {
 
     return [
       {
-        tokenInfo: this.holdingTokens[0] as TokenInfo,
         calls,
-        balanceAtom: getBalanceAtom(this.holdingTokens[0], atom(true)),
+        amounts: [
+          {
+            balanceAtom: getBalanceAtom(this.holdingTokens[0], atom(true)),
+            tokenInfo: this.vesuRebalance.asset(),
+          },
+        ],
       },
     ];
   };

@@ -1,6 +1,7 @@
 import { provider, TokenName } from '@/constants';
 import { DeltaNeutralMM } from './delta_neutral_mm';
 import {
+  AmountsInfo,
   IStrategySettings,
   Step,
   StrategyAction,
@@ -8,12 +9,18 @@ import {
   TokenInfo,
 } from './IStrategy';
 import MyNumber from '@/utils/MyNumber';
-import { getEndpoint, getTokenInfoFromName } from '@/utils';
+import {
+  convertToV2TokenInfo,
+  getEndpoint,
+  getTokenInfoFromName,
+  ZeroAmountsInfo,
+} from '@/utils';
 import { vesu } from '@/store/vesu.store';
 import { endur } from '@/store/endur.store';
 import { PoolInfo } from '@/store/pools';
 import { Contract } from 'starknet';
 import { fetchQuotes, QuoteRequest } from '@avnu/avnu-sdk';
+import { Web3Number } from '@strkfarm/sdk';
 
 export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
   vesuPoolName = 'Re7 xSTRK';
@@ -197,13 +204,8 @@ export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
     return [...actions, strategyAction];
   }
 
-  getTVL = async () => {
-    if (!this.isLive())
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+  getTVL = async (): Promise<AmountsInfo> => {
+    if (!this.isLive()) return ZeroAmountsInfo([this.token]);
 
     try {
       const resp = await fetch(
@@ -232,25 +234,27 @@ export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
       const xSTRKPrice = await this.getXSTRKPrice();
       const collateralInSTRK =
         Number(collateralXSTRK.toEtherToFixedDecimals(6)) * xSTRKPrice;
+      const usdValue =
+        Number(collateralUSDValue.toEtherStr()) -
+        Number(debtUSDValue.toEtherStr());
       return {
-        amount: MyNumber.fromEther(
-          (
-            collateralInSTRK - Number(debtSTRK.toEtherToFixedDecimals(6))
-          ).toFixed(6),
-          data.data[0].collateral.decimals,
-        ),
-        usdValue:
-          Number(collateralUSDValue.toEtherStr()) -
-          Number(debtUSDValue.toEtherStr()),
-        tokenInfo: this.token,
+        usdValue,
+        amounts: [
+          {
+            amount: new Web3Number(
+              (
+                collateralInSTRK - Number(debtSTRK.toEtherToFixedDecimals(6))
+              ).toFixed(6),
+              data.data[0].collateral.decimals,
+            ),
+            usdValue,
+            tokenInfo: convertToV2TokenInfo(this.token),
+          },
+        ],
       };
     } catch (error) {
       console.error('Error fetching TVL:', error);
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+      return ZeroAmountsInfo([this.token]);
     }
   };
 

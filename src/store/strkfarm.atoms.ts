@@ -12,8 +12,8 @@ import {
   PoolType,
   ProtocolAtoms,
 } from './pools';
-import { getLiveStatusEnum } from './strategies.atoms';
 import { IInvestmentFlow } from '@strkfarm/sdk';
+import { getLiveStatusEnum } from '@/strategies/IStrategy';
 
 export interface STRKFarmStrategyAPIResult {
   name: string;
@@ -28,7 +28,7 @@ export interface STRKFarmStrategyAPIResult {
     value: string;
   };
   riskFactor: number;
-  logo: string;
+  logos: string[];
   isAudited: boolean;
   auditUrl?: string;
   actions: {
@@ -67,7 +67,7 @@ export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
         pool: {
           id: rawPool.id,
           name: poolName,
-          logos: [rawPool.logo],
+          logos: [...rawPool.logos],
         },
         protocol: {
           name: this.name,
@@ -94,6 +94,7 @@ export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
           is_promoted: poolName.includes('Stake'),
         },
       };
+      console.log('rawPool', poolName, poolInfo);
       return poolInfo;
     });
   }

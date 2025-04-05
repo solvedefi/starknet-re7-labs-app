@@ -6,18 +6,19 @@ import {
 } from '@/strategies/IStrategy';
 import CONSTANTS from '@/constants';
 import Mustache from 'mustache';
-import { getTokenInfoFromName } from '@/utils';
+import { convertToV2TokenInfo, getTokenInfoFromName } from '@/utils';
 import { allPoolsAtomUnSorted, privatePoolsAtom } from './protocols';
-import EndurAtoms, { endur } from './endur.store';
-import { getDefaultPoolInfo, PoolInfo } from './pools';
+import { endur } from './endur.store';
+import { PoolInfo } from './pools';
 import { AutoTokenStrategy } from '@/strategies/auto_strk.strat';
 import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
 import { DeltaNeutralMM2 } from '@/strategies/delta_neutral_mm_2';
 import { DeltaNeutralMMVesuEndur } from '@/strategies/delta_neutral_mm_vesu_endur';
 import { Box, Link } from '@chakra-ui/react';
-import { VesuRebalanceStrategies } from '@strkfarm/sdk';
+import { EkuboCLVaultStrategies, VesuRebalanceStrategies } from '@strkfarm/sdk';
 import { VesuRebalanceStrategy } from '@/strategies/vesu_rebalance';
 import { atomWithQuery } from 'jotai-tanstack-query';
+import { EkuboClStrategy } from '@/strategies/ekubo_cl_vault';
 
 export interface StrategyInfo<T> extends IStrategyProps<T> {
   name: string;
@@ -73,6 +74,7 @@ export function getStrategies() {
       isAudited: true,
       isPaused: false,
       alerts: alerts2,
+      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
     },
   );
   const autoUSDCStrategy = new AutoTokenStrategy(
@@ -86,6 +88,7 @@ export function getStrategies() {
       isAudited: true,
       isPaused: false,
       alerts: alerts2,
+      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('USDC')),
     },
   );
 
@@ -124,6 +127,7 @@ export function getStrategies() {
       isAudited: true,
       alerts,
       isPaused: true,
+      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('USDC')),
     },
   );
 
@@ -140,6 +144,7 @@ export function getStrategies() {
       alerts,
       isAudited: true,
       isPaused: true,
+      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('ETH')),
     },
   );
   const deltaNeutralMMSTRKETH = new DeltaNeutralMM(
@@ -155,6 +160,7 @@ export function getStrategies() {
       isAudited: true,
       alerts,
       isPaused: true,
+      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
     },
   );
 
@@ -171,6 +177,7 @@ export function getStrategies() {
       alerts,
       isAudited: false,
       isPaused: true,
+      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('ETH')),
     },
   );
 
@@ -203,12 +210,13 @@ export function getStrategies() {
         },
       ],
       isAudited: false,
+      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
     },
   );
 
   const vesuRebalanceStrats = VesuRebalanceStrategies.map((v) => {
     return new VesuRebalanceStrategy(
-      getTokenInfoFromName(v.depositTokens[0].symbol),
+      getTokenInfoFromName(v.depositTokens[0]?.symbol || ''),
       v.name,
       v.description,
       v,
@@ -225,6 +233,34 @@ export function getStrategies() {
             tab: 'all',
           },
         ],
+        quoteToken: convertToV2TokenInfo(
+          getTokenInfoFromName(v.depositTokens[0]?.symbol || ''),
+        ),
+      },
+    );
+  });
+
+  const ekuboCLStrats = EkuboCLVaultStrategies.map((v) => {
+    return new EkuboClStrategy(
+      v.name,
+      v.description,
+      v,
+      StrategyLiveStatus.HOT,
+      {
+        maxTVL: 0,
+        isAudited: v.auditUrl ? true : false,
+        auditUrl: v.auditUrl,
+        isPaused: false,
+        alerts: [
+          {
+            type: 'info',
+            text: 'Depending on the current position range and price, your input amounts are automatially adjusted to nearest required amounts',
+            tab: 'all',
+          },
+        ],
+        quoteToken: convertToV2TokenInfo(
+          getTokenInfoFromName(v.depositTokens[1]?.symbol || ''),
+        ),
       },
     );
   });
@@ -240,6 +276,7 @@ export function getStrategies() {
   //   },
   // );
 
+  // undo
   const strategies: IStrategy<any>[] = [
     autoStrkStrategy,
     autoUSDCStrategy,
@@ -249,6 +286,7 @@ export function getStrategies() {
     deltaNeutralMMETHUSDCReverse,
     deltaNeutralxSTRKSTRK,
     ...vesuRebalanceStrats,
+    ...ekuboCLStrats,
     // xSTRKStrategy,
   ];
 
@@ -260,17 +298,8 @@ export const STRATEGIES_INFO = getStrategies();
 export const getPrivatePools = (get: any) => {
   // A placeholder to fetch any external pools/rewards info
   // that is not necessarily available in the allPools (i.e. not public)
-  const endurRewardInfo = get(EndurAtoms.rewardInfo);
-  const endurRewardPoolInfo = getDefaultPoolInfo();
-  endurRewardPoolInfo.pool.id = 'endur_strk_reward';
-  endurRewardPoolInfo.protocol.name = endur.name;
-  endurRewardPoolInfo.protocol.link = endur.link;
-  endurRewardPoolInfo.protocol.logo = endur.logo;
-  endurRewardPoolInfo.pool.name = 'STRK';
-  endurRewardPoolInfo.pool.logos = [getTokenInfoFromName('STRK').logo];
-  endurRewardPoolInfo.apr = endurRewardInfo.data || 0;
 
-  return [endurRewardPoolInfo];
+  return [];
 };
 
 const strategiesAtomAsync = atomWithQuery((get) => {
@@ -324,18 +353,4 @@ export function getLiveStatusNumber(status: StrategyLiveStatus) {
     return 4;
   }
   return 5;
-}
-
-export function getLiveStatusEnum(status: number) {
-  if (status == 1) {
-    return StrategyLiveStatus.HOT;
-  }
-  if (status == 2) {
-    return StrategyLiveStatus.NEW;
-  } else if (status == 3) {
-    return StrategyLiveStatus.ACTIVE;
-  } else if (status == 4) {
-    return StrategyLiveStatus.COMING_SOON;
-  }
-  return StrategyLiveStatus.RETIRED;
 }

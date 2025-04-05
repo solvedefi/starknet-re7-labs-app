@@ -20,7 +20,7 @@ export interface BalanceResult {
   tokenInfo: TokenInfo | undefined;
 }
 
-function returnEmptyBal(): BalanceResult {
+export function returnEmptyBal(): BalanceResult {
   return {
     amount: MyNumber.fromZero(),
     tokenInfo: undefined,
@@ -31,6 +31,7 @@ export async function getERC20Balance(
   token: TokenInfo | undefined,
   address: string | undefined,
 ) {
+  console.log('getERC20Balance', token?.token, address);
   if (!token) return returnEmptyBal();
   if (!address) return returnEmptyBal();
 
@@ -39,7 +40,6 @@ export async function getERC20Balance(
   });
   const erc20Contract = new Contract(ERC20Abi, token.token, provider);
   const balance = await erc20Contract.call('balanceOf', [address]);
-  console.log('erc20 balData', token.token, balance.toString());
   return {
     amount: new MyNumber(balance.toString(), token.decimals),
     tokenInfo: token,
@@ -50,7 +50,6 @@ export async function getERC4626Balance(
   token: TokenInfo | undefined,
   address: string | undefined,
 ) {
-  console.log('balData isERC4626', token?.token);
   if (!token) return returnEmptyBal();
   if (!address) return returnEmptyBal();
 
@@ -64,12 +63,6 @@ export async function getERC4626Balance(
   ]);
 
   const asset = await erc4626Contract.call('asset', []);
-  console.log(
-    'erc4626 balData',
-    token.token,
-    balance,
-    standariseAddress(asset as string),
-  );
   const assetInfo = getTokenInfoFromAddr(standariseAddress(asset as string));
   if (!assetInfo) {
     throw new Error('ERC4626: Asset not found');
@@ -108,7 +101,6 @@ export async function getERC721PositionValue(
     const tokenId = num.getDecimalString(address);
     result = await erc721Contract.call('describe_position', [tokenId]);
   }
-  console.log('erc721 position balData', token.address, result);
   const tokenInfo = getTokenInfoFromName(token.config.mainTokenName);
   return {
     amount: new MyNumber(
@@ -122,7 +114,7 @@ export async function getERC721PositionValue(
 export function getERC20BalanceAtom(token: TokenInfo | undefined) {
   return atomWithQuery((get) => {
     return {
-      queryKey: ['getERC20Balance', token?.token],
+      queryKey: ['getERC20Balance', token?.token, get(addressAtom)],
       queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
         return getERC20Balance(token, get(addressAtom));
       },
@@ -148,11 +140,9 @@ function getERC721PositionValueAtom(token: NFTInfo | undefined) {
     return {
       queryKey: ['getERC721PositionValue', token?.address],
       queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
-        console.log('getERC721PositionValueAtom', token);
         try {
           return await getERC721PositionValue(token, get(addressAtom));
         } catch (e) {
-          console.error('getERC721PositionValueAtome', e);
           return returnEmptyBal();
         }
       },
@@ -166,10 +156,8 @@ export async function getBalance(
   address: string,
 ) {
   if (token) {
-    console.log('token getBalance', token);
     if (Object.prototype.hasOwnProperty.call(token, 'isERC4626')) {
       const _token = <TokenInfo>token;
-      console.log('token getBalance isERC4626', _token.isERC4626);
       if (_token.isERC4626) return getERC4626Balance(_token, address);
     } else {
       const _token = <NFTInfo>token;
@@ -187,10 +175,8 @@ export function getBalanceAtom(
   enabledAtom: Atom<boolean>,
 ) {
   if (token) {
-    console.log('token getBalanceAtom', token);
     if (Object.prototype.hasOwnProperty.call(token, 'isERC4626')) {
       const _token = <TokenInfo>token;
-      console.log('token getBalanceAtom isERC4626', _token.isERC4626);
       if (_token.isERC4626) return getERC4626BalanceAtom(_token);
     } else {
       const _token = <NFTInfo>token;

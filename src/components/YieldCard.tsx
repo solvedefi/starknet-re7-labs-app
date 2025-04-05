@@ -70,9 +70,9 @@ export function StrategyInfo(props: YieldCardProps) {
   return (
     <Box>
       <HStack spacing={2}>
-        <AvatarGroup size="xs" max={2} marginRight={'10px'}>
-          {pool.pool.logos.map((logo) => (
-            <Avatar key={logo} src={logo} />
+        <AvatarGroup size="xs" max={3} marginRight={'10px'}>
+          {pool.pool.logos.map((logo, index) => (
+            <Avatar key={index} src={logo} />
           ))}
         </AvatarGroup>
         <Box>
@@ -235,8 +235,8 @@ export function getStrategyWiseHoldingsInfo(
   }
   return {
     usdValue: amount.usdValue,
-    amount: Number(amount.amount),
-    tokenInfo: amount.tokenInfo,
+    amount: Number(amount.holdings[0].amount),
+    tokenInfo: amount.holdings[0].tokenInfo,
   };
 }
 

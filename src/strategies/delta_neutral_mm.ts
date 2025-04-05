@@ -1,6 +1,7 @@
 import CONSTANTS, { NFTS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
 import {
+  AmountsInfo,
   DepositActionInputs,
   IStrategy,
   IStrategySettings,
@@ -16,9 +17,16 @@ import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
 import MyNumber from '@/utils/MyNumber';
 import { Call, Contract, uint256 } from 'starknet';
 import { nostraLending } from '@/store/nostralending.store';
-import { getPrice, getTokenInfoFromName, standariseAddress } from '@/utils';
 import {
-  DUMMY_BAL_ATOM,
+  buildStrategyActionHook,
+  convertToV2TokenInfo,
+  DummyStrategyActionHook,
+  getPrice,
+  getTokenInfoFromName,
+  standariseAddress,
+  ZeroAmountsInfo,
+} from '@/utils';
+import {
   getBalance,
   getBalanceAtom,
   getERC20Balance,
@@ -73,6 +81,7 @@ export class DeltaNeutralMM extends IStrategy<void> {
           decimals: tokenInfo.decimals,
           address: ContractAddr.from(tokenInfo.token),
           logo: '',
+          displayDecimals: tokenInfo.displayDecimals,
         },
       ],
       protocols: [],
@@ -289,18 +298,12 @@ export class DeltaNeutralMM extends IStrategy<void> {
     ];
   }
 
-  depositMethods = (inputs: DepositActionInputs) => {
+  depositMethods = async (inputs: DepositActionInputs) => {
     const { amount, address, provider } = inputs;
     const baseTokenInfo = this.token;
 
     if (!address || address == '0x0') {
-      return [
-        {
-          tokenInfo: baseTokenInfo,
-          calls: [],
-          balanceAtom: DUMMY_BAL_ATOM,
-        },
-      ];
+      return [DummyStrategyActionHook([baseTokenInfo])];
     }
 
     const baseTokenContract = new Contract(
@@ -326,46 +329,36 @@ export class DeltaNeutralMM extends IStrategy<void> {
 
     const calls1 = [call11, call12];
 
-    return [
-      {
-        tokenInfo: baseTokenInfo,
-        calls: calls1,
-        balanceAtom: getBalanceAtom(baseTokenInfo, atom(true)),
-      },
-    ];
+    return [buildStrategyActionHook(calls1, [baseTokenInfo])];
   };
 
-  getUserTVL = async (user: string) => {
+  getUserTVL = async (user: string): Promise<AmountsInfo> => {
     if (this.liveStatus == StrategyLiveStatus.COMING_SOON)
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+      return ZeroAmountsInfo([this.token]);
     const balanceInfo = await getBalance(this.holdingTokens[0], user);
     if (!balanceInfo.tokenInfo) {
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+      return ZeroAmountsInfo([this.token]);
     }
     const price = await getPrice(balanceInfo.tokenInfo);
     console.log('getUserTVL dnmm', price, balanceInfo.amount.toEtherStr());
+    const usdValue = Number(balanceInfo.amount.toEtherStr()) * price;
     return {
-      amount: balanceInfo.amount,
-      usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
-      tokenInfo: balanceInfo.tokenInfo,
+      usdValue,
+      amounts: [
+        {
+          amount: Web3Number.fromWei(
+            balanceInfo.amount.toString(),
+            balanceInfo.tokenInfo.decimals,
+          ),
+          usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
+          tokenInfo: convertToV2TokenInfo(balanceInfo.tokenInfo),
+        },
+      ],
     };
   };
 
-  getTVL = async () => {
-    if (!this.isLive())
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+  getTVL = async (): Promise<AmountsInfo> => {
+    if (!this.isLive()) return ZeroAmountsInfo([this.token]);
 
     try {
       const mainTokenName = this.token.name;
@@ -378,22 +371,24 @@ export class DeltaNeutralMM extends IStrategy<void> {
       const amount = bal.amount.operate('div', 1 + discountFactor);
       console.log('getTVL1', amount.toString());
       const price = await getPrice(this.token);
+      const usdValue = Number(amount.toEtherStr()) * price;
       return {
-        amount,
-        usdValue: Number(amount.toEtherStr()) * price,
-        tokenInfo: this.token,
+        usdValue,
+        amounts: [
+          {
+            usdValue,
+            amount: Web3Number.fromWei(amount.toString(), amount.decimals),
+            tokenInfo: convertToV2TokenInfo(this.token),
+          },
+        ],
       };
     } catch (error) {
       console.error('Error fetching TVL:', error);
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+      return ZeroAmountsInfo([this.token]);
     }
   };
 
-  withdrawMethods = (inputs: WithdrawActionInputs) => {
+  withdrawMethods = async (inputs: WithdrawActionInputs) => {
     const { amount, address, provider, isMax } = inputs;
     const mainToken = { ...this.token };
 
@@ -404,13 +399,7 @@ export class DeltaNeutralMM extends IStrategy<void> {
     );
 
     if (!address || address == '0x0') {
-      return [
-        {
-          tokenInfo: mainToken,
-          calls: [],
-          balanceAtom: DUMMY_BAL_ATOM,
-        },
-      ];
+      return [DummyStrategyActionHook([mainToken])];
     }
 
     const strategyContract = new Contract(
@@ -439,11 +428,11 @@ export class DeltaNeutralMM extends IStrategy<void> {
       throw new Error('DeltaMM: NFT not found');
     }
     return [
-      {
-        tokenInfo: mainToken,
+      buildStrategyActionHook(
         calls,
-        balanceAtom: getBalanceAtom(nftInfo, atom(true)),
-      },
+        [mainToken],
+        [getBalanceAtom(nftInfo, atom(true))],
+      ),
     ];
   };
 }

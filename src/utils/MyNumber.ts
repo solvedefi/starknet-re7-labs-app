@@ -2,6 +2,10 @@ import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 const customInspectSymbol = Symbol.for('nodejs.util.inspect.custom');
 
+BigNumber.config({
+  DECIMAL_PLACES: 18,
+});
+
 export default class MyNumber {
   bigNumber: BigNumber;
   decimals: number;

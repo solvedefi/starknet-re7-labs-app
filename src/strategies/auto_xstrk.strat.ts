@@ -1,6 +1,7 @@
 import CONSTANTS, { TOKENS, provider } from '@/constants';
 import { PoolInfo } from '@/store/pools';
 import {
+  AmountsInfo,
   DepositActionInputs,
   IStrategy,
   IStrategySettings,
@@ -14,14 +15,15 @@ import AutoStrkAbi from '@/abi/autoStrk.abi.json';
 import MasterAbi from '@/abi/master.abi.json';
 import MyNumber from '@/utils/MyNumber';
 import { Contract, num, uint256 } from 'starknet';
-import { atom } from 'jotai';
+import { getBalance } from '@/store/balance.atoms';
 import {
-  DUMMY_BAL_ATOM,
-  getBalance,
-  getBalanceAtom,
-  getERC20BalanceAtom,
-} from '@/store/balance.atoms';
-import { getPrice, getTokenInfoFromName } from '@/utils';
+  buildStrategyActionHook,
+  convertToV2TokenInfo,
+  DummyStrategyActionHook,
+  getPrice,
+  getTokenInfoFromName,
+  ZeroAmountsInfo,
+} from '@/utils';
 import { endur } from '@/store/endur.store';
 import { ContractAddr, IStrategyMetadata, Web3Number } from '@strkfarm/sdk';
 
@@ -69,6 +71,7 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
           decimals: tokenInfo.decimals,
           address: ContractAddr.from(tokenInfo.token),
           logo: '',
+          displayDecimals: tokenInfo.displayDecimals,
         },
       ],
       protocols: [],
@@ -165,37 +168,33 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
 
   getUserTVL = async (user: string) => {
     if (this.liveStatus == StrategyLiveStatus.COMING_SOON)
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+      return ZeroAmountsInfo([this.token]);
 
     // returns zToken
     const balanceInfo = await getBalance(this.holdingTokens[0], user);
     if (!balanceInfo.tokenInfo) {
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+      return ZeroAmountsInfo([this.token]);
     }
     const price = await getPrice(this.token);
     console.log('getUserTVL autoc', price, balanceInfo.amount.toEtherStr());
+    const usdValue = Number(balanceInfo.amount.toEtherStr()) * price;
     return {
-      amount: balanceInfo.amount,
-      usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
-      tokenInfo: balanceInfo.tokenInfo,
+      usdValue,
+      amounts: [
+        {
+          amount: Web3Number.fromWei(
+            balanceInfo.amount.toString(),
+            balanceInfo.tokenInfo.decimals,
+          ),
+          usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
+          tokenInfo: convertToV2TokenInfo(balanceInfo.tokenInfo),
+        },
+      ],
     };
   };
 
-  getTVL = async () => {
-    if (!this.isLive())
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+  getTVL = async (): Promise<AmountsInfo> => {
+    if (!this.isLive()) return ZeroAmountsInfo([this.token]);
 
     const strategyContract = new Contract(
       AutoStrkAbi,
@@ -217,10 +216,19 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
         STRKINfo.decimals,
       );
       const price = await getPrice(this.token);
+      const usdValue = Number(totalAssets.toEtherStr()) * price;
       return {
-        amount: totalAssets,
-        usdValue: Number(totalAssets.toEtherStr()) * price,
-        tokenInfo: STRKINfo,
+        usdValue,
+        amounts: [
+          {
+            amount: Web3Number.fromWei(
+              totalAssets.toString(),
+              totalAssets.decimals,
+            ),
+            usdValue: Number(totalAssets.toEtherStr()) * price,
+            tokenInfo: convertToV2TokenInfo(STRKINfo),
+          },
+        ],
       };
     } else if (isxSTRK) {
       const xSTRKTotalAssets = new MyNumber(
@@ -241,16 +249,25 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
         STRKINfo.decimals,
       );
       const price = await getPrice(this.token);
+      const usdValue = Number(strkAmount.toEtherStr()) * price;
       return {
-        amount: strkAmount,
-        usdValue: Number(strkAmount.toEtherStr()) * price,
-        tokenInfo: STRKINfo,
+        usdValue,
+        amounts: [
+          {
+            amount: Web3Number.fromWei(
+              strkAmount.toString(),
+              strkAmount.decimals,
+            ),
+            usdValue: Number(strkAmount.toEtherStr()) * price,
+            tokenInfo: convertToV2TokenInfo(STRKINfo),
+          },
+        ],
       };
     }
     throw new Error(`getTVL asset not STRK or xSTRK`);
   };
 
-  depositMethods = (inputs: DepositActionInputs) => {
+  depositMethods = async (inputs: DepositActionInputs) => {
     const { amount, address, provider } = inputs;
     const baseTokenInfo: TokenInfo = TOKENS.find(
       (t) => t.name == this.token.name,
@@ -261,16 +278,8 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
 
     if (!address || address == '0x0') {
       return [
-        {
-          tokenInfo: baseTokenInfo,
-          calls: [],
-          balanceAtom: DUMMY_BAL_ATOM,
-        },
-        {
-          tokenInfo: xTokenInfo,
-          calls: [],
-          balanceAtom: DUMMY_BAL_ATOM,
-        },
+        DummyStrategyActionHook([baseTokenInfo]),
+        DummyStrategyActionHook([xTokenInfo]),
       ];
     }
 
@@ -317,33 +326,19 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
     const calls2 = [call21, call22];
 
     return [
-      {
-        tokenInfo: baseTokenInfo,
-        calls: calls1,
-        balanceAtom: getBalanceAtom(baseTokenInfo, atom(true)),
-      },
-      {
-        tokenInfo: xTokenInfo,
-        calls: calls2,
-        balanceAtom: getBalanceAtom(xTokenInfo, atom(true)),
-      },
+      buildStrategyActionHook(calls1, [baseTokenInfo]),
+      buildStrategyActionHook(calls2, [xTokenInfo]),
     ];
   };
 
-  withdrawMethods = (inputs: WithdrawActionInputs) => {
+  withdrawMethods = async (inputs: WithdrawActionInputs) => {
     const { amount, address, provider } = inputs;
     const frmToken: TokenInfo = TOKENS.find(
       (t) => t.token == this.strategyAddress,
     ) as TokenInfo;
 
     if (!address || address == '0x0') {
-      return [
-        {
-          tokenInfo: frmToken,
-          calls: [],
-          balanceAtom: DUMMY_BAL_ATOM,
-        },
-      ];
+      return [DummyStrategyActionHook([frmToken])];
     }
 
     // const baseTokenContract = new Contract(ERC20Abi, baseTokenInfo.token, provider);
@@ -372,12 +367,6 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
 
     const calls = [call2];
 
-    return [
-      {
-        tokenInfo: frmToken,
-        calls,
-        balanceAtom: getERC20BalanceAtom(frmToken),
-      },
-    ];
+    return [buildStrategyActionHook(calls, [frmToken])];
   };
 }

@@ -10,15 +10,15 @@ import NostraDegenAtoms, { nostraDegen } from './nostradegen.store';
 import NostraDexAtoms, { nostraDex } from './nostradex.store';
 import NostraLendingAtoms, { nostraLending } from './nostralending.store';
 import { Category, isPoolRetired, PoolInfo, PoolType } from './pools';
-import { getLiveStatusEnum } from './strategies.atoms';
 import STRKFarmAtoms, {
   strkfarm,
   STRKFarmStrategyAPIResult,
 } from './strkfarm.atoms';
 import VesuAtoms, { vesu } from './vesu.store';
 import ZkLendAtoms, { zkLend } from './zklend.store';
+import { getLiveStatusEnum } from '@/strategies/IStrategy';
 
-export const PROTOCOLS = [
+export const getProtocols = () => [
   {
     name: endur.name,
     class: endur,
@@ -103,16 +103,19 @@ export const PROTOCOLS = [
 
 export const ALL_FILTER = 'All';
 
-const allProtocols = PROTOCOLS.map((p) => ({
-  name: p.name,
-  logo: p.class.logo,
-}));
+const allProtocols = () => {
+  return getProtocols().map((p) => ({
+    name: p.name,
+    logo: p.class.logo,
+  }));
+};
 
 export const filters = {
   categories: [...Object.values(Category)],
   types: [...Object.values(PoolType)],
-  protocols: allProtocols.filter(
-    (p, index) => allProtocols.findIndex((_p) => _p.name === p.name) === index,
+  protocols: allProtocols().filter(
+    (p, index) =>
+      allProtocols().findIndex((_p) => _p.name === p.name) === index,
   ),
 };
 
@@ -167,7 +170,7 @@ export const privatePoolsAtom = atom((get) => {
 
 export const allPoolsAtomUnSorted = atom((get) => {
   const pools: PoolInfo[] = [];
-  return PROTOCOLS.reduce(
+  return getProtocols().reduce(
     (_pools, p) => _pools.concat(get(p.atoms.pools)),
     pools,
   );
@@ -188,7 +191,7 @@ export function getPoolInfoFromStrategy(
     pool: {
       id: strat.id,
       name: strat.name,
-      logos: [strat.logo],
+      logos: [...strat.logos],
     },
     protocol: {
       name: 'STRKFarm',

@@ -10,7 +10,8 @@ import { MY_STORE } from '@/store';
 import VesuAtoms, { vesu } from '@/store/vesu.store';
 import EndurAtoms, { endur } from '@/store/endur.store';
 
-export const revalidate = 3600; // 1 hr
+export const revalidate = 60; // 1 hr
+export const dynamic = 'force-dynamic';
 
 const allPoolsAtom = atom<PoolInfo[]>((get) => {
   const pools: PoolInfo[] = [];

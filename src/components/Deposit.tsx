@@ -20,7 +20,7 @@ import {
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import TxButton from './TxButton';
 import { provider } from '@/constants';
 import {
@@ -28,7 +28,7 @@ import {
   TokenInfo as TokenInfoV2,
   Web3Number,
 } from '@strkfarm/sdk';
-import { AmountInput } from './AmountInput';
+import AmountInput, { AmountInputRef } from './AmountInput';
 import { addressAtom } from '@/store/claims.atoms';
 
 interface DepositProps {
@@ -152,6 +152,13 @@ function InternalDeposit(props: DepositProps) {
   useEffect(() => {
     resetDepositForm();
   }, []);
+
+  const inputRef1 = useRef<AmountInputRef | null>(null);
+  const inputRef2 = useRef<AmountInputRef | null>(null);
+
+  const inputRefs = useMemo(() => {
+    return [inputRef1, inputRef2];
+  }, [inputRef1, inputRef2]);
 
   // since we use a separate jotai provider,
   // need to set this again here
@@ -306,6 +313,7 @@ function InternalDeposit(props: DepositProps) {
           callsInfo[0].amounts.map((inputAmtInfo, index) => {
             return (
               <AmountInput
+                ref={inputRefs[index]}
                 key={index}
                 index={index}
                 tokenInfo={inputAmtInfo.tokenInfo}
@@ -339,7 +347,14 @@ function InternalDeposit(props: DepositProps) {
             props.strategy.settings.quoteToken,
           )}
           strategy={props.strategy}
-          resetDepositForm={resetDepositForm}
+          resetDepositForm={() => {
+            resetDepositForm();
+            inputRefs.forEach((ref) => {
+              if (ref.current) {
+                ref.current.reset();
+              }
+            });
+          }}
         />
       </Center>
 

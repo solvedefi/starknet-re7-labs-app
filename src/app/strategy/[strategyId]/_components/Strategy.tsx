@@ -280,23 +280,29 @@ const Strategy = ({ params }: StrategyParams) => {
                               : 'Connect wallet'}
                           </Text>
                         </Box>
-                        <Tooltip
-                          label={!strategy?.isRetired() && 'Life time earnings'}
-                        >
-                          <Box>
-                            <Text textAlign={'right'} fontWeight={'none'}>
-                              <b>Net earnings</b>
-                            </Text>
-                            <Text
-                              textAlign={'right'}
-                              color={profit >= 0 ? 'cyan' : 'red'}
-                            >
-                              {address && profit !== 0 && !strategy?.isRetired()
-                                ? `${profit?.toFixed(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
-                                : '-'}
-                            </Text>
-                          </Box>
-                        </Tooltip>
+                        {!strategy.settings.isTransactionHistDisabled && (
+                          <Tooltip
+                            label={
+                              !strategy?.isRetired() && 'Life time earnings'
+                            }
+                          >
+                            <Box>
+                              <Text textAlign={'right'} fontWeight={'none'}>
+                                <b>Net earnings</b>
+                              </Text>
+                              <Text
+                                textAlign={'right'}
+                                color={profit >= 0 ? 'cyan' : 'red'}
+                              >
+                                {address &&
+                                profit !== 0 &&
+                                !strategy?.isRetired()
+                                  ? `${profit?.toFixed(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
+                                  : '-'}
+                              </Text>
+                            </Box>
+                          </Tooltip>
+                        )}
                       </Flex>
                     )}
                   {(balData.isLoading || !balData.data?.tokenInfo) && (
@@ -579,10 +585,16 @@ const Strategy = ({ params }: StrategyParams) => {
                 <Text fontSize={'20px'} fontWeight={'bold'}>
                   Transaction history
                 </Text>
-                <Text fontSize={'13px'} marginBottom={'10px'} color={'color2'}>
-                  There may be delays fetching data. If your transaction{' '}
-                  {`isn't`} found, try again later.
-                </Text>
+                {!strategy.settings.isTransactionHistDisabled && (
+                  <Text
+                    fontSize={'13px'}
+                    marginBottom={'10px'}
+                    color={'color2'}
+                  >
+                    There may be delays fetching data. If your transaction{' '}
+                    {`isn't`} found, try again later.
+                  </Text>
+                )}
 
                 {txHistoryResult.isSuccess && (
                   <>
@@ -655,13 +667,25 @@ const Strategy = ({ params }: StrategyParams) => {
                 )}
 
                 {/* If no filtered tx */}
-                {txHistory.findManyInvestment_flows.length === 0 && (
+                {!strategy.settings.isTransactionHistDisabled &&
+                  txHistory.findManyInvestment_flows.length === 0 && (
+                    <Text
+                      fontSize={'14px'}
+                      textAlign={'center'}
+                      color="light_grey"
+                    >
+                      No transactions found
+                    </Text>
+                  )}
+                {strategy.settings.isTransactionHistDisabled && (
                   <Text
                     fontSize={'14px'}
                     textAlign={'center'}
                     color="light_grey"
+                    marginTop={'20px'}
                   >
-                    No transactions found
+                    Transaction history is not available for this strategy yet.
+                    If enabled in future, will include the entire history.
                   </Text>
                 )}
               </Card>

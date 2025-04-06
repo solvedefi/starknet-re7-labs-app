@@ -80,7 +80,7 @@ export class DeltaNeutralMM extends IStrategy<void> {
           symbol: tokenInfo.name,
           decimals: tokenInfo.decimals,
           address: ContractAddr.from(tokenInfo.token),
-          logo: '',
+          logo: tokenInfo.logo,
           displayDecimals: tokenInfo.displayDecimals,
         },
       ],

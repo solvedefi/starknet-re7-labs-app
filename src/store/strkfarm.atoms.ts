@@ -19,6 +19,10 @@ export interface STRKFarmStrategyAPIResult {
   name: string;
   id: string;
   apy: number;
+  apySplit: {
+    baseApy: number;
+    rewardsApy: number;
+  };
   depositToken: string[];
   leverage: number;
   contract: { name: string; address: string }[];

@@ -28,6 +28,7 @@ import {
   Tr,
   VStack,
 } from '@chakra-ui/react';
+import { ContractAddr } from '@strkfarm/sdk';
 import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useMemo } from 'react';
@@ -220,23 +221,27 @@ export function getStrategyWiseHoldingsInfo(
   id: string,
 ) {
   const amount = userData?.strategyWise.find((item) => item.id === id);
+  const defaultTokenInfo = {
+    name: 'N/A',
+    symbol: 'N/A',
+    address: ContractAddr.from('0x0'),
+    decimals: 0,
+    logo: '',
+    displayDecimals: 2,
+  };
   if (!amount) {
     return {
       usdValue: 0,
       amount: 0,
-      tokenInfo: {
-        symbol: '',
-        decimals: 0,
-        displayDecimals: 0,
-        logo: '',
-        name: '',
-      },
+      tokenInfo: defaultTokenInfo,
     };
   }
   return {
     usdValue: amount.usdValue,
-    amount: Number(amount.holdings[0].amount),
-    tokenInfo: amount.holdings[0].tokenInfo,
+    amount: amount.holdings.length ? Number(amount.holdings[0].amount) : 0,
+    tokenInfo: amount.holdings.length
+      ? amount.holdings[0].tokenInfo
+      : defaultTokenInfo,
   };
 }
 

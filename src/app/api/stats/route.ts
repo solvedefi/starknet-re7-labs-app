@@ -35,7 +35,12 @@ export async function GET(_req: Request) {
 
   const response = NextResponse.json({
     tvl: result.reduce((a, b) => a + b, 0),
+    lastUpdated: new Date().toISOString(),
   });
 
+  response.headers.set(
+    'Cache-Control',
+    `s-maxage=${revalidate}, stale-while-revalidate=180`,
+  );
   return response;
 }

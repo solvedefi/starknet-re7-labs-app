@@ -11,8 +11,8 @@ export async function GET(request: Request) {
     });
   }
   console.error('Revalidating...', `${process.env.HOSTNAME}/api/strategies`);
-  const prom1 = axios(`${process.env.HOSTNAME}/api/strategies`);
-  const prom2 = axios(`${process.env.HOSTNAME}/api/stats`);
+  const prom1 = axios(`${process.env.HOSTNAME}/api/strategies?no_cache=true`);
+  const prom2 = axios(`${process.env.HOSTNAME}/api/stats?no_cache=true`);
 
   const result = await Promise.all([prom1, prom2]);
   console.error('Revalidation complete');

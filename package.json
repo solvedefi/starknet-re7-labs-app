@@ -38,6 +38,7 @@
     "@tanstack/query-core": "5.28.0",
     "@types/mixpanel-browser": "2.49.0",
     "@types/mustache": "4.2.5",
+    "@upstash/redis": "^1.34.7",
     "@vercel/analytics": "1.2.2",
     "@vercel/speed-insights": "1.0.12",
     "@xyflow/react": "^12.4.4",

@@ -10,7 +10,7 @@ import { MY_STORE } from '@/store';
 import VesuAtoms, { vesu } from '@/store/vesu.store';
 import EndurAtoms, { endur } from '@/store/endur.store';
 
-export const revalidate = 60; // 1 hr
+export const revalidate = 600; // 1 hr
 export const dynamic = 'force-dynamic';
 
 const allPoolsAtom = atom<PoolInfo[]>((get) => {
@@ -151,7 +151,7 @@ export async function GET(req: Request) {
     });
     response.headers.set(
       'Cache-Control',
-      `s-maxage=${revalidate}, stale-while-revalidate=180`,
+      `s-maxage=${revalidate}, stale-while-revalidate=300`,
     );
     return response;
   } catch (err) {

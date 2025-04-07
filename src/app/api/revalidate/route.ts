@@ -1,4 +1,3 @@
-import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -10,8 +9,8 @@ export async function GET(request: Request) {
       status: 401,
     });
   }
-  revalidatePath('/api/strategies');
-  revalidatePath('/api/stats');
+  fetch(`${process.env.HOSTNAME}/api/strategies`);
+  fetch(`${process.env.HOSTNAME}/api/stats`);
   return NextResponse.json(
     {
       revalidated: true,

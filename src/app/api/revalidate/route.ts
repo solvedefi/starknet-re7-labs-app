@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -10,11 +11,15 @@ export async function GET(request: Request) {
     });
   }
   console.error('Revalidating...', `${process.env.HOSTNAME}/api/strategies`);
-  const prom1 = fetch(`${process.env.HOSTNAME}/api/strategies`);
-  const prom2 = fetch(`${process.env.HOSTNAME}/api/stats`);
+  const prom1 = axios(`${process.env.HOSTNAME}/api/strategies`);
+  const prom2 = axios(`${process.env.HOSTNAME}/api/stats`);
 
-  await Promise.all([prom1, prom2]);
+  const result = await Promise.all([prom1, prom2]);
   console.error('Revalidation complete');
+  const res1 = await result[0].data;
+  const res2 = await result[1].data;
+  console.error(`Value 1: ${res1.lastUpdated}`);
+  console.error(`Value 2: ${res2.lastUpdated}`);
   return NextResponse.json(
     {
       revalidated: true,

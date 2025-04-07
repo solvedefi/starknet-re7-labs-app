@@ -2,11 +2,12 @@ import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  console.log(`secret`, searchParams.get('secret'));
-  if (searchParams.get('secret') !== process.env.MY_SECRET_TOKEN) {
-    return new Response(`Invalid credentials`, {
-      status: 500,
+  const authHeader = request.headers.get('authorization');
+  console.log('Authorization header:', authHeader);
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    console.error('Unauthorized request');
+    return new Response('Unauthorized', {
+      status: 401,
     });
   }
   revalidatePath('/api/strategies');

@@ -11,7 +11,7 @@ import VesuAtoms, { vesu } from '@/store/vesu.store';
 import EndurAtoms, { endur } from '@/store/endur.store';
 import kvRedis, { getDataFromRedis } from '../lib';
 
-export const revalidate = 600; // 1 hr
+export const revalidate = 1800; // 30 minutes
 export const dynamic = 'force-dynamic';
 
 const allPoolsAtom = atom<PoolInfo[]>((get) => {

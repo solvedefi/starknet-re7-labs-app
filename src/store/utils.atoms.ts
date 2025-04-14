@@ -3,6 +3,7 @@ import { atomWithQuery } from 'jotai-tanstack-query';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 import { addressAtom } from './claims.atoms';
 import fetchWithRetry from '@/utils/fetchWithRetry';
+import { SingleTokenInfo } from '@strkfarm/sdk';
 
 export interface BlockInfo {
   data: {
@@ -85,17 +86,10 @@ export const dAppStatsAtom = atomWithQuery((get) => ({
   },
 }));
 
-interface StrategyWise {
+export interface StrategyWise {
   id: string;
   usdValue: number;
-  amount: string;
-  tokenInfo: {
-    name: string;
-    symbol: string;
-    logo: string;
-    decimals: number;
-    displayDecimals: number;
-  };
+  holdings: SingleTokenInfo[];
 }
 
 export interface UserStats {

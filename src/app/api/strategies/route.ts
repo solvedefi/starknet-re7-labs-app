@@ -1,22 +1,24 @@
 import { NextResponse } from 'next/server';
 import { atom } from 'jotai';
-import ZkLendAtoms from '@/store/zklend.store';
 import { PoolInfo, PoolType } from '@/store/pools';
-import NostraLendingAtoms from '@/store/nostralending.store';
 import { RpcProvider } from 'starknet';
 import { getLiveStatusNumber, getStrategies } from '@/store/strategies.atoms';
-import { MY_STORE } from '@/store';
 import MyNumber from '@/utils/MyNumber';
 import { IStrategy, NFTInfo, TokenInfo } from '@/strategies/IStrategy';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
+import { MY_STORE } from '@/store';
 import VesuAtoms, { vesu } from '@/store/vesu.store';
 import EndurAtoms, { endur } from '@/store/endur.store';
+import kvRedis, { getDataFromRedis } from '../lib';
 
-export const revalidate = 3600; // 1 hr
+export const revalidate = 1800; // 30 minutes
+export const dynamic = 'force-dynamic';
 
 const allPoolsAtom = atom<PoolInfo[]>((get) => {
   const pools: PoolInfo[] = [];
-  const poolAtoms = [ZkLendAtoms, NostraLendingAtoms, VesuAtoms, EndurAtoms];
+  // undo
+  const poolAtoms = [VesuAtoms, EndurAtoms];
+  // const poolAtoms: ProtocolAtoms[] = [];
   return poolAtoms.reduce((_pools, p) => _pools.concat(get(p.pools)), pools);
 });
 
@@ -24,18 +26,20 @@ async function getPools(store: any, retry = 0) {
   const allPools: PoolInfo[] | undefined = store.get(allPoolsAtom);
 
   console.log('allPools', allPools?.length);
-  const minProtocolsRequired = [vesu.name, endur.name];
+  // undo
+  const minProtocolsRequired: string[] = [vesu.name, endur.name];
   const hasRequiredPools = minProtocolsRequired.every((p) => {
+    if (minProtocolsRequired.length == 0) return true;
     if (!allPools) return false;
     return allPools.some((pool) => {
-      console.log('pool.protocol.name', pool.protocol.name);
+      console.log(new Date(), 'pool.protocol.name', pool.protocol.name);
       return (
         pool.protocol.name === p &&
         (pool.type == PoolType.Lending || pool.type == PoolType.Staking)
       );
     });
   });
-  console.log('hasRequiredPools', hasRequiredPools);
+  console.log(new Date(), 'hasRequiredPools', hasRequiredPools);
   const MAX_RETRIES = 120;
   if (retry >= MAX_RETRIES) {
     throw new Error('Failed to fetch pools');
@@ -59,14 +63,18 @@ async function getStrategyInfo(
     name: strategy.name,
     id: strategy.id,
     apy: strategy.netYield,
-    depositToken: strategy
-      .depositMethods({
+    apySplit: {
+      baseApy: strategy.netYield,
+      rewardsApy: 0,
+    },
+    depositToken: (
+      await strategy.depositMethods({
         amount: MyNumber.fromZero(),
         address: '',
         provider,
         isMax: false,
       })
-      .map((t) => t.tokenInfo.token),
+    ).map((t) => t.amounts[0].tokenInfo.address.address),
     leverage: strategy.leverage,
     contract: strategy.holdingTokens.map((t) => ({
       name: t.name,
@@ -78,7 +86,7 @@ async function getStrategyInfo(
       value: strategy.liveStatus,
     },
     riskFactor: strategy.riskFactor,
-    logo: strategy.holdingTokens[0].logo,
+    logos: strategy.metadata.depositTokens.map((t) => t.logo),
     isAudited: strategy.settings.auditUrl ? true : false,
     auditUrl: strategy.settings.auditUrl,
     actions: strategy.actions.map((action) => {
@@ -101,7 +109,20 @@ async function getStrategyInfo(
   };
 }
 
+const REDIS_KEY = `${process.env.VK_REDIS_PREFIX}::strategies`;
+
 export async function GET(req: Request) {
+  console.log('GET /api/strategies', req.url);
+  const cacheData = await getDataFromRedis(REDIS_KEY, req.url, revalidate);
+  if (cacheData) {
+    const resp = NextResponse.json(cacheData);
+    resp.headers.set(
+      'Cache-Control',
+      `s-maxage=${revalidate}, stale-while-revalidate=300`,
+    );
+    return resp;
+  }
+
   const allPools = await getPools(MY_STORE);
   const strategies = getStrategies();
 
@@ -137,15 +158,24 @@ export async function GET(req: Request) {
   const stratsData = await Promise.all(stratsDataProms);
 
   try {
-    return NextResponse.json({
+    const data = {
       status: true,
       strategies: stratsData,
-    });
+      lastUpdated: new Date().toISOString(),
+    };
+    await kvRedis.set(REDIS_KEY, data);
+    const response = NextResponse.json(data);
+    response.headers.set(
+      'Cache-Control',
+      `s-maxage=${revalidate}, stale-while-revalidate=300`,
+    );
+    return response;
   } catch (err) {
     console.error('Error /api/strategies', err);
     return NextResponse.json({
       status: false,
       strategies: [],
+      lastUpdated: new Date().toISOString(),
     });
   }
 }

@@ -1,11 +1,28 @@
 import { IDapp } from '@/store/IDapp.store';
-import { BalanceResult, getBalanceAtom } from '@/store/balance.atoms';
+import {
+  BalanceResult,
+  getBalanceAtom,
+  returnEmptyBal,
+} from '@/store/balance.atoms';
 import { IndexedPoolData } from '@/store/endur.store';
 import { LendingSpace } from '@/store/lending.base';
 import { Category, PoolInfo } from '@/store/pools';
 import { zkLend } from '@/store/zklend.store';
+import {
+  convertToV2TokenInfo,
+  convertToV2Web3Number,
+  getPrice,
+  MyTokenInfo,
+  MyWeb3Number,
+} from '@/utils';
 import MyNumber from '@/utils/MyNumber';
-import { IInvestmentFlow, IStrategyMetadata } from '@strkfarm/sdk';
+import {
+  IInvestmentFlow,
+  IStrategyMetadata,
+  SingleActionAmount,
+  TokenInfo as TokenInfoV2,
+  Web3Number,
+} from '@strkfarm/sdk';
 import { Atom, atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { ReactNode } from 'react';
@@ -69,10 +86,24 @@ export enum StrategyLiveStatus {
   HOT = 'Hot & New 🔥',
 }
 
+export type onStratAmountsChangeFn = (
+  change: {
+    amountInfo: SingleActionAmount;
+    index: number;
+  },
+  allAmounts: SingleActionAmount[],
+) => Promise<SingleActionAmount[]>;
+
 export interface IStrategyActionHook {
-  tokenInfo: TokenInfo;
   calls: Call[];
-  balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
+  amounts: {
+    tokenInfo: TokenInfoV2;
+    balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
+  }[];
+
+  // if strategy wants to relate different input amounts,
+  // config this fn
+  onAmountsChange?: onStratAmountsChangeFn;
 }
 
 export interface IStrategySettings {
@@ -87,16 +118,24 @@ export interface IStrategySettings {
   isAudited?: boolean;
   auditUrl?: string;
   isPaused?: boolean;
+  quoteToken: TokenInfoV2; // used to show the holdings in this token,
+  isTransactionHistDisabled?: boolean;
 }
 
 export interface AmountInfo {
-  amount: MyNumber;
+  amount: Web3Number;
   usdValue: number;
-  tokenInfo: TokenInfo;
+  tokenInfo: TokenInfoV2;
+}
+
+export interface AmountsInfo {
+  usdValue: number;
+  amounts: AmountInfo[];
 }
 
 export interface DepositActionInputs {
   amount: MyNumber;
+  amount2?: MyNumber; // used in dual token deposits
   address: string;
   provider: ProviderInterface;
   isMax: boolean;
@@ -130,13 +169,19 @@ export class IStrategyProps<T> {
   leverage: number = 0;
   fee_factor = 0; // in absolute terms, not %
   status = StrategyStatus.UNINTIALISED;
+  isSingleTokenDepositView = true;
 
   readonly rewardTokens: { logo: string }[];
   readonly holdingTokens: (TokenInfo | NFTInfo)[];
 
   balEnabled = atom(false);
-  readonly balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
-  readonly tvlAtom: Atom<AtomWithQueryResult<AmountInfo, Error>>;
+  // summary of balance in some quote token
+  // as required by the strategy
+  balanceSummaryAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
+  // a strategy can have multiple balance tokens, this is for that
+  balanceAtoms: Atom<AtomWithQueryResult<BalanceResult, Error>>[] = [];
+  balancesAtom: Atom<BalanceResult[]>;
+  readonly tvlAtom: Atom<AtomWithQueryResult<AmountsInfo, Error>>;
 
   riskFactor: number = 5;
   risks: string[] = [
@@ -151,19 +196,23 @@ export class IStrategyProps<T> {
     return `Risk factor: ${this.riskFactor}/5 (${factorLevel} risk)`;
   }
 
-  depositMethods = (inputs: DepositActionInputs): IStrategyActionHook[] => {
+  depositMethods = async (
+    inputs: DepositActionInputs,
+  ): Promise<IStrategyActionHook[]> => {
     return [];
   };
 
-  withdrawMethods = (inputs: WithdrawActionInputs): IStrategyActionHook[] => {
+  withdrawMethods = async (
+    inputs: WithdrawActionInputs,
+  ): Promise<IStrategyActionHook[]> => {
     return [];
   };
 
-  getTVL = async (): Promise<AmountInfo> => {
+  getTVL = async (): Promise<AmountsInfo> => {
     throw new Error('getTVL: Not implemented');
   };
 
-  getUserTVL = async (user: string): Promise<AmountInfo> => {
+  getUserTVL = async (user: string): Promise<AmountsInfo> => {
     throw new Error('getTVL: Not implemented');
   };
 
@@ -184,26 +233,87 @@ export class IStrategyProps<T> {
     liveStatus: StrategyLiveStatus,
     settings: IStrategySettings,
     metadata: IStrategyMetadata<T>,
+    balanceAtom?: Atom<AtomWithQueryResult<BalanceResult, Error>>,
   ) {
     this.id = id;
     this.name = name;
     this.description = description;
     this.rewardTokens = rewardTokens;
     this.holdingTokens = holdingTokens;
-    console.log('calling getBalanceAtom', id, holdingTokens[0]);
-    this.balanceAtom = getBalanceAtom(holdingTokens[0], this.balEnabled);
+    this.balanceSummaryAtom =
+      balanceAtom || getBalanceAtom(holdingTokens[0], this.balEnabled);
     this.liveStatus = liveStatus;
     this.settings = settings;
     this.metadata = metadata;
     this.tvlAtom = atomWithQuery((get) => {
       return {
         queryKey: ['tvl', this.id],
-        queryFn: async ({ queryKey }: any): Promise<AmountInfo> => {
+        queryFn: async ({ queryKey }: any): Promise<AmountsInfo> => {
           return this.getTVL();
         },
         refetchInterval: 15000,
       };
     });
+    this.balancesAtom = this.getBalancesAtom();
+  }
+
+  getBalancesAtom() {
+    return atom((get) => {
+      return this.balanceAtoms.map((atom) => {
+        const res = get(atom);
+        if (!res.data) {
+          return returnEmptyBal();
+        }
+        return res.data;
+      });
+    });
+  }
+
+  async computeSummaryValue(
+    amounts: SingleActionAmount[],
+    quoteToken: MyTokenInfo,
+  ): Promise<MyWeb3Number> {
+    const valuesProm = amounts.map((amount) => {
+      return this.getValueInQuoteToken(
+        convertToV2Web3Number(amount.amount),
+        convertToV2TokenInfo(amount.tokenInfo),
+        quoteToken,
+      );
+    });
+    const values = await Promise.all(valuesProm);
+    const total = values.reduce(
+      (acc, amount) => {
+        return acc.plus(amount);
+      },
+      Web3Number.fromWei('0', quoteToken.decimals),
+    );
+    return total;
+  }
+
+  async getValueInQuoteToken(
+    amount: MyWeb3Number,
+    tokenInfo: MyTokenInfo,
+    quoteToken: MyTokenInfo,
+  ): Promise<MyWeb3Number> {
+    if (tokenInfo.address.eq(quoteToken.address)) {
+      return amount;
+    }
+
+    const price = await getPrice(tokenInfo);
+    const priceQuote = await getPrice(quoteToken);
+
+    const amt = amount.multipliedBy(price).dividedBy(priceQuote);
+
+    // adjust decimals
+    const decimals = tokenInfo.decimals;
+    const quoteDecimals = quoteToken.decimals;
+    if (decimals > quoteDecimals) {
+      return amt.dividedBy(10 ** (decimals - quoteDecimals));
+    }
+    if (decimals < quoteDecimals) {
+      return amt.multipliedBy(10 ** (quoteDecimals - decimals));
+    }
+    return amt;
   }
 }
 
@@ -220,6 +330,7 @@ export class IStrategy<T> extends IStrategyProps<T> {
     liveStatus = StrategyLiveStatus.ACTIVE,
     settings: IStrategySettings,
     metadata: IStrategyMetadata<T>,
+    balanceAtom?: Atom<AtomWithQueryResult<BalanceResult, Error>>,
   ) {
     super(
       id,
@@ -230,6 +341,7 @@ export class IStrategy<T> extends IStrategyProps<T> {
       liveStatus,
       settings,
       metadata,
+      balanceAtom,
     );
     this.tag = tag;
   }
@@ -389,4 +501,18 @@ export class IStrategy<T> extends IStrategyProps<T> {
   isSolving() {
     return this.status === StrategyStatus.SOLVING;
   }
+}
+
+export function getLiveStatusEnum(status: number) {
+  if (status == 1) {
+    return StrategyLiveStatus.HOT;
+  }
+  if (status == 2) {
+    return StrategyLiveStatus.NEW;
+  } else if (status == 3) {
+    return StrategyLiveStatus.ACTIVE;
+  } else if (status == 4) {
+    return StrategyLiveStatus.COMING_SOON;
+  }
+  return StrategyLiveStatus.RETIRED;
 }

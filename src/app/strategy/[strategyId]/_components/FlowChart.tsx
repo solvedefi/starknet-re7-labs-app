@@ -181,8 +181,8 @@ function getNodesAndEdges(
         <table style={{ width: '100%', fontSize: '11px' }}>
           {flow.subItems.map((item) => (
             <tr key={item.key}>
-              <td style={{ textAlign: 'right', width: '70%' }}>{item.key}:</td>
-              <td style={{ textAlign: 'left', width: '50%' }}>{item.value}</td>
+              <td style={{ textAlign: 'left' }}>{item.key}:</td>
+              <td style={{ textAlign: 'right' }}>{item.value}</td>
             </tr>
           ))}
         </table>
@@ -193,7 +193,7 @@ function getNodesAndEdges(
       style = { ...style, ...flow.style };
     }
     const _node: FlowNode = {
-      id: `${level}_${nodes.length}`,
+      id: flow.id || `${level}_${nodes.length}`,
       position: { x: 0, y: 0 }, // doesnt matter as we use dagre for layout
       data: { label: reactElement },
       style,
@@ -268,7 +268,7 @@ function InternalFlowChart(props: FlowChartProps) {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           // minZoom={1}
-          // maxZoom={1}
+          maxZoom={1}
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={false}

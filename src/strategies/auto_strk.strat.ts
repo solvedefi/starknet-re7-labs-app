@@ -12,17 +12,16 @@ import {
 import ERC20Abi from '@/abi/erc20.abi.json';
 import AutoStrkAbi from '@/abi/autoStrk.abi.json';
 import MasterAbi from '@/abi/master.abi.json';
-import MyNumber from '@/utils/MyNumber';
 import { Contract, uint256 } from 'starknet';
-import { atom } from 'jotai';
+import { getBalance, getERC20Balance } from '@/store/balance.atoms';
 import {
-  DUMMY_BAL_ATOM,
-  getBalance,
-  getBalanceAtom,
-  getERC20Balance,
-  getERC20BalanceAtom,
-} from '@/store/balance.atoms';
-import { getPrice, getTokenInfoFromName } from '@/utils';
+  buildStrategyActionHook,
+  convertToV2TokenInfo,
+  DummyStrategyActionHook,
+  getPrice,
+  getTokenInfoFromName,
+  ZeroAmountsInfo,
+} from '@/utils';
 import { zkLend } from '@/store/zklend.store';
 import { ContractAddr, IStrategyMetadata, Web3Number } from '@strkfarm/sdk';
 
@@ -72,7 +71,8 @@ export class AutoTokenStrategy extends IStrategy<void> {
           symbol: tokenInfo.name,
           decimals: tokenInfo.decimals,
           address: ContractAddr.from(tokenInfo.token),
-          logo: '',
+          logo: tokenInfo.logo,
+          displayDecimals: tokenInfo.displayDecimals,
         },
       ],
       protocols: [],
@@ -147,45 +147,50 @@ export class AutoTokenStrategy extends IStrategy<void> {
 
   getUserTVL = async (user: string) => {
     if (this.liveStatus == StrategyLiveStatus.COMING_SOON)
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+      return ZeroAmountsInfo([this.token]);
 
     // returns zToken
     const balanceInfo = await getBalance(this.holdingTokens[0], user);
     if (!balanceInfo.tokenInfo) {
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+      return ZeroAmountsInfo([this.token]);
     }
     const price = await getPrice(this.token);
     console.log('getUserTVL autoc', price, balanceInfo.amount.toEtherStr());
+    const usdValue = Number(balanceInfo.amount.toEtherStr()) * price;
     return {
-      amount: balanceInfo.amount,
-      usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
-      tokenInfo: balanceInfo.tokenInfo,
+      usdValue,
+      amounts: [
+        {
+          amount: Web3Number.fromWei(
+            balanceInfo.amount.toString(),
+            balanceInfo.tokenInfo.decimals,
+          ),
+          usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
+          tokenInfo: convertToV2TokenInfo(balanceInfo.tokenInfo),
+        },
+      ],
     };
   };
 
   getTVL = async () => {
-    if (!this.isLive())
-      return {
-        amount: MyNumber.fromEther('0', this.token.decimals),
-        usdValue: 0,
-        tokenInfo: this.token,
-      };
+    if (!this.isLive()) return ZeroAmountsInfo([this.token]);
 
     const zTokenInfo = getTokenInfoFromName(this.lpTokenName);
     const bal = await getERC20Balance(zTokenInfo, this.strategyAddress);
     const price = await getPrice(this.token);
+    const usdValue = Number(bal.amount.toEtherStr()) * price;
     return {
-      amount: bal.amount,
-      usdValue: Number(bal.amount.toEtherStr()) * price,
-      tokenInfo: this.token,
+      usdValue,
+      amounts: [
+        {
+          amount: Web3Number.fromWei(
+            bal.amount.toString(),
+            bal.amount.decimals,
+          ),
+          usdValue: Number(bal.amount.toEtherStr()) * price,
+          tokenInfo: convertToV2TokenInfo(this.token),
+        },
+      ],
     };
   };
 
@@ -195,7 +200,7 @@ export class AutoTokenStrategy extends IStrategy<void> {
   //     this.leverage = this.netYield / normalYield;
   // }
 
-  depositMethods = (inputs: DepositActionInputs) => {
+  depositMethods = async (inputs: DepositActionInputs) => {
     const { amount, address, provider } = inputs;
     const baseTokenInfo: TokenInfo = TOKENS.find(
       (t) => t.name == this.token.name,
@@ -206,16 +211,8 @@ export class AutoTokenStrategy extends IStrategy<void> {
 
     if (!address || address == '0x0') {
       return [
-        {
-          tokenInfo: baseTokenInfo,
-          calls: [],
-          balanceAtom: DUMMY_BAL_ATOM,
-        },
-        {
-          tokenInfo: zTokenInfo,
-          calls: [],
-          balanceAtom: DUMMY_BAL_ATOM,
-        },
+        DummyStrategyActionHook([baseTokenInfo]),
+        DummyStrategyActionHook([zTokenInfo]),
       ];
     }
 
@@ -261,33 +258,19 @@ export class AutoTokenStrategy extends IStrategy<void> {
     const calls2 = [call21, call22];
 
     return [
-      {
-        tokenInfo: baseTokenInfo,
-        calls: calls1,
-        balanceAtom: getBalanceAtom(baseTokenInfo, atom(true)),
-      },
-      {
-        tokenInfo: zTokenInfo,
-        calls: calls2,
-        balanceAtom: getBalanceAtom(zTokenInfo, atom(true)),
-      },
+      buildStrategyActionHook(calls1, [baseTokenInfo]),
+      buildStrategyActionHook(calls2, [zTokenInfo]),
     ];
   };
 
-  withdrawMethods = (inputs: WithdrawActionInputs) => {
+  withdrawMethods = async (inputs: WithdrawActionInputs) => {
     const { amount, address, provider } = inputs;
     const frmToken: TokenInfo = TOKENS.find(
       (t) => t.token == this.strategyAddress,
     ) as TokenInfo;
 
     if (!address || address == '0x0') {
-      return [
-        {
-          tokenInfo: frmToken,
-          calls: [],
-          balanceAtom: DUMMY_BAL_ATOM,
-        },
-      ];
+      return [DummyStrategyActionHook([frmToken])];
     }
 
     // const baseTokenContract = new Contract(ERC20Abi, baseTokenInfo.token, provider);
@@ -316,12 +299,6 @@ export class AutoTokenStrategy extends IStrategy<void> {
 
     const calls = [call1, call2];
 
-    return [
-      {
-        tokenInfo: frmToken,
-        calls,
-        balanceAtom: getERC20BalanceAtom(frmToken),
-      },
-    ];
+    return [buildStrategyActionHook(calls, [frmToken])];
   };
 }

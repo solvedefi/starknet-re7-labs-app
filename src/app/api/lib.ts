@@ -1,5 +1,5 @@
 import { Redis } from '@upstash/redis';
-import { Contract, RpcProvider } from 'starknet';
+import { Contract, RpcProvider, uint256 } from 'starknet';
 
 const kvRedis = new Redis({
   url: process.env.VK_REDIS_KV_REST_API_URL,
@@ -35,10 +35,13 @@ export const getRewardsInfo = async (
     tvlUsd: number;
     depositToken: string[];
     id: string;
+    contract: {
+      address: string;
+    }[];
   }[],
 ) => {
   const funder =
-    '0x03495DD1e4838aa06666aac236036D86E81A6553e222FC02e70C2Cbc0062e8d0';
+    '0x02D6cf6182259ee62A001EfC67e62C1fbc0dF109D2AA4163EB70D6d1074F0173';
   const allowedStrats = [
     {
       id: 'vesu_fusion_eth',
@@ -47,7 +50,8 @@ export const getRewardsInfo = async (
       maxAPY: 100, // in percent
       underlyingTokenName: 'ETH',
       decimals: 18,
-      rewardToken: '',
+      rewardToken:
+        '0x021fe2ca1b7e731e4a5ef7df2881356070c5d72db4b2d19f9195f6b641f75df0',
     },
   ];
 
@@ -60,7 +64,11 @@ export const getRewardsInfo = async (
     reward: number;
     tvlUsd: number;
     rewardAPY: number;
+    rewardDecimals: number;
     maxRewardsPerDay: number;
+    rewardToken: string;
+    funder: string;
+    receiver: string;
   }[] = [];
   for (const strat of strategies) {
     const stratId = strat.id;
@@ -73,8 +81,27 @@ export const getRewardsInfo = async (
         `${process.env.HOSTNAME}/api/price/${stratAllowed.underlyingTokenName}`,
       );
       const priceData = await priceResponse.json();
-      const tokenPrice = priceData.price;
-      // ! consider token price of vToken
+      // consider token price of vToken
+      const clsVToken = await provider.getClassAt(stratAllowed.rewardToken);
+      const tokenContractVToken = new Contract(
+        clsVToken.abi,
+        stratAllowed.rewardToken,
+        provider,
+      );
+      const shareValue = await tokenContractVToken.call('convert_to_assets', [
+        uint256.bnToUint256((1e18).toString()),
+      ]);
+      console.log(`shareValue::${stratId}::${shareValue}`);
+      const tokenPrice =
+        (priceData.price *
+          Number(
+            (BigInt(shareValue.toString()) * BigInt(10000)) /
+              BigInt((1e18).toString()),
+          )) /
+        10000;
+      console.log(
+        `RewardCalc::${stratId}::tokenPrice::${tokenPrice}, underlyingTokenPrice::${priceData.price}`,
+      );
 
       const tvlUsd = strat.tvlUsd;
       console.log(`RewardCalc::${stratId}::tvlUsd::${tvlUsd}`);
@@ -86,7 +113,6 @@ export const getRewardsInfo = async (
         `RewardCalc::${stratId}::ewardBasedOnTVL::${rewardBasedOnTVL}`,
       );
       console.log(`RewardCalc::${stratId}::tvl::${tvlUsd}`);
-      console.log(`RewardCalc::${stratId}::tokenPrice::${tokenPrice}`);
 
       // Ensure the reward does not exceed max rewards per day
       let finalReward = Math.min(
@@ -116,9 +142,13 @@ export const getRewardsInfo = async (
       rewardsInfo.push({
         id: stratId,
         reward: finalReward,
+        rewardDecimals: stratAllowed.decimals,
         tvlUsd,
         rewardAPY: ((finalReward * 24 * 365) / (tvlUsd / tokenPrice)) * 100,
         maxRewardsPerDay: stratAllowed.maxRewardsPerDay,
+        rewardToken: stratAllowed.rewardToken,
+        funder,
+        receiver: strat.contract[0].address,
       });
     }
   }

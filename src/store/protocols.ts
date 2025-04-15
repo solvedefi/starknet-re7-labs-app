@@ -187,7 +187,7 @@ export function getPoolInfoFromStrategy(
   } else if (strat.name.includes('ETH')) {
     category.push(Category.ETH);
   }
-  return {
+  const item = {
     pool: {
       id: strat.id,
       name: strat.name,
@@ -202,8 +202,8 @@ export function getPoolInfoFromStrategy(
     apr: strat.apy,
     aprSplits: [
       {
-        apr: strat.apy,
-        title: 'Net Yield',
+        apr: strat.apySplit.baseApy,
+        title: 'Strategy APY',
         description: 'Includes fees & Defi spring rewards',
       },
     ],
@@ -225,6 +225,15 @@ export function getPoolInfoFromStrategy(
       is_promoted: strat.name.includes('Stake'),
     },
   };
+
+  if (strat.apySplit.rewardsApy > 0) {
+    item.aprSplits.push({
+      apr: strat.apySplit.rewardsApy,
+      title: 'Rewards APY',
+      description: 'Additional incentives by STRKFarm',
+    });
+  }
+  return item;
 }
 
 export const allPoolsAtomWithStrategiesUnSorted = atom((get) => {

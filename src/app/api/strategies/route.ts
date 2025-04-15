@@ -9,7 +9,7 @@ import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 import { MY_STORE } from '@/store';
 import VesuAtoms, { vesu } from '@/store/vesu.store';
 import EndurAtoms, { endur } from '@/store/endur.store';
-import kvRedis, { getDataFromRedis } from '../lib';
+import kvRedis, { getDataFromRedis, getRewardsInfo } from '../lib';
 
 export const revalidate = 1800; // 30 minutes
 export const dynamic = 'force-dynamic';
@@ -59,7 +59,7 @@ async function getStrategyInfo(
 ): Promise<STRKFarmStrategyAPIResult> {
   const tvl = await strategy.getTVL();
 
-  return {
+  const data = {
     name: strategy.name,
     id: strategy.id,
     apy: strategy.netYield,
@@ -107,6 +107,19 @@ async function getStrategyInfo(
     }),
     investmentFlows: strategy.investmentFlows,
   };
+
+  const rewardsInfo = await getRewardsInfo([
+    {
+      id: strategy.id,
+      tvlUsd: data.tvlUsd,
+      depositToken: data.depositToken,
+    },
+  ]);
+  if (rewardsInfo.length > 0) {
+    data.apySplit.rewardsApy = rewardsInfo[0].rewardAPY / 100;
+    data.apy += rewardsInfo[0].rewardAPY / 100;
+  }
+  return data;
 }
 
 const REDIS_KEY = `${process.env.VK_REDIS_PREFIX}::strategies`;

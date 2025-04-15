@@ -19,6 +19,7 @@ import { EkuboCLVaultStrategies, VesuRebalanceStrategies } from '@strkfarm/sdk';
 import { VesuRebalanceStrategy } from '@/strategies/vesu_rebalance';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { EkuboClStrategy } from '@/strategies/ekubo_cl_vault';
+import { ReactNode } from 'react';
 
 export interface StrategyInfo<T> extends IStrategyProps<T> {
   name: string;
@@ -203,11 +204,6 @@ export function getStrategies() {
           text: 'Depeg-risk: If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
           tab: 'all',
         },
-        {
-          type: 'info',
-          text: 'There is an ongoing issue with Braavos, because of which your transactions may fail. We will update here once it is resolved.',
-          tab: 'all',
-        },
       ],
       isAudited: false,
       quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
@@ -218,7 +214,7 @@ export function getStrategies() {
     return new VesuRebalanceStrategy(
       getTokenInfoFromName(v.depositTokens[0]?.symbol || ''),
       v.name,
-      v.description,
+      v.description as string,
       v,
       StrategyLiveStatus.HOT,
       {
@@ -226,13 +222,7 @@ export function getStrategies() {
         isAudited: v.auditUrl ? true : false,
         auditUrl: v.auditUrl,
         isPaused: false,
-        alerts: [
-          {
-            type: 'info',
-            text: 'There is an ongoing issue with Braavos that may cause your transactions to fail. We will provide an update here once it is resolved.',
-            tab: 'all',
-          },
-        ],
+        alerts: [],
         quoteToken: convertToV2TokenInfo(
           getTokenInfoFromName(v.depositTokens[0]?.symbol || ''),
         ),
@@ -243,7 +233,7 @@ export function getStrategies() {
   const ekuboCLStrats = EkuboCLVaultStrategies.map((v) => {
     return new EkuboClStrategy(
       v.name,
-      v.description,
+      v.description as ReactNode,
       v,
       StrategyLiveStatus.HOT,
       {

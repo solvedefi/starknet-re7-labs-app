@@ -168,7 +168,8 @@ export function copyReferralLink(refCode: string) {
   });
 }
 
-export async function getPrice(tokenInfo: MyMultiTokenInfo) {
+export async function getPrice(tokenInfo: MyMultiTokenInfo, source?: string) {
+  console.log(`getPrice::${source}`, tokenInfo.name);
   try {
     return await getPriceFromMyAPI(tokenInfo);
   } catch (e) {

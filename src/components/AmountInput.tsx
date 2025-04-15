@@ -24,6 +24,7 @@ import {
   Center,
   MenuList,
   MenuItem,
+  Link,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { useAtom, useAtomValue, Atom, useSetAtom } from 'jotai';
@@ -31,6 +32,7 @@ import { TokenInfo as TokenInfoV2, Web3Number } from '@strkfarm/sdk';
 import {
   AmountInputInfo,
   depositAtom,
+  DepositAtomType,
   inputsInfoAtom,
   updateInputInfoAtom,
 } from './Deposit';
@@ -74,6 +76,10 @@ const AmountInput = forwardRef(
     const [depositInfo, setDepositInfo] = useAtom(depositAtom);
     const setInputInfo = useSetAtom(updateInputInfoAtom);
     const inputsInfo = useAtomValue(inputsInfoAtom);
+    const [simulatedMaxAmount, setSimulatedMaxAmount] = useState({
+      isSet: false,
+      amount: 1e18,
+    }); // some random big amount to start with
 
     const inputInfo = useMemo(() => {
       if (props.index < 0 || props.index >= inputsInfo.length)
@@ -147,12 +153,28 @@ const AmountInput = forwardRef(
         }
       }
 
-      const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
+      // simulation check
+      const postSimulationMax = MyNumber.min(
+        adjustedMaxAllowed,
+        MyNumber.fromEther(
+          simulatedMaxAmount.amount.toFixed(13),
+          selectedMarket.decimals,
+        ),
+      );
+
+      const min = MyNumber.min(reducedBalance, postSimulationMax);
       return MyNumber.max(
         min,
         MyNumber.fromEther('0', selectedMarket.decimals),
       );
-    }, [balance, props.strategy, selectedMarket, props.isDeposit, tvlInfo]);
+    }, [
+      balance,
+      props.strategy,
+      selectedMarket,
+      props.isDeposit,
+      tvlInfo,
+      simulatedMaxAmount.amount,
+    ]);
 
     function onAmountChange(
       _amt: MyNumber,
@@ -167,34 +189,38 @@ const AmountInput = forwardRef(
         rawAmount,
       });
 
-      checkAndTriggerOnAmountsChange(_amt, _token);
+      checkAndTriggerOnAmountsChange(_amt, _token, inputsInfo, depositInfo);
     }
 
     function checkAndTriggerOnAmountsChange(
       _amt: MyNumber,
       _token: TokenInfoV2 = props.tokenInfo,
+      _inputsInfo: AmountInputInfo[],
+      _depositInfo: DepositAtomType,
     ) {
       // if onAmountsChange defined
-      const isAllTokenInfosDefined = inputsInfo.every((item) => item.tokenInfo);
+      const isAllTokenInfosDefined = _inputsInfo.every(
+        (item) => item.tokenInfo,
+      );
       console.log(
-        'onAmountsChange [11.3] [2.1]',
+        'onAmountsChange [2.1]',
         props.index,
         isAllTokenInfosDefined,
         props.buttonText,
-        inputsInfo,
-        depositInfo.onAmountsChange,
+        _inputsInfo,
+        _depositInfo.onAmountsChange,
       );
-      if (!isAllTokenInfosDefined || !depositInfo.onAmountsChange) {
+      if (!isAllTokenInfosDefined || !_depositInfo.onAmountsChange) {
         return;
       }
       const _amtWeb3 = Web3Number.fromWei(_amt.toString(), _token.decimals);
-      console.log('onAmountsChange [2.2]', _amtWeb3);
+      console.log('onAmountsChange [2.2]', _amtWeb3.toString(), props.index);
       try {
         setDepositInfo({
-          ...depositInfo,
+          ..._depositInfo,
           loading: true,
         });
-        depositInfo
+        _depositInfo
           .onAmountsChange(
             {
               amountInfo: {
@@ -203,7 +229,7 @@ const AmountInput = forwardRef(
               },
               index: props.index,
             },
-            inputsInfo.map((item, index) => {
+            _inputsInfo.map((item, index) => {
               if (index == props.index) {
                 return {
                   amount: _amtWeb3,
@@ -217,26 +243,31 @@ const AmountInput = forwardRef(
             }),
           )
           .then((output) => {
-            console.log('onAmountsChange [2.3]', output);
+            console.log('onAmountsChange [2.3]', JSON.stringify(output));
             output.map((item, _index) => {
+              console.log(
+                'onAmountsChange [2.4]',
+                item.amount.toString(),
+                item.tokenInfo.symbol,
+              );
               setInputInfo({
                 index: _index,
                 info: {
-                  ...inputsInfo[_index],
+                  ..._inputsInfo[_index],
                   ...item,
                   rawAmount: Number(item.amount.toFixed(6)).toString(),
                 },
               });
             });
             setDepositInfo({
-              ...depositInfo,
+              ..._depositInfo,
               loading: false,
             });
           })
           .catch((err) => {
             console.log('onAmountsChange [2.4]', err);
             setDepositInfo({
-              ...depositInfo,
+              ..._depositInfo,
               loading: false,
             });
           });
@@ -321,6 +352,10 @@ const AmountInput = forwardRef(
       );
     }
 
+    useEffect(() => {
+      console.log(`onAmountsChange [10.2]`, inputInfo, props.index);
+    }, [JSON.stringify(inputsInfo)]);
+
     function updateTokenInfo(inputInfo: AmountInputInfo) {
       const { amount, tokenInfo: _t, isMaxClicked, rawAmount } = inputInfo;
       console.log(
@@ -353,22 +388,80 @@ const AmountInput = forwardRef(
       });
     }, []);
 
-    const handleDebouncedChange = debounce(
-      (newAmount: MyNumber, valueStr: string) => {
-        checkAndTriggerOnAmountsChange(newAmount, props.tokenInfo);
-
-        // Track user input
-        mixpanel.track('Enter amount', {
-          strategyId: props.strategy.id,
-          strategyName: props.strategy.name,
-          buttonText: props.buttonText,
-          amount: inputInfo.amount.toFixed(2),
-          token: selectedMarket.name,
-          maxAmount: maxAmount.toEtherStr(),
-          address,
+    useEffect(() => {
+      if (
+        !depositInfo ||
+        !depositInfo.onAmountsChange ||
+        simulatedMaxAmount.isSet
+      ) {
+        return;
+      }
+      // simulate deposits using a large amount
+      const amt = new Web3Number(10000000, props.tokenInfo.decimals);
+      depositInfo
+        .onAmountsChange(
+          {
+            amountInfo: {
+              amount: amt,
+              tokenInfo: props.tokenInfo,
+            },
+            index: props.index,
+          },
+          inputsInfo.map((item, index) => {
+            if (index == props.index) {
+              return {
+                amount: amt,
+                tokenInfo: props.tokenInfo,
+              };
+            }
+            return {
+              amount: Web3Number.fromWei('0', item.tokenInfo?.decimals || 0),
+              tokenInfo: item.tokenInfo!,
+            };
+          }),
+        )
+        .then((output) => {
+          console.log('onAmountsChange [3.1]', output);
+          output.map((item, _index) => {
+            if (_index == props.index) {
+              setSimulatedMaxAmount({
+                isSet: true,
+                amount: Number(item.amount.toFixed(13)),
+              });
+            }
+          });
         });
-      },
-      100,
+    }, [depositInfo.onAmountsChange, simulatedMaxAmount.isSet]);
+
+    const handleDebouncedChange = useCallback(
+      debounce(
+        (
+          newAmount: MyNumber,
+          valueStr: string,
+          _inputsInfo: AmountInputInfo[],
+          _depositInfo: DepositAtomType,
+        ) => {
+          checkAndTriggerOnAmountsChange(
+            newAmount,
+            props.tokenInfo,
+            _inputsInfo,
+            _depositInfo,
+          );
+
+          // Track user input
+          mixpanel.track('Enter amount', {
+            strategyId: props.strategy.id,
+            strategyName: props.strategy.name,
+            buttonText: props.buttonText,
+            amount: inputInfo.amount.toFixed(2),
+            token: selectedMarket.name,
+            maxAmount: maxAmount.toEtherStr(),
+            address,
+          });
+        },
+        400,
+      ),
+      [],
     ); // ms delay
 
     return (
@@ -463,7 +556,7 @@ const AmountInput = forwardRef(
               isMaxClicked: inputInfo.isMaxClicked,
               rawAmount: valueStr,
             });
-            handleDebouncedChange(newAmount, valueStr);
+            handleDebouncedChange(newAmount, valueStr, inputsInfo, depositInfo);
           }}
           marginTop={'10px'}
           keepWithinRange={false}
@@ -483,6 +576,39 @@ const AmountInput = forwardRef(
         </NumberInput>
 
         {/* Validation error messages */}
+        {simulatedMaxAmount.amount == 0 && (
+          <Tooltip
+            label={
+              <Text>
+                The liquidity at the current market price, is only in{' '}
+                {
+                  inputsInfo.find((_, index) => index != props.index)?.tokenInfo
+                    ?.symbol
+                }
+                . It may be in {props.tokenInfo.symbol}, when the market price
+                re-aligns.
+              </Text>
+            }
+          >
+            <Text
+              marginTop="2px"
+              marginLeft={'7px'}
+              color="light_grey"
+              fontSize={'12px'}
+            >
+              The liquidity at the current market price, is only in{' '}
+              {
+                inputsInfo.find((_, index) => index != props.index)?.tokenInfo
+                  ?.symbol
+              }
+              .{' '}
+              <Link href="" textDecoration={'underline'}>
+                Learn more
+              </Link>
+              .
+            </Text>
+          </Tooltip>
+        )}
         {isMinAmountError && dirty && (
           <Text
             marginTop="2px"

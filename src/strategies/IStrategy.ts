@@ -155,7 +155,7 @@ export class IStrategyProps<T> {
   readonly liveStatus: StrategyLiveStatus;
   readonly id: string;
   readonly name: string;
-  readonly description: string;
+  readonly description: string | ReactNode;
   readonly settings: IStrategySettings;
   readonly metadata: IStrategyMetadata<T>;
   exchanges: IDapp<any>[] = [];
@@ -227,7 +227,7 @@ export class IStrategyProps<T> {
   constructor(
     id: string,
     name: string,
-    description: string,
+    description: string | ReactNode,
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus: StrategyLiveStatus,
@@ -272,12 +272,14 @@ export class IStrategyProps<T> {
   async computeSummaryValue(
     amounts: SingleActionAmount[],
     quoteToken: MyTokenInfo,
+    source: string,
   ): Promise<MyWeb3Number> {
     const valuesProm = amounts.map((amount) => {
       return this.getValueInQuoteToken(
         convertToV2Web3Number(amount.amount),
         convertToV2TokenInfo(amount.tokenInfo),
         quoteToken,
+        source,
       );
     });
     const values = await Promise.all(valuesProm);
@@ -294,13 +296,20 @@ export class IStrategyProps<T> {
     amount: MyWeb3Number,
     tokenInfo: MyTokenInfo,
     quoteToken: MyTokenInfo,
+    source: string,
   ): Promise<MyWeb3Number> {
     if (tokenInfo.address.eq(quoteToken.address)) {
       return amount;
     }
 
-    const price = await getPrice(tokenInfo);
-    const priceQuote = await getPrice(quoteToken);
+    const price = await getPrice(
+      tokenInfo,
+      `getValueInQuoteToken::1::${source}`,
+    );
+    const priceQuote = await getPrice(
+      quoteToken,
+      `getValueInQuoteToken::2::${source}`,
+    );
 
     const amt = amount.multipliedBy(price).dividedBy(priceQuote);
 
@@ -324,7 +333,7 @@ export class IStrategy<T> extends IStrategyProps<T> {
     id: string,
     tag: string,
     name: string,
-    description: string,
+    description: string | ReactNode,
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus = StrategyLiveStatus.ACTIVE,

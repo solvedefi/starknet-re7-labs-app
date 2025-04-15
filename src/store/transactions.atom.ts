@@ -4,15 +4,14 @@
 import { TOKENS } from '@/constants';
 import { capitalize, standariseAddress } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
-import { Atom, Getter, Setter, atom } from 'jotai';
+import { Getter, Setter, atom } from 'jotai';
 import toast from 'react-hot-toast';
 import { RpcProvider, TransactionExecutionStatus } from 'starknet';
 import { StrategyInfo, strategiesAtom } from './strategies.atoms';
 import { createAtomWithStorage } from './utils.atoms';
-import { atomWithQuery, AtomWithQueryResult } from 'jotai-tanstack-query';
+import { atomWithQuery } from 'jotai-tanstack-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/utils/apolloClient';
-import { BalanceResult } from './balance.atoms';
 
 export interface StrategyTxProps {
   strategyId: string;
@@ -81,19 +80,15 @@ async function getTxHistory(
 
 export const newTxsAtom = atom<TransactionInfo[]>([]);
 
-export const TxHistoryAtom = (
-  contract: string,
-  owner: string,
-  balData: Atom<AtomWithQueryResult<BalanceResult, Error>>,
-) =>
+export const TxHistoryAtom = (contract: string, owner: string) =>
   atomWithQuery((get) => ({
     // balData just to trigger a refetch
-    queryKey: ['tx_history', { contract, owner }, get(balData)],
+    queryKey: ['tx_history', contract, owner, JSON.stringify(get(newTxsAtom))],
     queryFn: async ({ queryKey }: any): Promise<TxHistory> => {
       const [, { contract, owner }] = queryKey;
       const res = await getTxHistory(contract, owner);
 
-      console.log('TxHistoryAtom res', res);
+      console.log('TxHistoryAtom res', res, contract, owner, queryKey);
       // add new txs from local cache
       const newTxs = get(newTxsAtom);
       console.log('TxHistoryAtom newTxs', newTxs);

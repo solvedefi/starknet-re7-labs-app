@@ -154,7 +154,7 @@ export class AutoTokenStrategy extends IStrategy<void> {
     if (!balanceInfo.tokenInfo) {
       return ZeroAmountsInfo([this.token]);
     }
-    const price = await getPrice(this.token);
+    const price = await getPrice(this.token, 'autostrk');
     console.log('getUserTVL autoc', price, balanceInfo.amount.toEtherStr());
     const usdValue = Number(balanceInfo.amount.toEtherStr()) * price;
     return {
@@ -177,7 +177,7 @@ export class AutoTokenStrategy extends IStrategy<void> {
 
     const zTokenInfo = getTokenInfoFromName(this.lpTokenName);
     const bal = await getERC20Balance(zTokenInfo, this.strategyAddress);
-    const price = await getPrice(this.token);
+    const price = await getPrice(this.token, 'autostrk2');
     const usdValue = Number(bal.amount.toEtherStr()) * price;
     return {
       usdValue,

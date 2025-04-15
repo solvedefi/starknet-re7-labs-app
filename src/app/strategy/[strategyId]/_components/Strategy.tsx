@@ -31,7 +31,7 @@ import HarvestTime from '@/components/HarvestTime';
 import { DUMMY_BAL_ATOM, returnEmptyBal } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { strategiesAtom, StrategyInfo } from '@/store/strategies.atoms';
-import { transactionsAtom, TxHistoryAtom } from '@/store/transactions.atom';
+import { TxHistoryAtom } from '@/store/transactions.atom';
 import {
   capitalize,
   getTokenInfoFromAddr,
@@ -54,18 +54,12 @@ import { TokenDeposit } from './TokenDeposit';
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
   const strategies = useAtomValue(strategiesAtom);
-  const transactions = useAtomValue(transactionsAtom);
   const [isMounted, setIsMounted] = useState(false);
 
   const strategy: StrategyInfo<any> | undefined = useMemo(() => {
     const id = params.strategyId;
-
-    console.log('id', id);
-
     return strategies.find((s) => s.id === id);
-  }, [params.strategyId, strategies]);
-
-  console.log('strategy', strategy);
+  }, [params.strategyId, strategies.map((id) => id).toString()]);
 
   const strategyAddress = useMemo(() => {
     const holdingTokens = strategy?.holdingTokens;
@@ -89,14 +83,10 @@ const Strategy = ({ params }: StrategyParams) => {
 
   // fetch tx history
   const txHistoryAtom = useMemo(
-    () =>
-      TxHistoryAtom(
-        strategyAddress,
-        address!,
-        strategy?.balanceSummaryAtom || DUMMY_BAL_ATOM,
-      ),
-    [address, strategyAddress, balData],
+    () => TxHistoryAtom(strategyAddress, address!),
+    [address, strategyAddress],
   );
+
   const txHistoryResult = useAtomValue(txHistoryAtom);
   const txHistory = useMemo(() => {
     if (txHistoryResult.data) {
@@ -115,7 +105,7 @@ const Strategy = ({ params }: StrategyParams) => {
       txHistoryResult.isLoading,
     );
     return txHistoryResult.data || { findManyInvestment_flows: [] };
-  }, [txHistoryResult.data]);
+  }, [JSON.stringify(txHistoryResult.data)]);
 
   // compute profit
   // profit doesnt change quickly in real time, but total deposit amount can change
@@ -222,13 +212,13 @@ const Strategy = ({ params }: StrategyParams) => {
                     >
                       How does it work?
                     </Text>
-                    <Text
+                    <Box
                       color="light_grey"
                       marginBottom="5px"
-                      fontSize={'15px'}
+                      fontSize={'14px'}
                     >
                       {strategy.description}
-                    </Text>
+                    </Box>
                     <Wrap>
                       {getUniqueById(
                         strategy.actions.map((p) => ({
@@ -420,7 +410,7 @@ const Strategy = ({ params }: StrategyParams) => {
               <Text fontSize={'20px'} marginBottom={'0px'} fontWeight={'bold'}>
                 Behind the scenes
               </Text>
-              <Text fontSize={'15px'} marginBottom={'10px'}>
+              <Text fontSize={'14px'} marginBottom={'10px'}>
                 Actions done automatically by the strategy (smart-contract) with
                 an investment of $1000
               </Text>
@@ -547,8 +537,8 @@ const Strategy = ({ params }: StrategyParams) => {
                     <ListItem
                       color="light_grey"
                       key={r}
-                      fontSize={'14px'}
-                      marginBottom={'5px'}
+                      fontSize={'13px'}
+                      marginBottom={'10px'}
                       alignItems={'justify'}
                     >
                       {r}

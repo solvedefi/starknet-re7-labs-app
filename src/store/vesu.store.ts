@@ -57,7 +57,7 @@ function bitIntToNumber(info: { value: string; decimals: number }) {
 async function getVesuPoolInfo(pool: VesuPool, asset: VesuAsset) {
   try {
     const tokenInfo = getTokenInfoFromName(asset.symbol);
-    const price = await getPrice(tokenInfo);
+    const price = await getPrice(tokenInfo, 'ekubo');
     const tvlInToken = bitIntToNumber(asset.stats.totalSupplied);
     console.log('Vesu pool', pool, asset, price, tvlInToken);
     const myPool: PoolInfo = {

@@ -175,7 +175,7 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
     if (!balanceInfo.tokenInfo) {
       return ZeroAmountsInfo([this.token]);
     }
-    const price = await getPrice(this.token);
+    const price = await getPrice(this.token, 'autoxstrk');
     console.log('getUserTVL autoc', price, balanceInfo.amount.toEtherStr());
     const usdValue = Number(balanceInfo.amount.toEtherStr()) * price;
     return {
@@ -215,7 +215,7 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
         (await strategyContract.call('total_assets', [])).toString(),
         STRKINfo.decimals,
       );
-      const price = await getPrice(this.token);
+      const price = await getPrice(this.token, 'autoxstrk2');
       const usdValue = Number(totalAssets.toEtherStr()) * price;
       return {
         usdValue,
@@ -248,7 +248,7 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
         ).toString(),
         STRKINfo.decimals,
       );
-      const price = await getPrice(this.token);
+      const price = await getPrice(this.token, 'autoxstrk3');
       const usdValue = Number(strkAmount.toEtherStr()) * price;
       return {
         usdValue,

@@ -339,7 +339,7 @@ export class DeltaNeutralMM extends IStrategy<void> {
     if (!balanceInfo.tokenInfo) {
       return ZeroAmountsInfo([this.token]);
     }
-    const price = await getPrice(balanceInfo.tokenInfo);
+    const price = await getPrice(balanceInfo.tokenInfo, 'dnmm1');
     console.log('getUserTVL dnmm', price, balanceInfo.amount.toEtherStr());
     const usdValue = Number(balanceInfo.amount.toEtherStr()) * price;
     return {
@@ -370,7 +370,7 @@ export class DeltaNeutralMM extends IStrategy<void> {
       const discountFactor = this.stepAmountFactors[4];
       const amount = bal.amount.operate('div', 1 + discountFactor);
       console.log('getTVL1', amount.toString());
-      const price = await getPrice(this.token);
+      const price = await getPrice(this.token, 'dnmm11');
       const usdValue = Number(amount.toEtherStr()) * price;
       return {
         usdValue,

@@ -41,6 +41,7 @@ export async function GET(_req: Request, context: any) {
           amount: a.amount,
         })),
         strategy.settings.quoteToken,
+        'stats[address]',
       );
       return {
         id: strategy.id,

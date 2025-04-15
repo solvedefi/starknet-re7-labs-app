@@ -206,7 +206,13 @@ function InternalDeposit(props: DepositProps) {
       .catch((e) => {
         console.error('Error in deposit methods', e);
       });
-  }, [props.callsInfo, address, inputsInfo, firstInputInfo, isMaxClicked]);
+  }, [
+    JSON.stringify(props.callsInfo),
+    address,
+    JSON.stringify(inputsInfo),
+    JSON.stringify(firstInputInfo),
+    isMaxClicked,
+  ]);
 
   // This is used to store the raw amount entered by the user
   const isDeposit = useMemo(() => props.buttonText === 'Deposit', [props]);
@@ -234,7 +240,11 @@ function InternalDeposit(props: DepositProps) {
       };
     });
     props.strategy
-      .computeSummaryValue(amounts, props.strategy.settings.quoteToken)
+      .computeSummaryValue(
+        amounts,
+        props.strategy.settings.quoteToken,
+        'depositcomp',
+      )
       .then((summary) => {
         setInvestedSummary(summary);
         setLoadingInvestmentSummary(false);
@@ -245,10 +255,13 @@ function InternalDeposit(props: DepositProps) {
         setLoadingInvestmentSummary(false);
       });
   }, [
-    inputsInfo,
+    // arrays and complex objects tend to trigger re-renders too much
+    // below is a workaround
+    JSON.stringify(inputsInfo),
     props.strategy.settings.quoteToken,
-    callsInfo,
-    firstInputInfo,
+    callsInfo.length,
+    callsInfo.length ? callsInfo[0].amounts.length : 0,
+    firstInputInfo.amount.toString(),
   ]);
 
   // use to maintain tx history and show toasts
@@ -262,10 +275,6 @@ function InternalDeposit(props: DepositProps) {
       tokenAddr: props.strategy.settings.quoteToken.address.address,
     };
   }, [props]);
-
-  useEffect(() => {
-    console.log('Deposit txInfo', txInfo);
-  }, [txInfo]);
 
   // constructs tx calls
   const { calls } = useMemo(() => {

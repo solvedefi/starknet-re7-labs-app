@@ -55,7 +55,7 @@ export class DeltaNeutralMM2 extends DeltaNeutralMM {
       const discountFactor = this.stepAmountFactors[4];
       const amount = bal.amount.operate('div', 1 + discountFactor);
       console.log('getTVL1', amount.toString());
-      const price = await getPrice(this.token);
+      const price = await getPrice(this.token, 'dnmm2');
       const usdValue = Number(amount.toEtherStr()) * price;
       return {
         usdValue,

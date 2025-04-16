@@ -9,7 +9,7 @@ import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 import { MY_STORE } from '@/store';
 import VesuAtoms, { vesu } from '@/store/vesu.store';
 import EndurAtoms, { endur } from '@/store/endur.store';
-import kvRedis, { getDataFromRedis } from '../lib';
+import kvRedis, { getDataFromRedis, getRewardsInfo } from '../lib';
 
 export const revalidate = 1800; // 30 minutes
 export const dynamic = 'force-dynamic';
@@ -59,7 +59,7 @@ async function getStrategyInfo(
 ): Promise<STRKFarmStrategyAPIResult> {
   const tvl = await strategy.getTVL();
 
-  return {
+  const data = {
     name: strategy.name,
     id: strategy.id,
     apy: strategy.netYield,
@@ -107,6 +107,20 @@ async function getStrategyInfo(
     }),
     investmentFlows: strategy.investmentFlows,
   };
+
+  const rewardsInfo = await getRewardsInfo([
+    {
+      id: strategy.id,
+      tvlUsd: data.tvlUsd,
+      depositToken: data.depositToken,
+      contract: data.contract,
+    },
+  ]);
+  if (rewardsInfo.length > 0) {
+    data.apySplit.rewardsApy = rewardsInfo[0].rewardAPY / 100;
+    data.apy += rewardsInfo[0].rewardAPY / 100;
+  }
+  return data;
 }
 
 const REDIS_KEY = `${process.env.VK_REDIS_PREFIX}::strategies`;
@@ -140,27 +154,27 @@ export async function GET(req: Request) {
   //   }
   // });
 
-  const stratsDataProms: any[] = [];
-  const _strats = strategies.sort((a, b) => {
+  const stratsDataProms: Promise<STRKFarmStrategyAPIResult>[] = [];
+  for (let i = 0; i < strategies.length; i++) {
+    stratsDataProms.push(getStrategyInfo(strategies[i]));
+  }
+  const stratsData = await Promise.all(stratsDataProms);
+
+  const _strats = stratsData.sort((a, b) => {
     // sort based on risk factor, live status and apy
     const aRisk = a.riskFactor;
     const bRisk = b.riskFactor;
-    const aLive = getLiveStatusNumber(a.liveStatus);
-    const bLive = getLiveStatusNumber(b.liveStatus);
+    const aLive = a.status.number;
+    const bLive = b.status.number;
     if (aLive !== bLive) return aLive - bLive;
     if (aRisk !== bRisk) return aRisk - bRisk;
-    return b.netYield - a.netYield;
+    return b.apy - a.apy;
   });
-  for (let i = 0; i < _strats.length; i++) {
-    stratsDataProms.push(getStrategyInfo(_strats[i]));
-  }
-
-  const stratsData = await Promise.all(stratsDataProms);
 
   try {
     const data = {
       status: true,
-      strategies: stratsData,
+      strategies: _strats,
       lastUpdated: new Date().toISOString(),
     };
     await kvRedis.set(REDIS_KEY, data);

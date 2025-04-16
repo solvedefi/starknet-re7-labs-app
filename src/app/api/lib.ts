@@ -47,7 +47,7 @@ export const getRewardsInfo = async (
       id: 'vesu_fusion_eth',
       // ! consider exchange rate of vToken
       maxRewardsPerDay: 0.073, // in token units
-      maxAPY: 100, // in percent
+      maxAPY: 200, // in percent
       underlyingTokenName: 'ETH',
       decimals: 18,
       rewardToken:

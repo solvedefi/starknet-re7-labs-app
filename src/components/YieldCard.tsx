@@ -136,11 +136,18 @@ function getAPRWithToolTip(pool: PoolInfo) {
     <Box width={'300px'}>
       {pool.aprSplits.map((split) => {
         return (
-          <Flex width={'100%'} key={split.title}>
-            <Text key="1" width={'70%'}>
-              {split.title} {split.description ? `(${split.description})` : ''}
-            </Text>
-            <Text fontSize={'xs'} width={'30%'} textAlign={'right'} key="2">
+          <Flex
+            margin="5px 0"
+            justifyContent={'space-between'}
+            key={split.title}
+          >
+            <Box>
+              <Text>{split.title}:</Text>
+              <Text fontSize={'12px'} opacity={0.7}>
+                {split.description}
+              </Text>
+            </Box>
+            <Text fontWeight={'bold'}>
               {split.apr === 'Err' ? split.apr : (split.apr * 100).toFixed(2)}%
             </Text>
           </Flex>
@@ -191,25 +198,30 @@ function StrategyAPY(props: YieldCardProps) {
         <>
           {getAPRWithToolTip(pool)}
 
-          {/* {pool.additional && pool.additional.leverage && (
-            <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
-              <Box width={'100%'}>
-                <Box float={'right'} display={'flex'} fontSize={'13px'}>
-                  <Text color="#FCC01E" textAlign={'right'}>
-                    ⚡
-                  </Text>
-                  <Text
-                    width="100%"
-                    color="cyan"
-                    textAlign={'right'}
-                    fontWeight={600}
-                  >
-                    {pool.additional.leverage.toFixed(1)}X
-                  </Text>
+          {pool.aprSplits.length &&
+            pool.aprSplits.some((a) => a.title == 'Rewards APY') && (
+              <Tooltip
+                label="Boosted rewards from STRKFarm"
+                bg="gray.300"
+                color="black"
+              >
+                <Box width={'100%'}>
+                  <Box float={'right'} display={'flex'} fontSize={'13px'}>
+                    <Text color="#FCC01E" textAlign={'right'}>
+                      ⚡
+                    </Text>
+                    <Text
+                      width="100%"
+                      color="cyan"
+                      textAlign={'right'}
+                      fontWeight={600}
+                    >
+                      Boosted
+                    </Text>
+                  </Box>
                 </Box>
-              </Box>
-            </Tooltip>
-          )} */}
+              </Tooltip>
+            )}
         </>
       )}
     </Box>

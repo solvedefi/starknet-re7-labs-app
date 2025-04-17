@@ -72,7 +72,7 @@ export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
         rewardsApy.push({
           apr: rawPool.apySplit.rewardsApy,
           title: 'Rewards APY',
-          description: 'Additional incentives by STRKFarm',
+          description: 'Incentives by STRKFarm',
         });
       }
 

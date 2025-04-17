@@ -2,9 +2,11 @@ import React, { useMemo } from 'react';
 import {
   Box,
   Flex,
+  Spinner,
   Stat,
   StatLabel,
   StatNumber,
+  Tag,
   Text,
   Tooltip,
 } from '@chakra-ui/react';
@@ -97,7 +99,47 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
       <Flex justifyContent="space-between">
         <Flex>
           <Tooltip
-            label={strategy.metadata.apyMethodology || defaultAPYTooltip}
+            label={
+              <Box fontSize={'13px'}>
+                <Text>
+                  {strategy.metadata.apyMethodology || defaultAPYTooltip}
+                </Text>
+                {strategyInfo && (
+                  <Box
+                    marginTop={'10px'}
+                    justifyContent={'space-between'}
+                    display={'flex'}
+                  >
+                    <Box>
+                      <Text>Strategy APY:</Text>
+                      <Text fontSize={'12px'} opacity={0.7}>
+                        Including fees and Defi spring rewards
+                      </Text>
+                    </Box>
+                    <Text fontWeight={'bold'}>
+                      {(strategyInfo.apySplit.baseApy * 100).toFixed(2)}%
+                    </Text>
+                  </Box>
+                )}
+                {strategyInfo && strategyInfo.apySplit.rewardsApy > 0 && (
+                  <Box
+                    marginTop={'10px'}
+                    justifyContent={'space-between'}
+                    display={'flex'}
+                  >
+                    <Box>
+                      <Text>Rewards APY:</Text>
+                      <Text fontSize={'12px'} opacity={0.7}>
+                        Incentives by STRKFarm
+                      </Text>
+                    </Box>
+                    <Text fontWeight={'bold'}>
+                      {(strategyInfo.apySplit.rewardsApy * 100).toFixed(2)}%
+                    </Text>
+                  </Box>
+                )}
+              </Box>
+            }
           >
             <Stat
               marginRight={'5px'}
@@ -111,21 +153,23 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
               </StatNumber>
             </Stat>
           </Tooltip>
-          {/* <Flex flexDirection={'column'} justifyContent={'flex-end'}>
-            <Tooltip label="This shows how much higher your yield is compared to zKLend">
-              <Tag
-                bg="bg"
-                color={'white'}
-                fontSize={'12px'}
-                padding={'2px 5px'}
-              >
-                🔥{leverage.toFixed(2)}x boosted
-                {leverage == 0 && (
-                  <Spinner size="xs" color="white" ml={'5px'} />
-                )}
-              </Tag>
-            </Tooltip>
-          </Flex> */}
+          {strategyInfo && strategyInfo.apySplit.rewardsApy > 0 && (
+            <Flex flexDirection={'column'} justifyContent={'flex-end'}>
+              <Tooltip label="Boosted rewards from STRKFarm">
+                <Tag
+                  bg="bg"
+                  color={'white'}
+                  fontSize={'12px'}
+                  padding={'2px 5px'}
+                >
+                  🔥 Boosted
+                  {leverage == 0 && (
+                    <Spinner size="xs" color="white" ml={'5px'} />
+                  )}
+                </Tag>
+              </Tooltip>
+            </Flex>
+          )}
         </Flex>
 
         {!isMobile && !strategy.settings.hideHarvestInfo && (

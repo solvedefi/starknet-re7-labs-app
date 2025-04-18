@@ -117,7 +117,6 @@ async function getStrategyInfo(
     {
       id: strategy.id,
       tvlUsd: data.tvlUsd,
-      depositToken: data.depositToken,
       contract: data.contract,
     },
   ]);

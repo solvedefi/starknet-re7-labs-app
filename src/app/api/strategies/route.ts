@@ -74,7 +74,12 @@ async function getStrategyInfo(
         provider,
         isMax: false,
       })
-    ).map((t) => t.amounts[0].tokenInfo.address.address),
+    )[0].amounts.map((t) => ({
+      symbol: t.tokenInfo.symbol,
+      name: t.tokenInfo.name,
+      address: t.tokenInfo.address.address,
+      decimals: t.tokenInfo.decimals,
+    })),
     leverage: strategy.leverage,
     contract: strategy.holdingTokens.map((t) => ({
       name: t.name,

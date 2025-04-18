@@ -602,7 +602,10 @@ const AmountInput = forwardRef(
                   ?.symbol
               }
               .{' '}
-              <Link href="" textDecoration={'underline'}>
+              <Link
+                href="https://docs.strkfarm.com/p/ekubo-cl-vaults"
+                textDecoration={'underline'}
+              >
                 Learn more
               </Link>
               .

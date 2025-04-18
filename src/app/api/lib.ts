@@ -1,3 +1,4 @@
+import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 import { Redis } from '@upstash/redis';
 import { Contract, RpcProvider, uint256 } from 'starknet';
 
@@ -31,14 +32,7 @@ export async function getDataFromRedis(
 export default kvRedis;
 
 export const getRewardsInfo = async (
-  strategies: {
-    tvlUsd: number;
-    depositToken: string[];
-    id: string;
-    contract: {
-      address: string;
-    }[];
-  }[],
+  strategies: Pick<STRKFarmStrategyAPIResult, 'id' | 'tvlUsd' | 'contract'>[],
 ) => {
   const funder =
     '0x02D6cf6182259ee62A001EfC67e62C1fbc0dF109D2AA4163EB70D6d1074F0173';

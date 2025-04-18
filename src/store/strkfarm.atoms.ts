@@ -23,7 +23,12 @@ export interface STRKFarmStrategyAPIResult {
     baseApy: number;
     rewardsApy: number;
   };
-  depositToken: string[];
+  depositToken: {
+    name: string;
+    address: string;
+    symbol: string;
+    decimals: number;
+  }[];
   leverage: number;
   contract: { name: string; address: string }[];
   tvlUsd: number;

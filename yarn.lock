@@ -2205,10 +2205,10 @@
     viem "^2.19.1"
     zod "^3.22.4"
 
-"@strkfarm/sdk@^1.0.34":
-  version "1.0.34"
-  resolved "https://registry.yarnpkg.com/@strkfarm/sdk/-/sdk-1.0.34.tgz#132d65a1731133e613631d9ec3716f4577113ef1"
-  integrity sha512-vo1J/G2ONgEwNfcd3md4hmersFNmXb5ap1FSb5v5jp7BsiIllNtYh2YmZQNr3bK6iDSqzuLjyBbcn0kbnGhAmw==
+"@strkfarm/sdk@^1.0.35":
+  version "1.0.35"
+  resolved "https://registry.yarnpkg.com/@strkfarm/sdk/-/sdk-1.0.35.tgz#307cd2beb53cb12bc66c4aab08560ff5b316ca5e"
+  integrity sha512-QG1Oes92QwUvusG8kY8GFWE3CxHr5Zde/ZM9bU1DhwGk0FRMkj0TbN19pNnVOEv4Odw9Tj990uISFphBm/mhHw==
   dependencies:
     "@avnu/avnu-sdk" "^3.0.2"
     axios "^1.7.2"

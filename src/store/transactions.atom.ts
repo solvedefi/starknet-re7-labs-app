@@ -85,10 +85,10 @@ export const TxHistoryAtom = (contract: string, owner: string) =>
     // balData just to trigger a refetch
     queryKey: ['tx_history', contract, owner, JSON.stringify(get(newTxsAtom))],
     queryFn: async ({ queryKey }: any): Promise<TxHistory> => {
-      const [, { contract, owner }] = queryKey;
+      // const [, { contract, owner }] = queryKey;
       const res = await getTxHistory(contract, owner);
 
-      console.log('TxHistoryAtom res', res, contract, owner, queryKey);
+      console.log('TxHistoryAtom res', res, { contract, owner, queryKey });
       // add new txs from local cache
       const newTxs = get(newTxsAtom);
       console.log('TxHistoryAtom newTxs', newTxs);

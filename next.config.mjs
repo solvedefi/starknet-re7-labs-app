@@ -50,6 +50,10 @@ const nextConfig = {
         source: '/vesu/:path*',
         destination: 'https://api.vesu.xyz/:path*',
       },
+      {
+        source: '/api/price/:path*',
+        destination: 'https://app.strkfarm.com/api/price/:path*',
+      }
     ];
   },
   async redirects() {
@@ -75,6 +79,7 @@ const nextConfig = {
           'https://github.com/strkfarm/static-assets/blob/177389cad715d69245c1b125df87f90318ac2d7b/tnc.pdf',
         permanent: true,
       },
+      
     ];
   },
   webpack(config, options) {

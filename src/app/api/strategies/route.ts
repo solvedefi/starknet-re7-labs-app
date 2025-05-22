@@ -9,7 +9,7 @@ import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 import { MY_STORE } from '@/store';
 import VesuAtoms, { vesu } from '@/store/vesu.store';
 import EndurAtoms, { endur } from '@/store/endur.store';
-import kvRedis, { getDataFromRedis, getRewardsInfo } from '../lib';
+import { getDataFromRedis, getRewardsInfo, setDataToRedis } from '../lib';
 
 export const revalidate = 1800; // 30 minutes
 export const dynamic = 'force-dynamic';
@@ -181,7 +181,7 @@ export async function GET(req: Request) {
       strategies: _strats,
       lastUpdated: new Date().toISOString(),
     };
-    await kvRedis.set(REDIS_KEY, data);
+    await setDataToRedis(REDIS_KEY, data);
     const response = NextResponse.json(data);
     response.headers.set(
       'Cache-Control',

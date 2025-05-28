@@ -194,17 +194,18 @@ export function getStrategies() {
     {
       maxTVL: 500000,
       alerts: [
-        // {
-        //   type: 'warning',
-        //   text: 'Note: Deposits may fail sometimes due to high utilisation on Vesu. We are working to add a dynamic TVL limit to better show limits.',
-        //   tab: 'deposit',
-        // },
+        {
+          type: 'warning',
+          text: 'Note: Vesu is undergoing an upgrade. Deposits and Withdraws are paused for this strategy until further notice.',
+          tab: 'all',
+        },
         {
           type: 'info',
           text: 'Depeg-risk: If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
           tab: 'all',
         },
       ],
+      isPaused: true,
       isAudited: false,
       quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
     },
@@ -221,8 +222,14 @@ export function getStrategies() {
         maxTVL: 0,
         isAudited: v.auditUrl ? true : false,
         auditUrl: v.auditUrl,
-        isPaused: false,
-        alerts: [],
+        isPaused: true,
+        alerts: [
+          {
+            type: 'warning',
+            text: 'Note: Vesu is undergoing an upgrade. Deposits and Withdraws are paused for this strategy until further notice.',
+            tab: 'all',
+          },
+        ],
         quoteToken: convertToV2TokenInfo(
           getTokenInfoFromName(v.depositTokens[0]?.symbol || ''),
         ),

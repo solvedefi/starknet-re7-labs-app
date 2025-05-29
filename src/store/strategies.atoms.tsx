@@ -196,7 +196,21 @@ export function getStrategies() {
       alerts: [
         {
           type: 'warning',
-          text: 'Note: Vesu is undergoing an upgrade. Deposits and Withdraws are paused for this strategy until further notice.',
+          text: (
+            <p>
+              <strong>Note:</strong> Vesu has recently migrated. Deposits and
+              withdrawals for this strategy are temporarily paused until we
+              migrate this strategy.{' '}
+              <a
+                href="https://x.com/vesuxyz/status/1927827405030244838"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Learn more
+              </a>
+              .
+            </p>
+          ),
           tab: 'all',
         },
         {
@@ -206,6 +220,7 @@ export function getStrategies() {
         },
       ],
       isPaused: true,
+      isInMaintenance: true,
       isAudited: false,
       quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
     },
@@ -223,10 +238,25 @@ export function getStrategies() {
         isAudited: v.auditUrl ? true : false,
         auditUrl: v.auditUrl,
         isPaused: true,
+        isInMaintenance: true,
         alerts: [
           {
             type: 'warning',
-            text: 'Note: Vesu is undergoing an upgrade. Deposits and Withdraws are paused for this strategy until further notice.',
+            text: (
+              <p>
+                <strong>Note:</strong> Vesu has recently migrated. Deposits and
+                withdrawals for this strategy are temporarily paused until we
+                migrate this strategy.{' '}
+                <a
+                  href="https://x.com/vesuxyz/status/1927827405030244838"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Learn more
+                </a>
+                .
+              </p>
+            ),
             tab: 'all',
           },
         ],

@@ -51,7 +51,7 @@ export class DeltaNeutralMMVesuEndur extends DeltaNeutralMM {
     const risks = [this.risks[0], this.risks[2]];
     if (this.settings.alerts && this.settings.alerts.length > 0) {
       risks.push(
-        (this.settings.alerts[0].text as string).replace('Note: ', ''),
+        'If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
       );
     }
     risks.push(...this.risks.slice(3));

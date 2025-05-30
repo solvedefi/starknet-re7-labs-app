@@ -84,6 +84,8 @@ export class DeltaNeutralMM extends IStrategy<void> {
           displayDecimals: tokenInfo.displayDecimals,
         },
       ],
+      launchBlock: 0,
+      faqs: [],
       protocols: [],
       maxTVL: new Web3Number('0', tokenInfo.decimals),
       risk: {

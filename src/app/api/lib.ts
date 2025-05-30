@@ -16,6 +16,11 @@ export async function getDataFromRedis(
     // force no cache
     return null;
   }
+
+  if (!process.env.VK_REDIS_KV_REST_API_URL) {
+    return null;
+  }
+
   const cacheData: any = await kvRedis.get(key);
   if (
     cacheData &&
@@ -29,7 +34,14 @@ export async function getDataFromRedis(
   return null;
 }
 
-export default kvRedis;
+export async function setDataToRedis(key: string, data: any) {
+  if (!process.env.VK_REDIS_KV_REST_API_URL) {
+    return;
+  }
+
+  await kvRedis.set(key, data);
+  console.log(`Cache set for ${key}`);
+}
 
 export const getRewardsInfo = async (
   strategies: Pick<STRKFarmStrategyAPIResult, 'id' | 'tvlUsd' | 'contract'>[],

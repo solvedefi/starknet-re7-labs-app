@@ -66,7 +66,6 @@ function HoldingsText({
   if (balData.isLoading || !balData.data?.tokenInfo) {
     return (
       <>
-        {balData.isLoading ? 'loading' : JSON.stringify(balData.data)}
         <Spinner size="sm" marginTop={'5px'} />
       </>
     );

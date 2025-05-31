@@ -194,33 +194,33 @@ export function getStrategies() {
     {
       maxTVL: 500000,
       alerts: [
-        {
-          type: 'warning',
-          text: (
-            <p>
-              <strong>Note:</strong> Vesu has recently migrated. Deposits and
-              withdrawals for this strategy are temporarily paused until we
-              migrate this strategy.{' '}
-              <a
-                href="https://x.com/vesuxyz/status/1927827405030244838"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Learn more
-              </a>
-              .
-            </p>
-          ),
-          tab: 'all',
-        },
+        // {
+        //   type: 'warning',
+        //   text: (
+        //     <p>
+        //       <strong>Note:</strong> Vesu has recently migrated. Deposits and
+        //       withdrawals for this strategy are temporarily paused until we
+        //       migrate this strategy.{' '}
+        //       <a
+        //         href="https://x.com/vesuxyz/status/1927827405030244838"
+        //         target="_blank"
+        //         rel="noopener noreferrer"
+        //       >
+        //         Learn more
+        //       </a>
+        //       .
+        //     </p>
+        //   ),
+        //   tab: 'all',
+        // },
         {
           type: 'info',
           text: 'Depeg-risk: If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
           tab: 'all',
         },
       ],
-      isPaused: true,
-      isInMaintenance: true,
+      isPaused: false,
+      isInMaintenance: false,
       isAudited: false,
       quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
     },
@@ -237,28 +237,28 @@ export function getStrategies() {
         maxTVL: 0,
         isAudited: v.auditUrl ? true : false,
         auditUrl: v.auditUrl,
-        isPaused: true,
-        isInMaintenance: true,
+        isPaused: false,
+        isInMaintenance: false,
         alerts: [
-          {
-            type: 'warning',
-            text: (
-              <p>
-                <strong>Note:</strong> Vesu has recently migrated. Deposits and
-                withdrawals for this strategy are temporarily paused until we
-                migrate this strategy.{' '}
-                <a
-                  href="https://x.com/vesuxyz/status/1927827405030244838"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Learn more
-                </a>
-                .
-              </p>
-            ),
-            tab: 'all',
-          },
+          // {
+          //   type: 'warning',
+          //   text: (
+          //     <p>
+          //       <strong>Note:</strong> Vesu has recently migrated. Deposits and
+          //       withdrawals for this strategy are temporarily paused until we
+          //       migrate this strategy.{' '}
+          //       <a
+          //         href="https://x.com/vesuxyz/status/1927827405030244838"
+          //         target="_blank"
+          //         rel="noopener noreferrer"
+          //       >
+          //         Learn more
+          //       </a>
+          //       .
+          //     </p>
+          //   ),
+          //   tab: 'all',
+          // },
         ],
         quoteToken: convertToV2TokenInfo(
           getTokenInfoFromName(v.depositTokens[0]?.symbol || ''),

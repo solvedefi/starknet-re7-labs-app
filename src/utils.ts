@@ -200,11 +200,18 @@ export function getEndpoint() {
 export function getHosturl() {
   const FALLBACK = 'strkfarm.com';
   try {
-    return (
-      (typeof window !== 'undefined'
-        ? window.location.hostname.split('.').slice(-2).join('.')
-        : null) || FALLBACK
-    );
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      // Check if hostname is an IPv4 or IPv6 address
+      /* prettier-ignore */
+      /* eslint-disable */
+      const isIP =
+        /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || // IPv4
+        /^\[?([a-fA-F0-9:]+)\]?$/.test(hostname); // IPv6 (with or without brackets)
+      if (isIP) return FALLBACK;
+      return hostname.split('.').slice(-2).join('.');
+    }
+    return FALLBACK;
   } catch (e) {
     return FALLBACK;
   }

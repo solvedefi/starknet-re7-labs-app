@@ -118,6 +118,7 @@ export interface IStrategySettings {
   isAudited?: boolean;
   auditUrl?: string;
   isPaused?: boolean;
+  isInMaintenance?: boolean;
   quoteToken: TokenInfoV2; // used to show the holdings in this token,
   isTransactionHistDisabled?: boolean;
 }

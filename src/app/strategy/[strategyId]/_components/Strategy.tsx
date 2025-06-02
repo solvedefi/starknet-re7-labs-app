@@ -51,6 +51,128 @@ import {
 } from '@/store/strkfarm.atoms';
 import { TokenDeposit } from './TokenDeposit';
 
+function HoldingsText({
+  strategy,
+  address,
+  balData,
+}: {
+  strategy: StrategyInfo<any>;
+  address: string | undefined;
+  balData: any;
+}) {
+  if (strategy.settings.isInMaintenance)
+    return <span style={{ color: 'orange' }}>Maintenance Mode</span>;
+  if (!address) return 'Connect wallet';
+  if (balData.isLoading || !balData.data?.tokenInfo) {
+    return (
+      <>
+        <Spinner size="sm" marginTop={'5px'} />
+      </>
+    );
+  }
+  if (balData.isError) {
+    console.error('Balance data error:', balData.error);
+    return 'Error';
+  }
+  const value = Number(
+    balData.data.amount.toEtherToFixedDecimals(
+      balData.data.tokenInfo?.displayDecimals || 2,
+    ),
+  );
+  if (value === 0 || strategy?.isRetired()) return '-';
+  return `${balData.data.amount.toEtherToFixedDecimals(
+    balData.data.tokenInfo?.displayDecimals || 2,
+  )} ${balData.data.tokenInfo?.name}`;
+}
+
+function NetEarningsText({
+  strategy,
+  address,
+  profit,
+  balData,
+}: {
+  strategy: StrategyInfo<any>;
+  address: string | undefined;
+  profit: number;
+  balData: any;
+}) {
+  if (
+    !address ||
+    profit === 0 ||
+    strategy?.isRetired() ||
+    strategy.settings.isInMaintenance
+  )
+    return '-';
+  return `${profit?.toFixed(
+    balData.data.tokenInfo?.displayDecimals || 2,
+  )} ${balData.data.tokenInfo?.name}`;
+}
+
+function HoldingsAndEarnings({
+  strategy,
+  address,
+  balData,
+  profit,
+}: {
+  strategy: StrategyInfo<any>;
+  address: string | undefined;
+  balData: any;
+  profit: number;
+}) {
+  // if (
+  //   balData.isLoading ||
+  //   !balData.data?.tokenInfo ||
+  //   balData.isPending
+  // ) {
+  //   return (
+  //     <Text>
+  //       <b>Your Holdings: </b>
+  //       {address ? <Spinner size="sm" marginTop={'5px'} /> : 'Connect wallet'}
+  //     </Text>
+  //   );
+  // }
+  // if (balData.isError) {
+  //   return (
+  //     <Text>
+  //       <b>Your Holdings: Error</b>
+  //     </Text>
+  //   );
+  // }
+  return (
+    <Flex width={'100%'} justifyContent={'space-between'}>
+      <Box>
+        <Text>
+          <b>Your Holdings </b>
+        </Text>
+        <Text color="cyan">
+          <HoldingsText
+            strategy={strategy}
+            address={address}
+            balData={balData}
+          />
+        </Text>
+      </Box>
+      {!strategy.settings.isTransactionHistDisabled && (
+        <Tooltip label={!strategy?.isRetired() && 'Life time earnings'}>
+          <Box>
+            <Text textAlign={'right'} fontWeight={'none'}>
+              <b>Net earnings</b>
+            </Text>
+            <Text textAlign={'right'} color={profit >= 0 ? 'cyan' : 'red'}>
+              <NetEarningsText
+                strategy={strategy}
+                address={address}
+                profit={profit}
+                balData={balData}
+              />
+            </Text>
+          </Box>
+        </Tooltip>
+      )}
+    </Flex>
+  );
+}
+
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
   const strategies = useAtomValue(strategiesAtom);
@@ -247,69 +369,12 @@ const Strategy = ({ params }: StrategyParams) => {
                   bg={'bg'}
                   marginTop={'20px'}
                 >
-                  {!balData.isLoading &&
-                    !balData.isError &&
-                    !balData.isPending &&
-                    balData.data &&
-                    balData.data.tokenInfo && (
-                      <Flex width={'100%'} justifyContent={'space-between'}>
-                        <Box>
-                          <Text>
-                            <b>Your Holdings </b>
-                          </Text>
-                          <Text color="cyan">
-                            {address
-                              ? Number(
-                                  balData.data.amount.toEtherToFixedDecimals(
-                                    balData.data.tokenInfo?.displayDecimals ||
-                                      2,
-                                  ),
-                                ) === 0 || strategy?.isRetired()
-                                ? '-'
-                                : `${balData.data.amount.toEtherToFixedDecimals(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
-                              : 'Connect wallet'}
-                          </Text>
-                        </Box>
-                        {!strategy.settings.isTransactionHistDisabled && (
-                          <Tooltip
-                            label={
-                              !strategy?.isRetired() && 'Life time earnings'
-                            }
-                          >
-                            <Box>
-                              <Text textAlign={'right'} fontWeight={'none'}>
-                                <b>Net earnings</b>
-                              </Text>
-                              <Text
-                                textAlign={'right'}
-                                color={profit >= 0 ? 'cyan' : 'red'}
-                              >
-                                {address &&
-                                profit !== 0 &&
-                                !strategy?.isRetired()
-                                  ? `${profit?.toFixed(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
-                                  : '-'}
-                              </Text>
-                            </Box>
-                          </Tooltip>
-                        )}
-                      </Flex>
-                    )}
-                  {(balData.isLoading || !balData.data?.tokenInfo) && (
-                    <Text>
-                      <b>Your Holdings: </b>
-                      {address ? (
-                        <Spinner size="sm" marginTop={'5px'} />
-                      ) : (
-                        'Connect wallet'
-                      )}
-                    </Text>
-                  )}
-                  {balData.isError && (
-                    <Text>
-                      <b>Your Holdings: Error</b>
-                    </Text>
-                  )}
+                  <HoldingsAndEarnings
+                    strategy={strategy}
+                    address={address}
+                    balData={balData}
+                    profit={profit}
+                  />
 
                   {/* Show individual holdings is more tokens */}
                   {individualBalances.length > 1 &&

@@ -1,74 +1,62 @@
 import strkfarmLogo from '@public/logo.png';
 import { atom } from 'jotai';
-import CarmineAtoms, { carmine } from './carmine.store';
-import EkuboAtoms, { ekubo } from './ekobu.store';
 import EndurAtoms, { endur } from './endur.store';
-import HaikoAtoms, { haiko } from './haiko.store';
-import HashstackAtoms, { hashstack } from './hashstack.store';
-import MySwapAtoms, { mySwap } from './myswap.store';
-import NostraDegenAtoms, { nostraDegen } from './nostradegen.store';
-import NostraDexAtoms, { nostraDex } from './nostradex.store';
-import NostraLendingAtoms, { nostraLending } from './nostralending.store';
 import { Category, isPoolRetired, PoolInfo, PoolType } from './pools';
-import STRKFarmAtoms, {
-  strkfarm,
-  STRKFarmStrategyAPIResult,
-} from './strkfarm.atoms';
+import { STRKFarmStrategyAPIResult } from './strkfarm.atoms';
 import VesuAtoms, { vesu } from './vesu.store';
-import ZkLendAtoms, { zkLend } from './zklend.store';
 import { getLiveStatusEnum } from '@/strategies/IStrategy';
 
 export const getProtocols = () => [
-  {
-    name: endur.name,
-    class: endur,
-    atoms: EndurAtoms,
-  },
-  {
-    name: strkfarm.name,
-    class: strkfarm,
-    atoms: STRKFarmAtoms,
-  },
-  {
-    name: ekubo.name,
-    class: ekubo,
-    atoms: EkuboAtoms,
-  },
+  // {
+  //   name: endur.name,
+  //   class: endur,
+  //   atoms: EndurAtoms,
+  // },
+  // {
+  //   name: strkfarm.name,
+  //   class: strkfarm,
+  //   atoms: STRKFarmAtoms,
+  // },
+  // {
+  //   name: ekubo.name,
+  //   class: ekubo,
+  //   atoms: EkuboAtoms,
+  // },
   // {
   //   name: jedi.name,
   //   class: jedi,
   //   atoms: JediAtoms,
   // },
-  {
-    name: mySwap.name,
-    class: mySwap,
-    atoms: MySwapAtoms,
-  },
+  // {
+  //   name: mySwap.name,
+  //   class: mySwap,
+  //   atoms: MySwapAtoms,
+  // },
   // {
   //   name: tenkswap.name,
   //   class: tenkswap,
   //   atoms: TenkSwapAtoms,
   // },
-  {
-    name: haiko.name,
-    class: haiko,
-    atoms: HaikoAtoms,
-  },
-  {
-    name: nostraDex.name,
-    class: nostraDex,
-    atoms: NostraDexAtoms,
-  },
-  {
-    name: nostraDegen.name,
-    class: nostraDegen,
-    atoms: NostraDegenAtoms,
-  },
-  {
-    name: carmine.name,
-    class: carmine,
-    atoms: CarmineAtoms,
-  },
+  // {
+  //   name: haiko.name,
+  //   class: haiko,
+  //   atoms: HaikoAtoms,
+  // },
+  // {
+  //   name: nostraDex.name,
+  //   class: nostraDex,
+  //   atoms: NostraDexAtoms,
+  // },
+  // {
+  //   name: nostraDegen.name,
+  //   class: nostraDegen,
+  //   atoms: NostraDegenAtoms,
+  // },
+  // {
+  //   name: carmine.name,
+  //   class: carmine,
+  //   atoms: CarmineAtoms,
+  // },
   // {
   //   name: starkDefi.name,
   //   class: starkDefi,
@@ -79,21 +67,21 @@ export const getProtocols = () => [
   //   class: sithswap,
   //   atoms: SithswapAtoms,
   // },
-  {
-    name: zkLend.name,
-    class: zkLend,
-    atoms: ZkLendAtoms,
-  },
-  {
-    name: nostraLending.name,
-    class: nostraLending,
-    atoms: NostraLendingAtoms,
-  },
-  {
-    name: hashstack.name,
-    class: hashstack,
-    atoms: HashstackAtoms,
-  },
+  // {
+  //   name: zkLend.name,
+  //   class: zkLend,
+  //   atoms: ZkLendAtoms,
+  // },
+  // {
+  //   name: nostraLending.name,
+  //   class: nostraLending,
+  //   atoms: NostraLendingAtoms,
+  // },
+  // {
+  //   name: hashstack.name,
+  //   class: hashstack,
+  //   atoms: HashstackAtoms,
+  // },
   {
     name: vesu.name,
     class: vesu,

@@ -1,0 +1,10 @@
+services:
+  starkfarm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: starkfarm
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+    command: ["yarn", "start"]

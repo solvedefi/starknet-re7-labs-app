@@ -81,6 +81,8 @@ export const CONSTANTS = {
       '0x9140757f8fb5748379be582be39d6daf704cc3a0408882c0d57981a885eed9',
     DeltaNeutralxSTRKSTRKXL:
       '0x7023a5cadc8a5db80e4f0fde6b330cbd3c17bbbf9cb145cbabd7bd5e6fb7b0b',
+    Re7XSTRKSTRK:
+      '0x0684f7fc8ebd6dae56bbae2ea21bc81b2c9c29d014c564a8ae90507ea6d2c4cc',
   },
   MOBILE_MSG: 'Desktop/Tablet only',
 };
@@ -274,6 +276,14 @@ export const NFTS: NFTInfo[] = [
   {
     name: 'frmDNMMSTRKxSTRK',
     address: CONSTANTS.CONTRACTS.DeltaNeutralxSTRKSTRKXL,
+    logo: CONSTANTS.LOGOS.STRK,
+    config: {
+      mainTokenName: 'STRK',
+    },
+  },
+  {
+    name: 'frmRe7STRKxSTRK',
+    address: CONSTANTS.CONTRACTS.Re7XSTRKSTRK,
     logo: CONSTANTS.LOGOS.STRK,
     config: {
       mainTokenName: 'STRK',

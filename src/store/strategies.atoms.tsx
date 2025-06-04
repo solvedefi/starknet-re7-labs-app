@@ -210,6 +210,33 @@ export function getStrategies() {
     },
   );
 
+  const re7EkuboXSTRKSTRK = new DeltaNeutralMMVesuEndur(
+    getTokenInfoFromName('STRK'),
+    'Re7 Ekubo xSTRK',
+    Mustache.render(xSTRKDescription, { token1: 'STRK', token2: 'xSTRK' }),
+    'xSTRK',
+    CONSTANTS.CONTRACTS.Re7XSTRKSTRK,
+    [1, 1, 0.725, 1.967985],
+    StrategyLiveStatus.ACTIVE,
+    {
+      maxTVL: 500000,
+      alerts: [
+        // {
+        //   type: 'warning',
+        //   text: 'Note: Deposits may fail sometimes due to high utilisation on Vesu. We are working to add a dynamic TVL limit to better show limits.',
+        //   tab: 'deposit',
+        // },
+        {
+          type: 'info',
+          text: 'Depeg-risk: If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
+          tab: 'all',
+        },
+      ],
+      isAudited: false,
+      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
+    },
+  );
+
   const vesuRebalanceStrats = VesuRebalanceStrategies.map((v) => {
     return new VesuRebalanceStrategy(
       getTokenInfoFromName(v.depositTokens[0]?.symbol || ''),
@@ -277,7 +304,9 @@ export function getStrategies() {
     // deltaNeutralMMETHUSDCReverse,
     // deltaNeutralxSTRKSTRK,
     // ...vesuRebalanceStrats,
-    ...ekuboCLStrats,
+    // ...ekuboCLStrats,
+    // deltaNeutralxSTRKSTRK,
+    re7EkuboXSTRKSTRK,
     // xSTRKStrategy,
   ];
 

@@ -16,6 +16,8 @@ const StrategyPage: NextPage<StrategyPage> = ({ searchParams }) => {
     redirect('/strategy/auto_token_strk');
   } else if (searchParams?.id === 'auto_token_usdc') {
     redirect('/strategy/auto_token_usdc');
+  } else if (searchParams?.id === 're7_ekubo_xstrkstrk') {
+    redirect('/strategy/re7_ekubo_xstrkstrk');
   }
 
   return <div>Page not found</div>;

@@ -68,6 +68,9 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
       },
     ];
 
+    if (!process.env.NEXT_PUBLIC_RPC_URL) {
+      throw new Error(`NEXT_PUBLIC_RPC_URL not found`);
+    }
     const config = getMainnetConfig(
       process.env.NEXT_PUBLIC_RPC_URL!,
       'pending',

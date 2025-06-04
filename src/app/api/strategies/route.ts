@@ -1,54 +1,13 @@
 import { NextResponse } from 'next/server';
-import { atom } from 'jotai';
-import { PoolInfo, PoolType } from '@/store/pools';
 import { RpcProvider } from 'starknet';
 import { getLiveStatusNumber, getStrategies } from '@/store/strategies.atoms';
 import MyNumber from '@/utils/MyNumber';
 import { IStrategy, NFTInfo, TokenInfo } from '@/strategies/IStrategy';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
-import { MY_STORE } from '@/store';
-import VesuAtoms, { vesu } from '@/store/vesu.store';
-import EndurAtoms, { endur } from '@/store/endur.store';
 import { getDataFromRedis, getRewardsInfo, setDataToRedis } from '../lib';
 
 export const revalidate = 1800; // 30 minutes
 export const dynamic = 'force-dynamic';
-
-const allPoolsAtom = atom<PoolInfo[]>((get) => {
-  const pools: PoolInfo[] = [];
-  // undo
-  const poolAtoms = [VesuAtoms, EndurAtoms];
-  // const poolAtoms: ProtocolAtoms[] = [];
-  return poolAtoms.reduce((_pools, p) => _pools.concat(get(p.pools)), pools);
-});
-
-async function getPools(store: any, retry = 0) {
-  const allPools: PoolInfo[] | undefined = store.get(allPoolsAtom);
-
-  console.log('allPools', allPools?.length);
-  // undo
-  const minProtocolsRequired: string[] = [vesu.name, endur.name];
-  const hasRequiredPools = minProtocolsRequired.every((p) => {
-    if (minProtocolsRequired.length == 0) return true;
-    if (!allPools) return false;
-    return allPools.some((pool) => {
-      console.log(new Date(), 'pool.protocol.name', pool.protocol.name);
-      return (
-        pool.protocol.name === p &&
-        (pool.type == PoolType.Lending || pool.type == PoolType.Staking)
-      );
-    });
-  });
-  console.log(new Date(), 'hasRequiredPools', hasRequiredPools);
-  const MAX_RETRIES = 120;
-  if (retry >= MAX_RETRIES) {
-    throw new Error('Failed to fetch pools');
-  } else if (!allPools || !hasRequiredPools) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return getPools(store, retry + 1);
-  }
-  return allPools;
-}
 
 const provider = new RpcProvider({
   nodeUrl: process.env.RPC_URL || 'https://starknet-mainnet.public.blastapi.io',
@@ -141,12 +100,11 @@ export async function GET(req: Request) {
     return resp;
   }
 
-  const allPools = await getPools(MY_STORE);
   const strategies = getStrategies();
 
   const proms = strategies.map((strategy) => {
     if (!strategy.isLive()) return;
-    return strategy.solve(allPools, '1000');
+    return strategy.solve([], '1000');
   });
 
   await Promise.all(proms);

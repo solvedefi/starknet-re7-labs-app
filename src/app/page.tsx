@@ -2,7 +2,6 @@
 
 import tg from '@/assets/tg.svg';
 import { useDotButton } from '@/components/EmblaCarouselDotButton';
-import Pools from '@/components/Pools';
 import Strategies from '@/components/Strategies';
 import TVL from '@/components/TVL';
 import CONSTANTS from '@/constants';
@@ -198,15 +197,6 @@ export default function Home() {
           >
             Strategies✨
           </Tab>
-          <Tab
-            color="light_grey"
-            _selected={{ color: 'purple' }}
-            onClick={() => {
-              mixpanel.track('All pools clicked');
-            }}
-          >
-            Find yields
-          </Tab>
         </TabList>
         <TabIndicator
           mt="-1.5px"
@@ -218,9 +208,6 @@ export default function Home() {
         <TabPanels>
           <TabPanel bg="highlight" float={'left'} width={'100%'}>
             <Strategies />
-          </TabPanel>
-          <TabPanel bg="highlight" width={'100%'} float={'left'}>
-            <Pools />
           </TabPanel>
         </TabPanels>
       </Tabs>

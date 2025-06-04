@@ -1,12 +1,22 @@
 import strkfarmLogo from '@public/logo.png';
 import { atom } from 'jotai';
 import EndurAtoms, { endur } from './endur.store';
-import { Category, isPoolRetired, PoolInfo, PoolType } from './pools';
+import {
+  Category,
+  isPoolRetired,
+  PoolInfo,
+  PoolType,
+  ProtocolAtoms2,
+} from './pools';
 import { STRKFarmStrategyAPIResult } from './strkfarm.atoms';
-import VesuAtoms, { vesu } from './vesu.store';
 import { getLiveStatusEnum } from '@/strategies/IStrategy';
+import { IDapp } from './IDapp.store';
 
-export const getProtocols = () => [
+export const getProtocols: () => {
+  name: string;
+  class: IDapp<any>;
+  atoms: ProtocolAtoms2;
+}[] = () => [
   // {
   //   name: endur.name,
   //   class: endur,
@@ -82,11 +92,11 @@ export const getProtocols = () => [
   //   class: hashstack,
   //   atoms: HashstackAtoms,
   // },
-  {
-    name: vesu.name,
-    class: vesu,
-    atoms: VesuAtoms,
-  },
+  // {
+  //   name: vesu.name,
+  //   class: vesu,
+  //   atoms: VesuAtoms,
+  // },
 ];
 
 export const ALL_FILTER = 'All';

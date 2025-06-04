@@ -34,7 +34,7 @@
     "@prisma/client": "5.18.0",
     "@starknet-react/chains": "3.0.0",
     "@starknet-react/core": "3.0.1",
-    "@strkfarm/sdk": "1.0.35",
+    "@strkfarm/sdk": "^1.0.44",
     "@tanstack/query-core": "5.28.0",
     "@types/mixpanel-browser": "2.49.0",
     "@types/mustache": "4.2.5",

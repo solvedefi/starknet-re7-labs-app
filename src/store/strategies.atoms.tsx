@@ -4,22 +4,14 @@ import {
   IStrategyProps,
   StrategyLiveStatus,
 } from '@/strategies/IStrategy';
-import CONSTANTS from '@/constants';
-import Mustache from 'mustache';
 import { convertToV2TokenInfo, getTokenInfoFromName } from '@/utils';
-import { allPoolsAtomUnSorted, privatePoolsAtom } from './protocols';
-import { endur } from './endur.store';
+import { privatePoolsAtom } from './protocols';
 import { PoolInfo } from './pools';
-import { AutoTokenStrategy } from '@/strategies/auto_strk.strat';
-import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
-import { DeltaNeutralMM2 } from '@/strategies/delta_neutral_mm_2';
-import { DeltaNeutralMMVesuEndur } from '@/strategies/delta_neutral_mm_vesu_endur';
 import { Box, Link } from '@chakra-ui/react';
-import { EkuboCLVaultStrategies, VesuRebalanceStrategies } from '@strkfarm/sdk';
-import { VesuRebalanceStrategy } from '@/strategies/vesu_rebalance';
+import { ContractAddr, EkuboCLVaultStrategies, Global } from '@strkfarm/sdk';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { EkuboClStrategy } from '@/strategies/ekubo_cl_vault';
-import { ReactNode } from 'react';
+import { IStrategyMetadata, CLVaultStrategySettings } from '@strkfarm/sdk';
 
 export interface StrategyInfo<T> extends IStrategyProps<T> {
   name: string;
@@ -64,35 +56,6 @@ export function getStrategies() {
     },
   ];
 
-  const autoStrkStrategy = new AutoTokenStrategy(
-    'STRK',
-    'Auto Compounding STRK',
-    "Stake your STRK or zkLend's zSTRK token to receive DeFi Spring $STRK rewards every 7 days. The strategy auto-collects your rewards and re-invests them in the zkLend STRK pool, giving you higher return through compounding. You receive frmzSTRK LP token as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your frmzSTRK for zSTRK and see your STRK in zkLend.",
-    'zSTRK',
-    CONSTANTS.CONTRACTS.AutoStrkFarm,
-    {
-      maxTVL: 2000000,
-      isAudited: true,
-      isPaused: false,
-      alerts: alerts2,
-      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
-    },
-  );
-  const autoUSDCStrategy = new AutoTokenStrategy(
-    'USDC',
-    'Auto Compounding USDC',
-    "Stake your USDC or zkLend's zUSDC token to receive DeFi Spring $STRK rewards every 7 days. The strategy auto-collects your $STRK rewards, swaps them to USDC and re-invests them in the zkLend USDC pool, giving you higher return through compounding. You receive frmzUSDC LP token as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your frmzUSDC for zUSDC and see your STRK in zkLend.",
-    'zUSDC',
-    CONSTANTS.CONTRACTS.AutoUsdcFarm,
-    {
-      maxTVL: 2000000,
-      isAudited: true,
-      isPaused: false,
-      alerts: alerts2,
-      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('USDC')),
-    },
-  );
-
   const alerts: any[] = [
     {
       type: 'warning',
@@ -113,202 +76,50 @@ export function getStrategies() {
     },
   ];
 
-  const DNMMDescription = `Deposit your {{token1}} to automatically loop your funds between zkLend and Nostra to create a delta neutral position. This strategy is designed to maximize your yield on {{token1}}. Your position is automatically adjusted periodically to maintain a healthy health factor. You receive a NFT as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your NFT for {{token1}}.`;
-  const usdcTokenInfo = getTokenInfoFromName('USDC');
-  const deltaNeutralMMUSDCETH = new DeltaNeutralMM(
-    usdcTokenInfo,
-    'USDC Sensei',
-    Mustache.render(DNMMDescription, { token1: 'USDC', token2: 'ETH' }),
-    'ETH',
-    CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
-    [1, 0.615384615, 1, 0.584615385, 0.552509024], // precomputed factors based on strategy math
-    StrategyLiveStatus.RETIRED,
+  const strategyMetadata: IStrategyMetadata<CLVaultStrategySettings> = {
+    ...EkuboCLVaultStrategies[0],
+    name: 'Re7 Ekubo xSTRK/STRK',
+    description: 'Some description', // can be string too or ReactNode
+    address: ContractAddr.from(
+      '0x0684f7fc8ebd6dae56bbae2ea21bc81b2c9c29d014c564a8ae90507ea6d2c4cc',
+    ),
+    launchBlock: 1446217,
+    depositTokens: [
+      // We support most blue chip tokens in this list, so, for any vault, u just need
+      // to specify the name
+      // ? The order of tokens is import. First is Ekubo poolKey token0, second is token1
+      // If token doesn't exist in our list, u can manually populate here as well
+      Global.getDefaultTokens().find((t) => t.symbol === 'xSTRK')!,
+      Global.getDefaultTokens().find((t) => t.symbol === 'STRK')!,
+    ],
+  };
+  const re7EkuboXSTRKSTRK = new EkuboClStrategy(
+    `Re7 Ekubo xSTRK/STRK`,
+    (
+      <div>Some description</div> // can be string too or ReactNode
+    ),
+    strategyMetadata,
+    StrategyLiveStatus.HOT,
     {
-      maxTVL: 1500000,
-      isAudited: true,
-      alerts,
-      isPaused: true,
-      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('USDC')),
-    },
-  );
-
-  const deltaNeutralMMETHUSDC = new DeltaNeutralMM(
-    getTokenInfoFromName('ETH'),
-    'ETH Sensei',
-    Mustache.render(DNMMDescription, { token1: 'ETH', token2: 'USDC' }),
-    'USDC',
-    CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
-    [1, 0.609886, 1, 0.920975, 0.510078], // precomputed factors based on strategy math
-    StrategyLiveStatus.RETIRED,
-    {
-      maxTVL: 1000,
-      alerts,
-      isAudited: true,
-      isPaused: true,
-      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('ETH')),
-    },
-  );
-  const deltaNeutralMMSTRKETH = new DeltaNeutralMM(
-    getTokenInfoFromName('STRK'),
-    'STRK Sensei',
-    Mustache.render(DNMMDescription, { token1: 'STRK', token2: 'ETH' }),
-    'ETH',
-    CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
-    [1, 0.384615, 1, 0.492308, 0.233276], // precomputed factors based on strategy math, last is the excess deposit1 that is happening
-    StrategyLiveStatus.RETIRED,
-    {
-      maxTVL: 1500000,
-      isAudited: true,
-      alerts,
-      isPaused: true,
-      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
-    },
-  );
-
-  const deltaNeutralMMETHUSDCReverse = new DeltaNeutralMM2(
-    getTokenInfoFromName('ETH'),
-    'ETH Sensei XL',
-    Mustache.render(DNMMDescription, { token1: 'ETH', token2: 'USDC' }),
-    'USDC',
-    CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDCXL,
-    [1, 0.5846153846, 1, 0.920975, 0.552509], // precomputed factors based on strategy math
-    StrategyLiveStatus.RETIRED,
-    {
-      maxTVL: 2000,
-      alerts,
-      isAudited: false,
-      isPaused: true,
-      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('ETH')),
-    },
-  );
-
-  const xSTRKDescription = `Deposit your {{token1}} to automatically loop your funds via Endur and Vesu to create a delta neutral position. This strategy is designed to maximize your yield on {{token1}}. Your position is automatically adjusted periodically to maintain a healthy health factor. You receive a NFT as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your NFT for {{token2}}.`;
-  const deltaNeutralxSTRKSTRK = new DeltaNeutralMMVesuEndur(
-    getTokenInfoFromName('STRK'),
-    'xSTRK Sensei',
-    Mustache.render(xSTRKDescription, { token1: 'STRK', token2: 'xSTRK' }),
-    'xSTRK',
-    CONSTANTS.CONTRACTS.DeltaNeutralxSTRKSTRKXL,
-    [1, 1, 0.725, 1.967985], // precomputed factors based on strategy math
-    StrategyLiveStatus.ACTIVE,
-    {
-      maxTVL: 500000,
+      maxTVL: 0,
+      isAudited: EkuboCLVaultStrategies[0].auditUrl ? true : false,
+      auditUrl: EkuboCLVaultStrategies[0].auditUrl,
+      isPaused: false,
       alerts: [
-        // {
-        //   type: 'warning',
-        //   text: 'Note: Deposits may fail sometimes due to high utilisation on Vesu. We are working to add a dynamic TVL limit to better show limits.',
-        //   tab: 'deposit',
-        // },
         {
           type: 'info',
-          text: 'Depeg-risk: If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
+          text: 'Depending on the current position range and price, your input amounts are automatially adjusted to nearest required amounts',
           tab: 'all',
         },
       ],
-      isAudited: false,
-      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
+      quoteToken: convertToV2TokenInfo(
+        getTokenInfoFromName('STRK'), // quote token for this strategy, used to denominate user holdings of the pool in this asset as a summary
+      ),
+      isTransactionHistDisabled: true,
     },
   );
 
-  const re7EkuboXSTRKSTRK = new DeltaNeutralMMVesuEndur(
-    getTokenInfoFromName('STRK'),
-    'Re7 Ekubo xSTRK',
-    Mustache.render(xSTRKDescription, { token1: 'STRK', token2: 'xSTRK' }),
-    'xSTRK',
-    CONSTANTS.CONTRACTS.Re7XSTRKSTRK,
-    [1, 1, 0.725, 1.967985],
-    StrategyLiveStatus.ACTIVE,
-    {
-      maxTVL: 500000,
-      alerts: [
-        // {
-        //   type: 'warning',
-        //   text: 'Note: Deposits may fail sometimes due to high utilisation on Vesu. We are working to add a dynamic TVL limit to better show limits.',
-        //   tab: 'deposit',
-        // },
-        {
-          type: 'info',
-          text: 'Depeg-risk: If xSTRK price on DEXes deviates from expected price, you may lose money or may have to wait for the price to recover.',
-          tab: 'all',
-        },
-      ],
-      isAudited: false,
-      quoteToken: convertToV2TokenInfo(getTokenInfoFromName('STRK')),
-    },
-  );
-
-  const vesuRebalanceStrats = VesuRebalanceStrategies.map((v) => {
-    return new VesuRebalanceStrategy(
-      getTokenInfoFromName(v.depositTokens[0]?.symbol || ''),
-      v.name,
-      v.description as string,
-      v,
-      StrategyLiveStatus.HOT,
-      {
-        maxTVL: 0,
-        isAudited: v.auditUrl ? true : false,
-        auditUrl: v.auditUrl,
-        isPaused: false,
-        alerts: [],
-        quoteToken: convertToV2TokenInfo(
-          getTokenInfoFromName(v.depositTokens[0]?.symbol || ''),
-        ),
-      },
-    );
-  });
-
-  const ekuboCLStrats = EkuboCLVaultStrategies.map((v) => {
-    return new EkuboClStrategy(
-      v.name,
-      v.description as ReactNode,
-      v,
-      StrategyLiveStatus.HOT,
-      {
-        maxTVL: 0,
-        isAudited: v.auditUrl ? true : false,
-        auditUrl: v.auditUrl,
-        isPaused: false,
-        alerts: [
-          {
-            type: 'info',
-            text: 'Depending on the current position range and price, your input amounts are automatially adjusted to nearest required amounts',
-            tab: 'all',
-          },
-        ],
-        quoteToken: convertToV2TokenInfo(
-          getTokenInfoFromName(v.depositTokens[1]?.symbol || ''),
-        ),
-        isTransactionHistDisabled: true,
-      },
-    );
-  });
-
-  // const xSTRKStrategy = new AutoXSTRKStrategy(
-  //   'Stake STRK',
-  //   'Endur is Starknet’s dedicated staking platform, where you can stake STRK to earn staking rewards. This strategy, built on Endur, is an incentivized vault that boosts returns by offering additional rewards. In the future, it may transition to auto-compounding on DeFi Spring, reinvesting rewards for maximum growth. Changes will be announced at least three days in advance on our socials.',
-  //   CONSTANTS.CONTRACTS.AutoxSTRKFarm,
-  //   {
-  //     maxTVL: 2000000,
-  //     alerts: [],
-  //     is_promoted: true,
-  //   },
-  // );
-
-  // undo
-  const strategies: IStrategy<any>[] = [
-    // autoStrkStrategy,
-    // autoUSDCStrategy,
-    // deltaNeutralMMUSDCETH,
-    // deltaNeutralMMETHUSDC,
-    // deltaNeutralMMSTRKETH,
-    // deltaNeutralMMETHUSDCReverse,
-    // deltaNeutralxSTRKSTRK,
-    // ...vesuRebalanceStrats,
-    // ...ekuboCLStrats,
-    // deltaNeutralxSTRKSTRK,
-    re7EkuboXSTRKSTRK,
-    // xSTRKStrategy,
-  ];
+  const strategies: IStrategy<any>[] = [re7EkuboXSTRKSTRK];
 
   return strategies;
 }
@@ -327,14 +138,7 @@ const strategiesAtomAsync = atomWithQuery((get) => {
     queryKey: ['strategies'],
     queryFn: async () => {
       const strategies = getStrategies();
-      const allPools = get(allPoolsAtomUnSorted);
-      const requiredPools = allPools.filter(
-        (p) =>
-          p.protocol.name === 'zkLend' ||
-          p.protocol.name === 'Nostra' ||
-          p.protocol.name === 'Vesu' ||
-          p.protocol.name === endur.name,
-      );
+      const requiredPools: PoolInfo[] = [];
 
       const privatePools: PoolInfo[] = get(privatePoolsAtom);
       const proms = strategies.map((s) =>

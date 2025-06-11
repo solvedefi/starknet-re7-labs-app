@@ -1,7 +1,6 @@
 import { usePagination } from '@ajna/pagination';
 import {
   Container,
-  Link,
   Skeleton,
   Stack,
   Table,
@@ -14,7 +13,6 @@ import {
 import { useAtomValue } from 'jotai';
 import React, { useMemo } from 'react';
 
-import CONSTANTS from '@/constants';
 import { filteredPools } from '@/store/protocols';
 import {
   STRKFarmBaseAPYsAtom,
@@ -88,11 +86,7 @@ export default function Strategies() {
         margin="15px 0"
         fontSize="18px"
       >
-        More strategies coming soon. Join our{' '}
-        <Link textDecoration={'underline'} href={CONSTANTS.COMMUNITY_TG}>
-          Telegram channel
-        </Link>{' '}
-        to stay upto date.
+        More strategies coming soon.
       </Text>
     </Container>
   );

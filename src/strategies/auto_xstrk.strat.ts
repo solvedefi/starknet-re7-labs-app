@@ -52,6 +52,7 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
     description: string,
     strategyAddress: string,
     settings: IStrategySettings,
+    launchBlock: number = 0,
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
     const frmToken = TOKENS.find((t) => t.token == strategyAddress);
@@ -75,6 +76,8 @@ export class AutoXSTRKStrategy extends IStrategy<void> {
         },
       ],
       protocols: [],
+      launchBlock,
+      faqs: [],
       maxTVL: new Web3Number('0', tokenInfo.decimals),
       risk: {
         riskFactor: [],

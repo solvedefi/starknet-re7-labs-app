@@ -51,6 +51,7 @@ export class AutoTokenStrategy extends IStrategy<void> {
     description: string,
     lpTokenName: string,
     strategyAddress: string,
+    launchBlock: number = 0,
     settings: IStrategySettings,
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
@@ -76,6 +77,8 @@ export class AutoTokenStrategy extends IStrategy<void> {
         },
       ],
       protocols: [],
+      launchBlock,
+      faqs: [],
       maxTVL: new Web3Number('0', tokenInfo.decimals),
       risk: {
         riskFactor: [],

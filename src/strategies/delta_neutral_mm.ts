@@ -57,6 +57,7 @@ export class DeltaNeutralMM extends IStrategy<void> {
     settings: IStrategySettings,
     protocol1: IDapp<any> = zkLend,
     protocol2: IDapp<any> = nostraLending,
+    lauchBlock: number = 0,
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
     const nftInfo = NFTS.find(
@@ -85,6 +86,8 @@ export class DeltaNeutralMM extends IStrategy<void> {
         },
       ],
       protocols: [],
+      launchBlock: lauchBlock,
+      faqs: [],
       maxTVL: new Web3Number('0', tokenInfo.decimals),
       risk: {
         riskFactor: [],

@@ -5,7 +5,6 @@ import {
   AlertIcon,
   Avatar,
   AvatarGroup,
-  Badge,
   Box,
   Card,
   Center,
@@ -14,8 +13,6 @@ import {
   GridItem,
   HStack,
   Link,
-  ListItem,
-  OrderedList,
   Spinner,
   Text,
   Tooltip,
@@ -32,19 +29,11 @@ import { DUMMY_BAL_ATOM, returnEmptyBal } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { strategiesAtom, StrategyInfo } from '@/store/strategies.atoms';
 import { TxHistoryAtom } from '@/store/transactions.atom';
-import {
-  capitalize,
-  getTokenInfoFromAddr,
-  getUniqueById,
-  shortAddress,
-  timeAgo,
-} from '@/utils';
+import { getTokenInfoFromAddr, getUniqueById } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
-import { ExternalLinkIcon } from '@chakra-ui/icons';
 import { StrategyParams } from '../page';
 import FlowChart from './FlowChart';
 import { isMobile } from 'react-device-detect';
-import { getRiskExplaination } from '@strkfarm/sdk';
 import {
   STRKFarmBaseAPYsAtom,
   STRKFarmStrategyAPIResult,
@@ -516,171 +505,6 @@ const Strategy = ({ params }: StrategyParams) => {
               <FlowChart strategyId={strategy.id} />
             </Card>
           )}
-          <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
-            <GridItem colSpan={colSpan1} bg="highlight">
-              {/* Risks card */}
-              <Card
-                width={'100%'}
-                color="white"
-                bg="highlight"
-                padding={'15px'}
-              >
-                <Text
-                  fontSize={'20px'}
-                  marginBottom={'10px'}
-                  fontWeight={'bold'}
-                >
-                  Risks
-                </Text>
-                <OrderedList>
-                  {strategy.risks.map((r) => (
-                    <ListItem
-                      color="light_grey"
-                      key={r}
-                      fontSize={'13px'}
-                      marginBottom={'10px'}
-                      alignItems={'justify'}
-                    >
-                      {r}
-                    </ListItem>
-                  ))}
-                </OrderedList>
-                <Box>
-                  {strategy.metadata.risk.riskFactor.map(
-                    (r: any, i: number) => (
-                      <Tooltip label={getRiskExplaination(r.type)} key={i}>
-                        <Badge
-                          padding={'5px 10px'}
-                          borderRadius={'10px'}
-                          opacity={0.8}
-                          marginRight={'5px'}
-                          marginTop={'10px'}
-                        >
-                          {r.type.valueOf()}
-                        </Badge>
-                      </Tooltip>
-                    ),
-                  )}
-                </Box>
-              </Card>
-            </GridItem>
-            <GridItem colSpan={colSpan2} bg={'highlight'}>
-              {/* Transaction history card */}
-              <Card
-                width={'100%'}
-                color="white"
-                bg="highlight"
-                padding={'15px'}
-              >
-                <Text fontSize={'20px'} fontWeight={'bold'}>
-                  Transaction history
-                </Text>
-                {!strategy.settings.isTransactionHistDisabled && (
-                  <Text
-                    fontSize={'13px'}
-                    marginBottom={'10px'}
-                    color={'color2'}
-                  >
-                    There may be delays fetching data. If your transaction{' '}
-                    {`isn't`} found, try again later.
-                  </Text>
-                )}
-
-                {txHistoryResult.isSuccess && (
-                  <>
-                    {txHistory.findManyInvestment_flows.map((tx, index) => {
-                      const token = getTokenInfoFromAddr(tx.asset);
-                      const decimals = token?.decimals;
-
-                      return (
-                        <Box
-                          className="text-cell"
-                          key={index}
-                          width={'100%'}
-                          color="light_grey"
-                          fontSize={'14px'}
-                          display={{ base: 'block', md: 'flex' }}
-                        >
-                          <Flex
-                            width={{ base: '100%' }}
-                            justifyContent={'space-between'}
-                          >
-                            <Text width={'10%'}>{index + 1}.</Text>
-                            <Box width={'40%'}>
-                              <Text
-                                textAlign={'right'}
-                                color={tx.type == 'deposit' ? 'cyan' : 'red'}
-                                fontWeight={'bold'}
-                              >
-                                {Number(
-                                  new MyNumber(
-                                    tx.amount,
-                                    decimals!,
-                                  ).toEtherToFixedDecimals(
-                                    token.displayDecimals,
-                                  ),
-                                ).toLocaleString()}{' '}
-                                {token?.name}
-                              </Text>
-                              <Text textAlign={'right'} color="color2_65p">
-                                {capitalize(tx.type)}
-                              </Text>
-                            </Box>
-
-                            <Box width={'50%'} justifyContent={'flex-end'}>
-                              <Text
-                                width={'100%'}
-                                textAlign={'right'}
-                                fontWeight={'bold'}
-                              >
-                                <Link
-                                  href={`https://starkscan.co/tx/${tx.txHash}`}
-                                  target="_blank"
-                                >
-                                  {shortAddress(tx.txHash)} <ExternalLinkIcon />
-                                </Link>
-                              </Text>
-                              <Text
-                                width={'100%'}
-                                textAlign={'right'}
-                                color="color2_65p"
-                              >
-                                {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                                {timeAgo(new Date(tx.timestamp * 1000))}
-                              </Text>
-                            </Box>
-                          </Flex>
-                        </Box>
-                      );
-                    })}
-                  </>
-                )}
-
-                {/* If no filtered tx */}
-                {!strategy.settings.isTransactionHistDisabled &&
-                  txHistory.findManyInvestment_flows.length === 0 && (
-                    <Text
-                      fontSize={'14px'}
-                      textAlign={'center'}
-                      color="light_grey"
-                    >
-                      No transactions found
-                    </Text>
-                  )}
-                {strategy.settings.isTransactionHistDisabled && (
-                  <Text
-                    fontSize={'14px'}
-                    textAlign={'center'}
-                    color="light_grey"
-                    marginTop={'20px'}
-                  >
-                    Transaction history is not available for this strategy yet.
-                    If enabled in future, will include the entire history.
-                  </Text>
-                )}
-              </Card>
-            </GridItem>
-          </Grid>
         </VStack>
       )}
     </>

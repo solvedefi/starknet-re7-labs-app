@@ -1,17 +1,10 @@
-import { ChevronDownIcon, HamburgerIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
-  Avatar,
   Box,
   Button,
   Center,
   Container,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   Flex,
-  IconButton,
   Image,
   Link,
   Menu,
@@ -28,8 +21,6 @@ import {
   StarknetkitConnector,
 } from 'starknetkit';
 
-import tg from '@/assets/tg.svg';
-import CONSTANTS from '@/constants';
 import { getERC20Balance } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { lastWalletAtom } from '@/store/utils.atoms';
@@ -262,32 +253,6 @@ export default function Navbar(props: NavbarProps) {
       top="0"
     >
       <TncModal />
-      <Center bg="bg" color="gray" padding={0}>
-        <Text
-          fontSize="12px"
-          textAlign={'center'}
-          padding="6px 5px"
-          color="#a5a5d9"
-        >
-          <b>
-            Strategies with{' '}
-            <Link
-              href="https://x.com/strkfarm/status/1889933140657053786"
-              target="_blank"
-              textDecoration={'underline'}
-            >
-              {' '}
-              zkLend exploit
-            </Link>{' '}
-            exposure have been retired. You can check your partially recovered
-            funds
-            <Link href="/recovery" color="orange">
-              {' '}
-              here.
-            </Link>
-          </b>
-        </Text>
-      </Center>
       <Box
         width={'100%'}
         maxWidth="1400px"
@@ -299,134 +264,9 @@ export default function Navbar(props: NavbarProps) {
             <Image
               src={fulllogo.src}
               alt="logo"
-              height={{ base: '35px', md: '50px' }}
+              height={{ base: '30px', md: '40px' }}
             />
           </Link>
-          {/* <Link href={'/claims'} isExternal>
-            <Button
-              margin="0 0 0 auto"
-              borderColor="color2"
-              color="color2"
-              variant="ghost"
-              marginRight={'30px'}
-              leftIcon={
-                <Avatar
-                  size="sm"
-                  bg="highlight"
-                  color="color2"
-                  name="T G"
-                  src={CONSTANTS.LOGOS.STRK}
-                />
-              }
-              _hover={{
-                bg: 'color2_50p',
-              }}
-              display={{ base: 'none !important', md: 'flex !important' }}
-            >
-              Claims
-            </Button>
-          </Link> */}
-
-          <Link href="/" margin="0 10px 0 0">
-            <Button
-              bg="transparent"
-              color="color2"
-              variant="outline"
-              border="none"
-              px="10px"
-              _hover={{
-                bg: 'color2_50p',
-              }}
-              display={{ base: 'none !important', lg: 'flex !important' }}
-              onClick={() => {
-                mixpanel.track('home_clicked');
-              }}
-            >
-              Home
-            </Button>
-          </Link>
-          {/* <Link href="/raffle" margin="0 10px 0 0">
-            <Button
-              bg="transparent"
-              color="color2"
-              variant="outline"
-              border="none"
-              px="10px"
-              _hover={{
-                bg: 'color2_50p',
-              }}
-              display={{ base: 'none !important', lg: 'flex !important' }}
-              onClick={() => {
-                mixpanel.track('home_clicked');
-              }}
-            >
-              🕹 {'  '}Raffle
-            </Button>
-          </Link> */}
-          <Link href="/community" margin="0 10px 0 0">
-            <Button
-              bg="transparent"
-              color="color2"
-              variant="outline"
-              border="none"
-              _hover={{
-                bg: 'color2_50p',
-              }}
-              px="10px"
-              display={{ base: 'none !important', lg: 'flex !important' }}
-              onClick={() => {
-                mixpanel.track('community_program_click');
-              }}
-            >
-              ✨ Community Program
-            </Button>
-          </Link>
-
-          {!props.hideTg && (
-            <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
-              <Button
-                margin="0 0 0 auto"
-                borderColor="color2"
-                color="color2"
-                variant="outline"
-                rightIcon={
-                  <Avatar
-                    size="sm"
-                    bg="highlight"
-                    color="color2"
-                    name="T G"
-                    src={tg.src}
-                  />
-                }
-                _hover={{
-                  bg: 'color2_50p',
-                }}
-                display={{ base: 'none !important', md: 'flex !important' }}
-              >
-                Join Telegram
-              </Button>
-              <IconButton
-                aria-label="tg"
-                variant={'ghost'}
-                borderColor={'color2'}
-                display={{ base: 'block', md: 'none' }}
-                icon={
-                  <Avatar
-                    size="sm"
-                    bg="highlight"
-                    className="glow-button"
-                    name="T G"
-                    color="color2"
-                    src={tg.src}
-                    _hover={{
-                      bg: 'color2_50p',
-                    }}
-                  />
-                }
-              />
-            </Link>
-          )}
-
           {true && (
             <Menu>
               <MenuButton
@@ -504,47 +344,6 @@ export default function Navbar(props: NavbarProps) {
               </MenuList>
             </Menu>
           )}
-
-          {isMobile && (
-            <IconButton
-              aria-label="Open menu"
-              icon={<HamburgerIcon color="color2" height="30px" width="30px" />}
-              background="transparent"
-              display={{ base: 'flex', md: 'none' }}
-              onClick={onOpen}
-              _focus={{
-                bg: 'none',
-              }}
-            />
-          )}
-
-          <Drawer placement="right" onClose={onClose} isOpen={isOpen}>
-            <DrawerOverlay />
-            <DrawerContent background="bg">
-              <DrawerHeader color="color1_light">Menu</DrawerHeader>
-              <DrawerBody>
-                <Flex direction="column">
-                  <Link href="/" color="color1_light" onClick={onClose}>
-                    Home
-                  </Link>
-                  {/* <Link href="/raffle" color="color1_light" onClick={onClose}>
-                    🕹 {'  '}Raffle
-                  </Link> */}
-                  <Link
-                    href="/community"
-                    color="color1_light"
-                    onClick={() => {
-                      onClose();
-                      mixpanel.track('community_program_click');
-                    }}
-                    mt={4}
-                  >
-                    ✨ Community Program
-                  </Link>
-                </Flex>
-              </DrawerBody>
-            </DrawerContent>
-          </Drawer>
         </Flex>
       </Box>
     </Container>

@@ -110,6 +110,19 @@ export const TOKENS: TokenInfo[] = [
     stepAmount: MyNumber.fromEther('10', 18),
     isERC4626: false,
   },
+  {
+    token: standariseAddress(
+      '0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac',
+    ),
+    name: 'WBTC',
+    decimals: 8,
+    displayDecimals: 2,
+    logo: CONSTANTS.LOGOS.WBTC,
+    minAmount: MyNumber.fromEther('0.00001', 8),
+    maxAmount: MyNumber.fromEther('10000', 8),
+    stepAmount: MyNumber.fromEther('0.00001', 8),
+    isERC4626: false,
+  },
   // ! todo change this
   {
     token: standariseAddress(

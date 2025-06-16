@@ -10,7 +10,6 @@ import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   AvatarGroup,
-  Badge,
   Box,
   Flex,
   Grid,
@@ -81,24 +80,6 @@ export function StrategyInfo(props: YieldCardProps) {
             <Heading size="sm" marginTop={'2px'}>
               {pool.pool.name}
             </Heading>
-            {pool.additional &&
-              pool.additional.tags
-                .filter((tag) => tag != StrategyLiveStatus.ACTIVE)
-                .map((tag) => {
-                  return (
-                    <Badge
-                      ml="1"
-                      bg={getStratCardBadgeBg(tag)}
-                      fontFamily={'sans-serif'}
-                      padding="2px 8px"
-                      textTransform="capitalize"
-                      fontWeight={500}
-                      key={tag}
-                    >
-                      {tag}
-                    </Badge>
-                  );
-                })}
             {pool.additional && pool.additional.auditUrl && (
               <Tooltip label="Audited smart contract. Click to view the audit report.">
                 <Link href={pool.additional.auditUrl} target="_blank">

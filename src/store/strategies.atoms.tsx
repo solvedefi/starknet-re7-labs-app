@@ -12,6 +12,7 @@ import { ContractAddr, EkuboCLVaultStrategies, Global } from '@strkfarm/sdk';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { EkuboClStrategy } from '@/strategies/ekubo_cl_vault';
 import { IStrategyMetadata, CLVaultStrategySettings } from '@strkfarm/sdk';
+import { VAULTS } from '@/constants';
 
 export interface StrategyInfo<T> extends IStrategyProps<T> {
   name: string;
@@ -121,7 +122,49 @@ export function getStrategies() {
 
   const strategies: IStrategy<any>[] = [re7EkuboXSTRKSTRK];
 
-  return strategies;
+  return VAULTS.map((vault) => {
+    const strategyMetadata: IStrategyMetadata<CLVaultStrategySettings> = {
+      ...EkuboCLVaultStrategies[0],
+      name: vault.name,
+      description: 'Some description', // can be string too or ReactNode
+      address: ContractAddr.from(vault.address),
+      launchBlock: vault.launchBlock,
+      depositTokens: [
+        // We support most blue chip tokens in this list, so, for any vault, u just need
+        // to specify the name
+        // ? The order of tokens is import. First is Ekubo poolKey token0, second is token1
+        // If token doesn't exist in our list, u can manually populate here as well
+        Global.getDefaultTokens().find((t) => t.symbol === vault.baseToken)!,
+        Global.getDefaultTokens().find((t) => t.symbol === vault.quoteToken)!,
+      ],
+    };
+
+    return new EkuboClStrategy(
+      vault.name,
+      (
+        <div>Some description</div> // can be string too or ReactNode
+      ),
+      strategyMetadata,
+      StrategyLiveStatus.HOT,
+      {
+        maxTVL: 0,
+        isAudited: EkuboCLVaultStrategies[0].auditUrl ? true : false,
+        auditUrl: EkuboCLVaultStrategies[0].auditUrl,
+        isPaused: false,
+        alerts: [
+          {
+            type: 'info',
+            text: 'Depending on the current position range and price, your input amounts are automatially adjusted to nearest required amounts',
+            tab: 'all',
+          },
+        ],
+        quoteToken: convertToV2TokenInfo(
+          getTokenInfoFromName(vault.baseToken), // quote token for this strategy, used to denominate user holdings of the pool in this asset as a summary
+        ),
+        isTransactionHistDisabled: true,
+      },
+    );
+  });
 }
 
 export const STRATEGIES_INFO = getStrategies();

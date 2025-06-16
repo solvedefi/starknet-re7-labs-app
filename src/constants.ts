@@ -320,4 +320,54 @@ export const SIGNING_DATA = {
   },
 };
 
+interface Vault {
+  name: string;
+  address: string;
+  launchBlock: number;
+  baseToken: string;
+  quoteToken: string;
+}
+
+export const VAULTS: Vault[] = [
+  {
+    name: 'Re7 Ekubo USDC/USDT',
+    address:
+      '0x30a77a103c6f7d9be4bb0030edfa0659309d78fcc9876888047f24a90cfb3eb',
+    launchBlock: 1485573,
+    baseToken: 'USDC',
+    quoteToken: 'USDT',
+  },
+  {
+    name: 'Re7 Ekubo ETH/USDC',
+    address:
+      '0x73226f8f9245e2ed6ab0bca33b704a70039764c74aa1eb1811f267278230bd5',
+    launchBlock: 1485579,
+    baseToken: 'ETH',
+    quoteToken: 'USDC',
+  },
+  {
+    name: 'Re7 Ekubo STRK/USDC',
+    address:
+      '0x5adec24bd41019a9a18fd4ce60f9f0a5d8a2f36920a2317ff2aafa91c6cc14a',
+    launchBlock: 1485580,
+    baseToken: 'STRK',
+    quoteToken: 'USDC',
+  },
+  {
+    name: 'Re7 Ekubo STRK/ETH',
+    address:
+      '0x50712d55ad5132936a0c62c79251a58ac7b3c6a518c74d18e56bcb472fcdf01',
+    launchBlock: 1485581,
+    baseToken: 'STRK',
+    quoteToken: 'ETH',
+  },
+  // {
+  //   name: 'Re7 Ekubo WBTC/USDC',
+  //   address: "0x75b15ae6812a55ef3ce3388da5bb4669af82957b5184155fc1d1711fc5c01c6",
+  //   launchBlock: 1485583,
+  //   baseToken: 'WBTC',
+  //   quoteToken: 'USDC'
+  // },
+];
+
 export default CONSTANTS;

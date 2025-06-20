@@ -58,7 +58,7 @@ export interface STRKFarmStrategyAPIResult {
 }
 
 export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
-  name = 'STRKFarm';
+  name = 'Re7 Labs';
   logo = strkfarmLogo.src;
   incentiveDataKey = '';
 

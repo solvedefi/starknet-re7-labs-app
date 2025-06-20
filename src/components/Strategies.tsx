@@ -55,7 +55,7 @@ export default function Strategies() {
           <Tr fontSize={'18px'} color={'white'} bg="bg">
             <Th>Strategy name</Th>
             <Th textAlign={'right'}>APY</Th>
-            <Th textAlign={'right'}>Risk</Th>
+            {/* <Th textAlign={'right'}>Risk</Th> */}
             <Th textAlign={'right'}>TVL</Th>
           </Tr>
         </Thead>

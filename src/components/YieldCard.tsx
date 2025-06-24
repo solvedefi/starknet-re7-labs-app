@@ -521,7 +521,7 @@ export default function YieldCard(props: YieldCardProps) {
             <StrategyAPY pool={pool} index={index} />
           )}
         </Td>
-        <Td>
+        {/* <Td>
           {isRetired ? (
             <Text ml="auto" w="fit-content" mr="2">
               -
@@ -531,7 +531,7 @@ export default function YieldCard(props: YieldCardProps) {
           ) : (
             '-'
           )}
-        </Td>
+        </Td> */}
         <Td>
           {isRetired ? (
             <Text ml="auto" w="fit-content" mr="2">

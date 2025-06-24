@@ -13,15 +13,15 @@ export async function generateMetadata({ params }: StrategyParams) {
   const strategy = strategies.find((s) => s.id === params?.strategyId);
   if (strategy) {
     return {
-      title: `${strategy.name} | STRKFarm`,
+      title: `${strategy.name} | Re7 Labs`,
       description: strategy.description,
     };
   }
 
   return {
-    title: 'Yield Strategy | STRKFarm',
+    title: 'Yield Strategy | Re7 Labs',
     description:
-      "STRKFarm's yield strategies are designed to maximize your yield farming returns. Stake your assets in our strategies to earn passive income while we take care of the rest.",
+      "Re7 Labs's yield strategies are designed to maximize your yield farming returns. Stake your assets in our strategies to earn passive income while we take care of the rest.",
   };
 }
 

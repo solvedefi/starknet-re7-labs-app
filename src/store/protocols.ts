@@ -192,7 +192,7 @@ export function getPoolInfoFromStrategy(
       logos: [...strat.logos],
     },
     protocol: {
-      name: 'STRKFarm',
+      name: 'Re7 Labs',
       link: `/strategy/${strat.id}`,
       logo: strkfarmLogo.src,
     },

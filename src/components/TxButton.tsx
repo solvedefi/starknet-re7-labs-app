@@ -165,7 +165,7 @@ export default function TxButton(props: TxButtonProps) {
             </Text>
 
             <Text textAlign="center" fontWeight="500">
-              While your deposit is being processed, if you like STRKFarm, do
+              While your deposit is being processed, if you like Re7 Labs, do
               you mind sharing on X/Twitter?
             </Text>
 

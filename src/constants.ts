@@ -7,6 +7,7 @@ const LOGOS = {
   USDT: '/zklend/icons/tokens/usdt.svg?w=20',
   USDC: '/zklend/icons/tokens/usdc.svg?w=20',
   WBTC: '/zklend/icons/tokens/wbtc.svg?w=20',
+  tBTC: '/zklend/icons/tokens/wbtc.svg?w=20',
   ETH: '/zklend/icons/tokens/eth.svg?w=20',
   STRK: '/zklend/icons/tokens/strk.svg?w=20',
   DAI: '/zklend/icons/tokens/dai.svg?w=20',
@@ -20,6 +21,7 @@ export type TokenName =
   | 'ETH'
   | 'STRK'
   | 'WBTC'
+  | 'tBTC'
   | 'DAI'
   | 'kSTRK'
   | 'xSTRK';
@@ -121,6 +123,19 @@ export const TOKENS: TokenInfo[] = [
     minAmount: MyNumber.fromEther('0.00001', 8),
     maxAmount: MyNumber.fromEther('10000', 8),
     stepAmount: MyNumber.fromEther('0.00001', 8),
+    isERC4626: false,
+  },
+  {
+    token: standariseAddress(
+      '0x04daa17763b286d1e59b97c283c0b8c949994c361e426a28f743c67bdfe9a32f',
+    ),
+    name: 'tBTC',
+    decimals: 18,
+    displayDecimals: 2,
+    logo: CONSTANTS.LOGOS.WBTC,
+    minAmount: MyNumber.fromEther('0.00001', 18),
+    maxAmount: MyNumber.fromEther('10000', 18),
+    stepAmount: MyNumber.fromEther('0.00001', 18),
     isERC4626: false,
   },
   // ! todo change this
@@ -345,42 +360,66 @@ export const VAULTS: Vault[] = [
   {
     name: 'Re7 Ekubo USDC/USDT',
     address:
-      '0x30a77a103c6f7d9be4bb0030edfa0659309d78fcc9876888047f24a90cfb3eb',
-    launchBlock: 1485573,
+      '0x3a4f8debaf12af97bb911099bc011d63d6c208d4c5ba8e15d7f437785b0aaa2',
+    launchBlock: 1501761,
     baseToken: 'USDC',
     quoteToken: 'USDT',
   },
   {
     name: 'Re7 Ekubo ETH/USDC',
     address:
-      '0x73226f8f9245e2ed6ab0bca33b704a70039764c74aa1eb1811f267278230bd5',
-    launchBlock: 1485579,
+      '0x160d8fa4569ef6a12e6bf47cb943d7b5ebba8a41a69a14c1d943050ba5ff947',
+    launchBlock: 1501761,
     baseToken: 'ETH',
     quoteToken: 'USDC',
   },
   {
     name: 'Re7 Ekubo STRK/USDC',
     address:
-      '0x5adec24bd41019a9a18fd4ce60f9f0a5d8a2f36920a2317ff2aafa91c6cc14a',
-    launchBlock: 1485580,
+      '0x351b36d0d9d8b40010658825adeeddb1397436cd41acd0ff6c6e23aaa8b5b30',
+    launchBlock: 1501762,
     baseToken: 'STRK',
     quoteToken: 'USDC',
   },
   {
     name: 'Re7 Ekubo STRK/ETH',
     address:
-      '0x50712d55ad5132936a0c62c79251a58ac7b3c6a518c74d18e56bcb472fcdf01',
-    launchBlock: 1485581,
+      '0x4ce3024b0ee879009112d7b0e073f8a87153dd35b029347d4247ffe48d28f51',
+    launchBlock: 1501763,
     baseToken: 'STRK',
     quoteToken: 'ETH',
   },
+  {
+    name: 'Re7 Ekubo WBTC/USDC',
+    address:
+      '0x2bcaef2eb7706875a5fdc6853dd961a0590f850bc3a031c59887189b5e84ba1',
+    launchBlock: 1501764,
+    baseToken: 'WBTC',
+    quoteToken: 'USDC',
+  },
   // {
-  //   name: 'Re7 Ekubo WBTC/USDC',
-  //   address: "0x75b15ae6812a55ef3ce3388da5bb4669af82957b5184155fc1d1711fc5c01c6",
-  //   launchBlock: 1485583,
-  //   baseToken: 'WBTC',
+  //   name: 'Re7 Ekubo tBTC/USDC',
+  //   address: "0x4aad891a2d4432fba06b6558631bb13f6bbd7f6f33ab8c3111e344889ea4456",
+  //   launchBlock: 1501764,
+  //   baseToken: 'tBTC',
   //   quoteToken: 'USDC'
   // },
+  {
+    name: 'Re7 Ekubo WBTC/ETH',
+    address:
+      '0x1c9232b8186d9317652f05055615f18a120c2ad9e5ee96c39e031c257fb945b',
+    launchBlock: 1501765,
+    baseToken: 'WBTC',
+    quoteToken: 'ETH',
+  },
+  {
+    name: 'Re7 Ekubo WBTC/STRK',
+    address:
+      '0x1248e385c23a929a015ec298a26560fa7745bbd6e41a886550e337b02714b1b',
+    launchBlock: 1501766,
+    baseToken: 'WBTC',
+    quoteToken: 'STRK',
+  },
 ];
 
 export default CONSTANTS;

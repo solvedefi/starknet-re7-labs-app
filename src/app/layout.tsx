@@ -6,22 +6,22 @@ import React from 'react';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'STRKFarm | Yield aggregator on Starknet',
+  title: 'Re7 Labs | Yield aggregator on Starknet',
   description:
-    'Find and invest in high yield pools. STRKFarm is the best yield aggregator on Starknet.',
+    'Find and invest in high yield pools. Re7 Labs is the best yield aggregator on Starknet.',
   openGraph: {
-    title: 'STRKFarm | Yield aggregator on Starknet',
+    title: 'Re7 Labs | Yield aggregator on Starknet',
     description:
-      'Find and invest in high yield pools. STRKFarm is the best yield aggregator on Starknet.',
-    images: ['https://static-assets-8zct.onrender.com/strkfarm/og-img-png.png'],
+      'Find and invest in high yield pools. Re7 Labs is the best yield aggregator on Starknet.',
+    images: ['https://www.re7labs.xyz/opengraph-image.png?fba144fde61dab4a'],
   },
   twitter: {
-    creator: '@akiraonstarknet',
-    title: 'STRKFarm | Yield aggregator on Starknet',
+    creator: '',
+    title: 'Re7 Labs | Yield aggregator on Starknet',
     description:
-      'Find and invest in high yield pools. STRKFarm is the best yield aggregator on Starknet.',
+      'Find and invest in high yield pools. Re7 Labs is the best yield aggregator on Starknet.',
     card: 'player',
-    images: ['https://static-assets-8zct.onrender.com/strkfarm/og-img-png.png'],
+    images: ['https://www.re7labs.xyz/opengraph-image.png?fba144fde61dab4a'],
   },
 };
 

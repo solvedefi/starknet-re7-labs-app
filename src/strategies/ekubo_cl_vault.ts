@@ -356,13 +356,16 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
               tokenInfo: convertToV2TokenInfo(b.tokenInfo!),
             }),
           );
-          console.log('getSummaryBalanceAtom [1]', amounts);
+          console.log(
+            'getSummaryBalanceAtom [1]',
+            amounts.map((x) => x.amount.toWei()),
+          );
           const amountWeb3Number = await this.computeSummaryValue(
             amounts,
             this.settings.quoteToken,
             'ekubo::summary',
           );
-          console.log('getSummaryBalanceAtom [2]', amountWeb3Number);
+          console.log('getSummaryBalanceAtom [2]', amountWeb3Number.toString());
           return {
             amount: convertToMyNumber(amountWeb3Number),
             tokenInfo: convertToV1TokenInfo(this.settings.quoteToken),

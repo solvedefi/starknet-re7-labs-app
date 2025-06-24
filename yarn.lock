@@ -40,15 +40,15 @@
     tslib "^2.3.0"
     zen-observable-ts "^1.2.5"
 
+"@avnu/avnu-sdk@3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@avnu/avnu-sdk/-/avnu-sdk-3.0.2.tgz#1751f951380160858bcb8a3fa30a5b4b086d3891"
+  integrity sha512-N8McoXYEcp1uhSZ4XlEi5BcTpvJDDhUw4kYnlYmPrd7fWezfGy4UHyoFT/A4gqEM4nL3vtENczDNFS1AVfdTnA==
+
 "@avnu/avnu-sdk@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@avnu/avnu-sdk/-/avnu-sdk-3.0.0.tgz#e4cb63d26aa6c244040963fcef44e2d95c15cba9"
   integrity sha512-BqqazrXDKn5RE1anyl9Ba+Kd/4VaKNsdKTl0ryTfXhMIYp+R4dXMaLD40emfXd+25kxM00xPKiZOiGHl2ntG5g==
-
-"@avnu/avnu-sdk@^3.0.2":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@avnu/avnu-sdk/-/avnu-sdk-3.0.2.tgz#1751f951380160858bcb8a3fa30a5b4b086d3891"
-  integrity sha512-N8McoXYEcp1uhSZ4XlEi5BcTpvJDDhUw4kYnlYmPrd7fWezfGy4UHyoFT/A4gqEM4nL3vtENczDNFS1AVfdTnA==
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.21.4", "@babel/code-frame@^7.24.7":
   version "7.24.7"
@@ -2162,12 +2162,12 @@
     viem "^2.19.1"
     zod "^3.22.4"
 
-"@strkfarm/sdk@^1.0.44":
-  version "1.0.44"
-  resolved "https://registry.yarnpkg.com/@strkfarm/sdk/-/sdk-1.0.44.tgz#cbd783df4b552f96cc45df8082bdb864a8e15d5b"
-  integrity sha512-D9kXl4PJX8mgUlb4Fa4K9a8NteH/1Wp5u4zkaL+VRATYp7+9nN4+2C118enzIW8VE55Uny1ftuGzMfjcfF1orw==
+"@strkfarm/sdk@^1.0.49":
+  version "1.0.49"
+  resolved "https://registry.yarnpkg.com/@strkfarm/sdk/-/sdk-1.0.49.tgz#bae8278a2df4e5c3b47ba9a88eec2145200789ec"
+  integrity sha512-kui+5Of7rzWIFzGQI9jk3Aj9ILNADwUiJp5U6lpz0u1Q2zgYIL0PgXiyQhkFks8KtfbBono7zdImb8ujfc+oiw==
   dependencies:
-    "@avnu/avnu-sdk" "^3.0.2"
+    "@avnu/avnu-sdk" "3.0.2"
     bignumber.js "4.0.4"
     browser-assert "^1.2.1"
     chalk "^4.1.2"
@@ -6264,6 +6264,11 @@ mlly@^1.7.1:
     pathe "^1.1.2"
     pkg-types "^1.1.1"
     ufo "^1.5.3"
+
+moment@^2.30.1:
+  version "2.30.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.30.1.tgz#f8c91c07b7a786e30c59926df530b4eac96974ae"
+  integrity sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==
 
 mri@^1.2.0:
   version "1.2.0"

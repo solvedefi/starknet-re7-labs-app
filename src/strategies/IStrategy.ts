@@ -7,7 +7,6 @@ import {
 import { IndexedPoolData } from '@/store/endur.store';
 import { LendingSpace } from '@/store/lending.base';
 import { Category, PoolInfo } from '@/store/pools';
-import { zkLend } from '@/store/zklend.store';
 import {
   convertToV2TokenInfo,
   convertToV2Web3Number,
@@ -409,9 +408,7 @@ export class IStrategy<T> extends IStrategyProps<T> {
 
   filterTokenByProtocol(
     tokenName: string,
-    protocol:
-      | IDapp<LendingSpace.MyBaseAprDoc[]>
-      | IDapp<IndexedPoolData> = zkLend,
+    protocol: IDapp<LendingSpace.MyBaseAprDoc[]> | IDapp<IndexedPoolData>,
   ) {
     return (
       pools: PoolInfo[],

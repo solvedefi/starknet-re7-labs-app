@@ -2,9 +2,8 @@ import CONSTANTS from '@/constants';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
 import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
 import { CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
-import fetchWithRetry from '@/utils/fetchWithRetry';
 import { Atom, atom } from 'jotai';
-import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
+import { AtomWithQueryResult } from 'jotai-tanstack-query';
 
 export enum Category {
   Stable = 'Stable Pools',
@@ -128,50 +127,6 @@ export interface ProtocolAtoms2 {
   pools: Atom<PoolInfo[]>;
   baseAPRs?: Atom<CustomAtomWithQueryResult<any, Error>>;
 }
-
-const _StrkDexIncentivesAtom = customAtomWithFetch({
-  queryKey: 'strk_dex_incentives',
-  url: CONSTANTS.DEX_INCENTIVE_URL,
-});
-
-export const StrkDexIncentivesAtom = atom((get) => {
-  const _data = get(_StrkDexIncentivesAtom);
-  if (_data.data) {
-    let data = JSON.stringify(_data.data);
-    data = data.replaceAll('NaN', '0');
-    _data.data = JSON.parse(data);
-  }
-  return _data;
-});
-
-export const StrkIncentivesAtom = atomWithQuery((get) => ({
-  queryKey: get(StrkIncentivesQueryKeyAtom),
-  queryFn: async ({ queryKey }): Promise<NostraPools | NostraPoolData[]> => {
-    try {
-      const res = await fetchWithRetry(
-        CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL,
-        {},
-        'Error fetching Nostra incentives information',
-      );
-      if (!res) return [];
-      let data = await res.text();
-      data = data.replaceAll('NaN', '0');
-      const parsedData: NostraPools = JSON.parse(data);
-
-      if (queryKey[1] === 'isNostraDex') {
-        // Filter the data to include only the specific nostra dex pools we are tracking
-        return Object.values(parsedData).filter((item: any) => {
-          const id = item.id;
-          return id === 'ETH-USDC' || id === 'STRK-ETH' || id === 'STRK-USDC';
-        });
-      }
-      return parsedData;
-    } catch (error) {
-      console.error('Error fetching nostra incentives: ', error);
-      return [];
-    }
-  },
-}));
 
 export const StrkIncentivesQueryKeyAtom = atom([
   'strk_incentives',

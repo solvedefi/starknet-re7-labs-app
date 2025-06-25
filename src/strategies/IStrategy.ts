@@ -312,15 +312,7 @@ export class IStrategyProps<T> {
 
     const amt = amount.multipliedBy(price).dividedBy(priceQuote);
 
-    // adjust decimals
-    const decimals = tokenInfo.decimals;
-    const quoteDecimals = quoteToken.decimals;
-    if (decimals > quoteDecimals) {
-      return amt.dividedBy(10 ** (decimals - quoteDecimals));
-    }
-    if (decimals < quoteDecimals) {
-      return amt.multipliedBy(10 ** (quoteDecimals - decimals));
-    }
+    amt.decimals = quoteToken.decimals; // ensure the decimals are set to quote token
     return amt;
   }
 }

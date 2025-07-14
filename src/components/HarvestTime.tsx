@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
 import {
   Box,
+  Container,
   Flex,
   Spinner,
-  Stat,
-  StatLabel,
-  StatNumber,
   Tag,
   Text,
   Tooltip,
@@ -19,6 +17,7 @@ import { isMobile } from 'react-device-detect';
 import STRKFarmAtoms, {
   STRKFarmStrategyAPIResult,
 } from '@/store/strkfarm.atoms';
+import styles from '../app/border.module.css';
 
 interface HarvestTimeProps {
   strategy: StrategyInfo<any>;
@@ -99,6 +98,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
       <Flex justifyContent="space-between">
         <Flex>
           <Tooltip
+            width={'180px'}
             label={
               <Box fontSize={'13px'}>
                 <Text>
@@ -141,17 +141,18 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
               </Box>
             }
           >
-            <Stat
+            <Container
+              className={styles.border}
               marginRight={'5px'}
+              padding={'16px 21px'}
+              width={'180px'}
+              alignItems={'center'}
               display={'flex'}
-              flexDirection={'column'}
-              justifyContent={'flex-end'}
+              justifyContent={'space-between'}
             >
-              <StatLabel>APY</StatLabel>
-              <StatNumber color="cyan" lineHeight="24px">
-                {((strategyInfo?.apy || 0) * 100).toFixed(2)}%
-              </StatNumber>
-            </Stat>
+              <Text>APY</Text>
+              <Text>{((strategyInfo?.apy || 0) * 100).toFixed(2)}%</Text>
+            </Container>
           </Tooltip>
           {strategyInfo && strategyInfo.apySplit.rewardsApy > 0 && (
             <Flex flexDirection={'column'} justifyContent={'flex-end'}>
@@ -176,84 +177,21 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
           <Tooltip
             label={`This is when your investment increases as STRK rewards are automatically claimed and reinvested into the strategy's tokens.`}
           >
-            <Box>
-              <Text
-                color="#D4D4D6"
-                fontSize="14px"
-                fontWeight="500"
-                display={'flex'}
-              >
+            <Box
+              className={styles.border_alt}
+              display={'flex'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+              width={'360px'}
+            >
+              <Text>
                 Next Harvest in:{' '}
-                {harvestTimestamp.isZero && (
-                  <Text color={'cyan'} fontWeight={'bold'} marginLeft={'5px'}>
-                    Anytime now
-                  </Text>
-                )}
+                {harvestTimestamp.isZero && <Text>Anytime now</Text>}
               </Text>
-              <Box
-                display="flex"
-                alignItems="center"
-                pt="5px"
-                gap="10px"
-                justifyContent="space-between"
-              >
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  flexDirection="column"
-                  gap="4px"
-                  bgColor="color2_50p"
-                  width="53px"
-                  height="53px"
-                  borderRadius="8px"
-                >
-                  <Text color="#AEAEAE" fontSize="12px" fontWeight="300">
-                    Days
-                  </Text>
-                  <Text color="white" fontWeight="semi-bold">
-                    {harvestTimestamp.days ?? 0}
-                  </Text>
-                </Box>
-
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  flexDirection="column"
-                  gap="4px"
-                  bgColor="color2_50p"
-                  width="53px"
-                  height="53px"
-                  borderRadius="8px"
-                >
-                  <Text color="#AEAEAE" fontSize="12px" fontWeight="300">
-                    Hour
-                  </Text>
-                  <Text color="white" fontWeight="semi-bold">
-                    {harvestTimestamp.hours ?? 0}
-                  </Text>
-                </Box>
-
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  flexDirection="column"
-                  gap="4px"
-                  bgColor="color2_50p"
-                  width="53px"
-                  height="53px"
-                  borderRadius="8px"
-                >
-                  <Text color="#AEAEAE" fontSize="12px" fontWeight="300">
-                    Mins
-                  </Text>
-                  <Text color="white" fontWeight="semi-bold">
-                    {harvestTimestamp.minutes ?? 0}
-                  </Text>
-                </Box>
-              </Box>
+              <Text>
+                {harvestTimestamp.days ?? 0}d {harvestTimestamp.hours ?? 0}h{' '}
+                {harvestTimestamp.minutes ?? 0}m
+              </Text>
             </Box>
           </Tooltip>
         )}
@@ -261,21 +199,15 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
 
       {!strategy.settings.hideHarvestInfo && (
         <Box
+          className={styles.border_alt}
+          marginTop={'20px'}
           display="flex"
-          padding="5px"
           width={'100%'}
-          bg="bg"
-          marginTop={'10px'}
-          borderRadius={'5px'}
+          alignItems={'center'}
+          justifyContent={'space-between'}
         >
-          <Text
-            color="white"
-            fontSize="12px"
-            fontWeight="normal"
-            textAlign={isMobile ? 'left' : 'right'}
-            width={'100%'}
-          >
-            Harvested{' '}
+          <Text>Harvested </Text>
+          <Text>
             <b>
               {getDisplayCurrencyAmount(
                 harvestTime?.data?.totalStrkHarvestedByContract.STRKAmount || 0,
@@ -283,7 +215,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
               )}{' '}
               STRK
             </b>{' '}
-            over <b>{harvestTime?.data?.totalHarvestsByContract} claims.</b>{' '}
+            / <b>{harvestTime?.data?.totalHarvestsByContract} claims.</b>{' '}
             {lastHarvest && (
               <span>
                 Last harvested <b>{timeAgo(lastHarvest)}</b> (Across all users).

@@ -5,6 +5,7 @@ import {
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
+  MarkerType,
 } from '@xyflow/react';
 import Dagre from '@dagrejs/dagre';
 import STRKFarmAtoms, {
@@ -18,23 +19,21 @@ import { Spinner } from '@chakra-ui/react';
 // import ELK from 'elkjs/lib/elk.bundled.js';
 
 const boxStyle = {
-  background: 'var(--chakra-colors-bg)',
-  opacity: 0.9,
   color: 'white',
   padding: '10px',
-  borderRadius: '5px',
-  fontSize: '13px',
-  width: '200px',
+  borderRadius: '25px',
+  fontSize: '12px',
+  minHeight: '120px',
+  width: 'auto',
 };
 
 // Dagre layouting
 const getLayoutedElements = (nodes: any[], edges: any[]) => {
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-  g.setDefaultEdgeLabel(() => ({}));
   g.setGraph({
     ranker: 'network-simplex',
     rankdir: 'TB',
-    nodesep: 30,
+    nodesep: 100, // Set to 100px as requested
     ranksep: 100,
   });
 
@@ -49,51 +48,29 @@ const getLayoutedElements = (nodes: any[], edges: any[]) => {
 
   Dagre.layout(g);
 
-  const newNodes = nodes.map((node) => {
-    const position = g.node(node.id);
-    // We are shifting the dagre node position (anchor=center center) to the top left
-    // so it matches the React Flow node anchor point (top left).
-    const x = position.x - (node.measured?.width ?? 0) / 2;
-    const y = position.y - (node.measured?.height ?? 0) / 2;
+  // Custom positioning logic - all nodes in one column
+  const newNodes = nodes.map((node, index) => {
+    console.log('Node width', node.position);
+    const baseX = 200;
+    const baseY = 50;
+    let x = 0;
+    let y = 0;
 
-    return { ...node, position: { x, y } };
+    if (index < 3) {
+      x = baseX;
+      y = baseY + index * 100;
+      node.sourcePosition = Position.Right;
+    } else {
+      x = baseX + 400;
+      y = baseY + 100;
+      node.sourcePosition = Position.Left;
+    }
+
+    return {
+      ...node,
+      position: { x, y },
+    };
   });
-
-  // ensure not more than 3 nodes in a row
-  let offset = 0;
-  const maxLevels = Math.max(...newNodes.map((n) => n.level));
-  for (let i = 0; i <= maxLevels; i++) {
-    const nodesInLevel = newNodes.filter((n) => n.level == i);
-    const maxInRow = 3;
-
-    const MOVE_BY = 120;
-
-    const totalGap = nodesInLevel.reduce((acc, n, index) => {
-      if (index == 0) return 0;
-      const prevNode = nodesInLevel[index - 1];
-      return acc + (n.position.x - prevNode.position.x);
-    }, 0);
-    const avgGabBetweenNodes =
-      totalGap / (nodesInLevel.length > 1 ? nodesInLevel.length - 1 : 1);
-
-    // increase y of alternate newNodes
-    let xOffset = 0;
-    for (let j = 0; j < nodesInLevel.length; j += 1) {
-      const extra =
-        nodesInLevel.length > maxInRow && (j - 1) % 2 == 0 ? MOVE_BY : 0;
-      const nodeIndex = newNodes.findIndex((n) => n.id == nodesInLevel[j].id);
-      newNodes[nodeIndex].position.y += offset + extra;
-      if (nodesInLevel.length > maxInRow) {
-        const widthOffset =
-          (avgGabBetweenNodes / 2) * (nodesInLevel.length / 2);
-        newNodes[nodeIndex].position.x += -xOffset + widthOffset;
-        xOffset += avgGabBetweenNodes / 2;
-      }
-    }
-    if (nodesInLevel.length > maxInRow) {
-      offset += MOVE_BY;
-    }
-  }
 
   return { nodes: newNodes, edges };
 };
@@ -175,23 +152,22 @@ function getNodesAndEdges(
   const edges: FlowEdge[] = [];
   for (const flow of investmentFlows) {
     const reactElement = (
-      <div>
-        <b>{flow.title}</b>
-        <br />
-        <table style={{ width: '100%', fontSize: '11px' }}>
-          {flow.subItems.map((item) => (
-            <tr key={item.key}>
-              <td style={{ textAlign: 'left' }}>{item.key}:</td>
-              <td style={{ textAlign: 'right' }}>{item.value}</td>
-            </tr>
-          ))}
-        </table>
+      <div
+        style={{ alignItems: 'center', textAlign: 'end', fontWeight: '300' }}
+      >
+        <b style={{ fontWeight: '700', margin: '10px' }}>{flow.title}</b>
+        {flow.subItems.map((item) => (
+          <div key={item.key}>
+            {item.key} <b style={{ fontWeight: '700' }}>{item.value}</b>
+          </div>
+        ))}
       </div>
     );
     let style = boxStyle;
     if (flow.style) {
       style = { ...style, ...flow.style };
     }
+
     const _node: FlowNode = {
       id: flow.id || `${level}_${nodes.length}`,
       position: { x: 0, y: 0 }, // doesnt matter as we use dagre for layout
@@ -200,10 +176,10 @@ function getNodesAndEdges(
       level,
     };
     if (flow.linkedFlows.length) {
-      _node.sourcePosition = Position.Bottom;
+      _node.sourcePosition = Position.Right;
     }
     if (parent) {
-      _node.targetPosition = Position.Top;
+      _node.targetPosition = Position.Left;
     }
     nodes.push(_node);
     if (parent) {
@@ -211,7 +187,18 @@ function getNodesAndEdges(
         id: `e${parent.id}-${_node.id}`,
         source: parent.id,
         target: _node.id,
-        animated: true,
+        animated: false,
+        type: 'smoothstep',
+        style: {
+          stroke: 'linear-gradient(to right, #2E45D0, #B1525C)',
+          strokeWidth: 2,
+        },
+        marketEnd: {
+          type: MarkerType.ArrowClosed,
+          width: 20,
+          height: 20,
+          color: '#B1525C',
+        },
       });
     }
     const { nodes: _nodes, edges: _edges } = getNodesAndEdges(
@@ -260,18 +247,18 @@ function InternalFlowChart(props: FlowChartProps) {
 
   if (strategyCached && strategyCached.investmentFlows.length > 0)
     return (
-      <div style={{ width: '100%', height: '350px' }}>
+      <div style={{ width: '100%', height: '400px' }}>
         <ReactFlow
-          fitView
+          // fitView
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           // minZoom={1}
-          maxZoom={1}
-          nodesDraggable={false}
+          // maxZoom={1}
+          // nodesDraggable={false}
           nodesConnectable={false}
-          elementsSelectable={false}
+          // elementsSelectable={false}
           // panOnScroll={false}
           // zoomOnScroll={false}
           // zoomOnDoubleClick={false}

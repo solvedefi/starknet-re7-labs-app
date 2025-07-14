@@ -34,6 +34,9 @@ import {
   truncate,
 } from '@/utils';
 import fulllogo from '@public/fulllogo.png';
+import active from '@public/active.png';
+import connectImg from '@public/connect.png';
+import close from '@public/close.png';
 import {
   InjectedConnector,
   useAccount,
@@ -42,7 +45,7 @@ import {
   useStarkProfile,
 } from '@starknet-react/core';
 import mixpanel from 'mixpanel-browser';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { constants } from 'starknet';
 import {
@@ -163,6 +166,8 @@ export default function Navbar(props: NavbarProps) {
   });
   const { connect: connectSnReact } = useConnect();
 
+  const isWalletConnect: boolean = false;
+
   const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
 
   const getTokenBalance = async (token: string, address: string) => {
@@ -189,12 +194,15 @@ export default function Navbar(props: NavbarProps) {
     };
   }, [isMobile]);
 
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+
   async function connectWallet(config = connectorConfig) {
     try {
       const { connector } = await connect(config);
 
       if (connector) {
         connectSnReact({ connector: connector as any });
+        setIsWalletConnected(true);
       }
     } catch (error) {
       console.error('connectWallet error', error);
@@ -212,6 +220,7 @@ export default function Navbar(props: NavbarProps) {
   useEffect(() => {
     (async () => {
       if (address) {
+        setIsWalletConnected(true);
         const standardAddr = standariseAddress(address);
         const userProps = {
           address: standardAddr,
@@ -232,6 +241,7 @@ export default function Navbar(props: NavbarProps) {
     if (connector) {
       const name: string = connector.name;
       setLastWallet(name);
+      setIsWalletConnected(true);
     }
   }, [connector]);
 
@@ -248,7 +258,7 @@ export default function Navbar(props: NavbarProps) {
       width={'100%'}
       padding={'0'}
       position={'fixed'}
-      bg="black"
+      bg="#0C0C0C"
       zIndex={999}
       top="0"
     >
@@ -273,27 +283,37 @@ export default function Navbar(props: NavbarProps) {
                 as={Button}
                 rightIcon={address ? <ChevronDownIcon /> : <></>}
                 iconSpacing={{ base: '1px', sm: '5px' }}
-                bgColor={'purple'}
+                sx={{
+                  background: isWalletConnected
+                    ? 'linear-gradient(to right, #2E45D0, #B1525C)'
+                    : '#2F2F2F',
+                }}
                 color="white"
-                borderColor={'purple'}
+                borderColor={'#2F2F2F'}
+                borderRadius="146px"
                 borderWidth="1px"
                 _hover={{
-                  bg: 'bg',
-                  borderColor: 'purple',
+                  bg: isWalletConnected
+                    ? 'linear-gradient(to right, #2E45D0, #B1525C)'
+                    : '#2F2F2F',
+                  borderColor: '#2F2F2F',
                   borderWidth: '1px',
-                  color: 'purple',
+                  color: '#FFF',
                 }}
                 _active={{
-                  bg: 'bg',
-                  borderColor: 'purple',
-                  color: 'purple',
+                  bg: isWalletConnected
+                    ? 'linear-gradient(to right, #2E45D0, #B1525C)'
+                    : '#2F2F2F',
+                  borderColor: '#2F2F2F',
+                  color: '#FFF',
                 }}
-                marginLeft={'10px'}
+                // marginLeft={'10px'}
                 display={{ base: 'flex' }}
-                height={{ base: '2rem', sm: '2.5rem' }}
+                // height={{ base: '50px', sm: '64px' }}
                 my={{ base: 'auto', sm: 'initial' }}
-                paddingX={{ base: '0.5rem', sm: '1rem' }}
-                fontSize={{ base: '0.8rem', sm: '1rem' }}
+                paddingX={{ base: '0.5rem', sm: '25px' }}
+                paddingY={{ base: '10px', sm: '25px' }}
+                fontSize={{ base: '0.8rem', sm: '15px' }}
                 onClick={
                   address
                     ? undefined
@@ -307,13 +327,10 @@ export default function Navbar(props: NavbarProps) {
                   {address ? (
                     <Center display="flex" alignItems="center" gap=".5rem">
                       <Image
-                        src={
-                          starkProfile?.profilePicture ||
-                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQa5dG19ABS0ge6iFAgpsvE_ULDUa4fJyT7hg&s'
-                        }
+                        src={active.src}
                         alt="pfp"
-                        width={{ base: '20px', sm: '30px' }}
-                        height={{ base: '20px', sm: '30px' }}
+                        width={{ base: '13px', sm: '13px' }}
+                        height={{ base: '13px', sm: '13px' }}
                         rounded="full"
                       />{' '}
                       <Text as="h3" marginTop={'3px !important'}>
@@ -323,22 +340,45 @@ export default function Navbar(props: NavbarProps) {
                       </Text>
                     </Center>
                   ) : (
-                    'Connect'
+                    <Center display="flex" alignItems="center" gap="40px">
+                      <Text as="h3" marginTop={'3px !important'}>
+                        CONNECT
+                      </Text>
+                      <Image
+                        src={connectImg.src}
+                        alt="pfp"
+                        width={{ base: '12px', sm: '18px' }}
+                        height={{ base: '12px', sm: '18px' }}
+                        marginRight={'-10px'}
+                        rounded="full"
+                      />
+                    </Center>
                   )}
                 </Center>
               </MenuButton>
-              <MenuList {...MyMenuListProps}>
+              <MenuList {...MyMenuListProps} borderRadius={'146px'}>
                 {address && (
                   <MenuItem
                     {...MyMenuItemProps}
+                    width={'140px'}
+                    height={'52px'}
+                    borderRadius={'46px'}
                     onClick={() => {
                       disconnectAsync().then((data) => {
                         console.log('wallet disconnected');
                         setLastWallet(null);
+                        setIsWalletConnected(false);
                       });
                     }}
                   >
-                    Disconnect
+                    DISCONNECT
+                    <Image
+                      src={close.src}
+                      width={'12px'}
+                      height={'12px'}
+                      alt="pfp"
+                      marginLeft={'20px'}
+                    />
                   </MenuItem>
                 )}
               </MenuList>

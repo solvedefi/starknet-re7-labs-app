@@ -12,7 +12,6 @@ import {
   Grid,
   GridItem,
   HStack,
-  Link,
   Spinner,
   Text,
   Tooltip,
@@ -39,6 +38,7 @@ import {
   STRKFarmStrategyAPIResult,
 } from '@/store/strkfarm.atoms';
 import { TokenDeposit } from './TokenDeposit';
+import styles from '../../../border.module.css';
 
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
@@ -157,96 +157,72 @@ const Strategy = ({ params }: StrategyParams) => {
 
   return (
     <>
-      <Flex marginBottom={'10px'}>
-        <AvatarGroup size={'md'} spacing={'-20px'} mr={'5px'}>
-          {strategy &&
-            strategy.metadata.depositTokens.length > 0 &&
-            strategy.metadata.depositTokens.map((token: any) => {
-              return (
-                <Avatar
-                  key={token.address}
-                  marginRight={'5px'}
-                  src={token.logo}
-                />
-              );
-            })}
-          {strategy && strategy.metadata.depositTokens.length == 0 && (
-            <Avatar marginRight={'5px'} src={strategy?.holdingTokens[0].logo} />
-          )}
-        </AvatarGroup>
-        <Text
-          marginTop={'6px'}
-          fontSize={{ base: '18px', md: '25px' }}
-          fontWeight={'bold'}
-          color="white"
-        >
-          {strategy ? strategy.name : 'Strategy Not found'}
-        </Text>
-      </Flex>
-
       {strategy && (
-        <VStack width={'100%'}>
+        <VStack width={'100%'} bg={'#171717'}>
           <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
             <GridItem display="flex" colSpan={colSpan1}>
-              <Card width="100%" padding={'15px'} color="white" bg="highlight">
+              <Card width="100%" padding={'15px'} color="white" bg="#171717">
+                <Flex>
+                  <AvatarGroup size={'md'} spacing={'-20px'} mr={'5px'}>
+                    {strategy &&
+                      strategy.metadata.depositTokens.length > 0 &&
+                      strategy.metadata.depositTokens.map((token: any) => {
+                        return (
+                          <Avatar
+                            key={token.address}
+                            marginRight={'5px'}
+                            src={token.logo}
+                            width={'30px'}
+                            height={'30px'}
+                          />
+                        );
+                      })}
+                    {strategy &&
+                      strategy.metadata.depositTokens.length == 0 && (
+                        <Avatar
+                          marginRight={'5px'}
+                          src={strategy?.holdingTokens[0].logo}
+                        />
+                      )}
+                  </AvatarGroup>
+                  <Text
+                    // marginTop={'6px'}
+                    marginLeft={'10px'}
+                    fontSize={{ base: '18px', md: '25px' }}
+                    fontWeight={'bold'}
+                    color="white"
+                  >
+                    {strategy ? strategy.name : 'Strategy Not found'}
+                  </Text>
+                </Flex>
+                <Text
+                  fontSize={'21px'}
+                  fontWeight={'400'}
+                  marginLeft={'55px'}
+                  marginBottom={'20px'}
+                >
+                  By Rekubo
+                </Text>
                 {!strategy?.isRetired() && (
                   <HarvestTime strategy={strategy} balData={balData} />
                 )}
-                <Box display={{ base: 'block', md: 'flex' }} marginTop={'10px'}>
-                  <Box width={{ base: '100%', md: '100%' }}>
-                    <Text
-                      fontSize={'20px'}
-                      marginBottom={'0px'}
-                      fontWeight={'bold'}
-                    >
-                      How does it work?
-                    </Text>
-                    <Box
-                      color="light_grey"
-                      marginBottom="5px"
-                      fontSize={'14px'}
-                    >
-                      {strategy.description}
-                    </Box>
-                    <Wrap>
-                      {getUniqueById(
-                        strategy.actions.map((p) => ({
-                          id: p.pool.protocol.name,
-                          logo: p.pool.protocol.logo,
-                        })),
-                      ).map((p) => (
-                        <WrapItem marginRight={'10px'} key={p.id}>
-                          <Center>
-                            <Avatar
-                              size="2xs"
-                              bg={'black'}
-                              src={p.logo}
-                              marginRight={'2px'}
-                            />
-                            <Text marginTop={'2px'}>{p.id}</Text>
-                          </Center>
-                        </WrapItem>
-                      ))}
-                    </Wrap>
-                  </Box>
-                </Box>
-                <Box
-                  padding={'10px'}
-                  borderRadius={'10px'}
-                  bg={'bg'}
-                  marginTop={'20px'}
-                >
+                <Box className={styles.border_alt} marginTop={'20px'}>
                   {!balData.isLoading &&
                     !balData.isError &&
                     !balData.isPending &&
                     balData.data &&
                     balData.data.tokenInfo && (
                       <Flex width={'100%'} justifyContent={'space-between'}>
-                        <Box>
+                        <Box
+                          display={'flex'}
+                          alignItems={'center'}
+                          justifyContent={'space-between'}
+                          width={'100%'}
+                        >
                           <Text>
-                            <b>Your Holdings </b>
+                            <b>Total Position Value </b>
                           </Text>
-                          <Text color="cyan">
+                          <Text>
                             {address
                               ? Number(
                                   balData.data.amount.toEtherToFixedDecimals(
@@ -259,29 +235,6 @@ const Strategy = ({ params }: StrategyParams) => {
                               : 'Connect wallet'}
                           </Text>
                         </Box>
-                        {!strategy.settings.isTransactionHistDisabled && (
-                          <Tooltip
-                            label={
-                              !strategy?.isRetired() && 'Life time earnings'
-                            }
-                          >
-                            <Box>
-                              <Text textAlign={'right'} fontWeight={'none'}>
-                                <b>Net earnings</b>
-                              </Text>
-                              <Text
-                                textAlign={'right'}
-                                color={profit >= 0 ? 'cyan' : 'red'}
-                              >
-                                {address &&
-                                profit !== 0 &&
-                                !strategy?.isRetired()
-                                  ? `${profit?.toFixed(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
-                                  : '-'}
-                              </Text>
-                            </Box>
-                          </Tooltip>
-                        )}
                       </Flex>
                     )}
                   {(balData.isLoading || !balData.data?.tokenInfo) && (
@@ -359,27 +312,65 @@ const Strategy = ({ params }: StrategyParams) => {
                       </Alert>
                     )}
                 </Box>
-                {strategy?.isRetired() && (
-                  <Alert
-                    fontSize={'14px'}
-                    color={'light_grey'}
-                    borderRadius={'10px'}
-                    bg="color2_50p"
-                    paddingY={'10px'}
-                    px={'14px'}
-                    mt={'5'}
-                  >
-                    <AlertIcon />
-
-                    <Text>
-                      This strategy is retired due to zkLend exploit. You can
-                      recover your partial funds from{' '}
-                      <Link href="/recovery" color={'white'}>
-                        here.
-                      </Link>
+                <Box display={{ base: 'block', md: 'flex' }} marginTop={'20px'}>
+                  <Box width={{ base: '100%', md: '100%' }}>
+                    <Text
+                      fontSize={'20px'}
+                      marginBottom={'0px'}
+                      fontWeight={'bold'}
+                    >
+                      How does it work?
                     </Text>
-                  </Alert>
-                )}
+                    <Box
+                      color="light_grey"
+                      marginBottom="5px"
+                      fontSize={'14px'}
+                    >
+                      {strategy.description}
+                    </Box>
+                    <Wrap>
+                      {getUniqueById(
+                        strategy.actions.map((p) => ({
+                          id: p.pool.protocol.name,
+                          logo: p.pool.protocol.logo,
+                        })),
+                      ).map((p) => (
+                        <WrapItem marginRight={'10px'} key={p.id}>
+                          <Center>
+                            <Avatar
+                              size="2xs"
+                              bg={'black'}
+                              src={p.logo}
+                              marginRight={'2px'}
+                            />
+                            <Text marginTop={'2px'}>{p.id}</Text>
+                          </Center>
+                        </WrapItem>
+                      ))}
+                    </Wrap>
+                  </Box>
+                </Box>
+                {/*{strategy?.isRetired() && (*/}
+                {/*  <Alert*/}
+                {/*    fontSize={'14px'}*/}
+                {/*    color={'light_grey'}*/}
+                {/*    borderRadius={'10px'}*/}
+                {/*    bg="color2_50p"*/}
+                {/*    paddingY={'10px'}*/}
+                {/*    px={'14px'}*/}
+                {/*    mt={'5'}*/}
+                {/*  >*/}
+                {/*    <AlertIcon />*/}
+
+                {/*    <Text>*/}
+                {/*      This strategy is retired due to zkLend exploit. You can*/}
+                {/*      recover your partial funds from{' '}*/}
+                {/*      <Link href="/recovery" color={'white'}>*/}
+                {/*        here.*/}
+                {/*      </Link>*/}
+                {/*    </Text>*/}
+                {/*  </Alert>*/}
+                {/*)}*/}
               </Card>
             </GridItem>
 
@@ -395,7 +386,7 @@ const Strategy = ({ params }: StrategyParams) => {
           </Grid>
 
           {!isMobile && (
-            <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
+            <Card width={'100%'} color="white" bg="#171717" padding={'15px'}>
               <Text fontSize={'20px'} marginBottom={'0px'} fontWeight={'bold'}>
                 Behind the scenes
               </Text>

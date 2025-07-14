@@ -2,9 +2,11 @@
 
 import Strategies from '@/components/Strategies';
 import TVL from '@/components/TVL';
+import arrow from '@public/arrow_left.png';
 
 import {
   Container,
+  Image,
   Tab,
   TabIndicator,
   TabList,
@@ -73,23 +75,36 @@ export default function Home() {
         <TabList>
           <Tab
             color="light_grey"
-            _selected={{ color: 'purple' }}
+            _selected={{ color: '#FFF' }}
             onClick={() => {
               mixpanel.track('Strategies opened');
             }}
           >
-            Strategies
+            <Container
+              width="100%"
+              display={'flex'}
+              alignItems={'center'}
+              padding={'8px 28px'}
+            >
+              <p>STRATEGIES</p>
+              <Image
+                src={arrow.src}
+                alt="logo"
+                height="13px"
+                marginLeft={'30px'}
+                marginBottom={'2px'}
+              />
+            </Container>
           </Tab>
         </TabList>
         <TabIndicator
-          mt="-1.5px"
-          height="2px"
-          bg="purple"
-          color="color1"
+          // mt="-1.5px"
+          height="3px"
+          bg="linear-gradient(to right, #2E45D0, #B1525C)"
           borderRadius="1px"
         />
         <TabPanels>
-          <TabPanel bg="highlight" float={'left'} width={'100%'}>
+          <TabPanel bg="#171717" float={'left'} width={'100%'}>
             <Strategies />
           </TabPanel>
         </TabPanels>

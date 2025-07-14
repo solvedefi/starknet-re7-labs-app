@@ -42,21 +42,35 @@ export default function Strategies() {
   }, [_filteredPools, currentPage]);
 
   return (
-    <Container width="100%" float={'left'} padding={'0px'} marginTop={'0px'}>
-      <Text color="color2Text" fontSize={'15px'}>
-        <b>What are strategies?</b>
-      </Text>
-      <Text color="color2Text" fontSize={'15px'} marginBottom={'15px'}>
-        Strategies are a combination of investment steps that combine various
-        pools to maximize yield.
-      </Text>
+    <Container width="100%" float={'left'} padding={'0px'}>
+      <Container width="100%" float={'left'} padding={'24px 30px 12px 32px'}>
+        <Text color="#FFF" fontSize={'18px'} padding={'5px 0px'}>
+          <b>What are strategies?</b>
+        </Text>
+        <Text
+          color="#FFF"
+          fontSize={'15px'}
+          marginBottom={'15px'}
+          padding={'2px 0px'}
+        >
+          Strategies are a combination of investment steps that combine various
+          pools to maximize yield.
+        </Text>
+      </Container>
       <Table variant="simple">
         <Thead display={{ base: 'none', md: 'table-header-group' }}>
-          <Tr fontSize={'18px'} color={'white'} bg="bg">
-            <Th>Strategy name</Th>
+          <Tr
+            fontSize={'15px'}
+            color={'#8A9B9B'}
+            bg="#131313"
+            borderRadius="15px"
+            borderBottom={'10px solid #131313 !important'}
+          >
+            <Th borderLeft={'10px solid #131313 !important'}>Strategy name</Th>
             <Th textAlign={'right'}>APY</Th>
             {/* <Th textAlign={'right'}>Risk</Th> */}
             <Th textAlign={'right'}>TVL</Th>
+            <Th borderRight={'10px solid #131313 !important'}></Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -79,15 +93,18 @@ export default function Strategies() {
           <Skeleton height="70px" />
         </Stack>
       )}
-      <Text
-        color="color2"
-        textAlign={'center'}
-        width={'100%'}
-        margin="15px 0"
-        fontSize="18px"
-      >
-        More strategies coming soon.
-      </Text>
+      <Container width="100%" float={'left'} padding={'16px 27px'}>
+        <Text
+          color="#FFF"
+          textAlign={'center'}
+          width={'100%'}
+          margin="15px 0"
+          padding="2px 0px"
+          fontSize="13px"
+        >
+          More strategies coming soon.
+        </Text>
+      </Container>
     </Container>
   );
 }

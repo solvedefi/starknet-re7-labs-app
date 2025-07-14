@@ -3,27 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: #212121;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --foreground-rgb: #212121;
   }
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: #212121;
 }
 
 @layer utilities {
@@ -175,14 +166,30 @@ body {
 
 td,
 th {
-  border-color: var(--chakra-colors-bg) !important;
   vertical-align: top;
+  padding: 16px 27px !important;
 }
 
 th {
-  color: var(--chakra-colors-color2Text) !important;
+  color: #8A9B9B !important;
+  padding: 21px 20px !important;
+  background: #131313;
+  border-radius: 10px;
 }
 
 .orange {
   color: orange;
+}
+
+.react-flow__node {
+  /*position: relative !important;*/
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.react-flow__node-default {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
 }

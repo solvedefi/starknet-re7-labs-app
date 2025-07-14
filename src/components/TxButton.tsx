@@ -42,9 +42,9 @@ export default function TxButton(props: TxButtonProps) {
   const referralCode = useAtomValue(referralCodeAtom);
 
   const disabledStyle = {
-    bg: 'var(--chakra-colors-disabled_bg)',
-    color: 'var(--chakra-colors-disabled_text)',
-    borderColor: 'var(--chakra-colors-disabled_bg)',
+    bg: '#2F2F2F',
+    color: '#9A9393',
+    borderColor: '#2F2F2F',
     borderWidth: '1px',
   };
 
@@ -134,6 +134,7 @@ export default function TxButton(props: TxButtonProps) {
         }}
         isDisabled={true}
         width={'100%'}
+        height={'60px'}
         {...props.buttonProps}
       >
         {disabledText}
@@ -145,14 +146,14 @@ export default function TxButton(props: TxButtonProps) {
     <>
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
-        <ModalContent borderRadius=".5rem" maxW="32rem">
+        <ModalContent borderRadius="5px" maxW="32rem">
           <ModalCloseButton color="white" />
           <ModalBody
-            backgroundColor={'var(--chakra-colors-highlight)'}
+            backgroundColor={'#171717'}
             pt="4rem"
             pb="3rem"
-            border="1px solid var(--chakra-colors-color2_65p)"
-            borderRadius=".5rem"
+            border="#363636"
+            borderRadius="15px"
             color="white"
             display="flex"
             alignItems="center"
@@ -215,14 +216,16 @@ export default function TxButton(props: TxButtonProps) {
       <Box width={'100%'} textAlign={'center'}>
         <Button
           color={'white'}
-          bg="purple"
+          bg="linear-gradient(to right, #2E45D0, #B1525C)"
           variant={'ghost'}
+          height={'60px'}
           width={'100%'}
+          marginTop={'20px'}
           _active={{
-            bg: 'var(--chakra-colors-color2)',
+            bg: 'linear-gradient(to right, #2E45D0, #B1525C)',
           }}
           _hover={{
-            bg: 'var(--chakra-colors-color2)',
+            bg: 'linear-gradient(to right, #2E45D0, #B1525C)',
           }}
           onClick={async () => {
             mixpanel.track('Click strategy button', {

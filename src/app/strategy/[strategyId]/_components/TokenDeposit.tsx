@@ -2,8 +2,8 @@ import Deposit from '@/components/Deposit';
 import { StrategyInfo } from '@/store/strategies.atoms';
 import {
   Alert,
-  AlertIcon,
   Card,
+  Image,
   Tab,
   TabIndicator,
   TabList,
@@ -13,6 +13,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { useState } from 'react';
+import info from '@public/info.png';
 
 interface TokenDepositProps {
   strategy: StrategyInfo<any>;
@@ -23,7 +24,7 @@ export function TokenDeposit(props: TokenDepositProps) {
   const [tabIndex, setTabIndex] = useState(0);
   const { strategy } = props;
   return (
-    <Card width="100%" padding={'15px'} color="white" bg="highlight">
+    <Card width="100%" padding={'15px'} color="white" bg="#212121">
       <Tabs
         position="relative"
         variant="unstyled"
@@ -34,37 +35,43 @@ export function TokenDeposit(props: TokenDepositProps) {
       >
         <TabList>
           <Tab
-            color="light_grey"
-            _selected={{ color: 'purple' }}
+            color="#5C5959"
+            paddingLeft={'0px'}
+            marginRight={'20px'}
+            fontSize={'12px'}
+            _selected={{ color: '#FFF' }}
             onClick={() => {
               // mixpanel.track('All pools clicked')
             }}
           >
-            Deposit
+            DEPOSIT
           </Tab>
           <Tab
-            color="light_grey"
-            _selected={{ color: 'purple' }}
+            color="#5C5959"
+            paddingLeft={'0px'}
+            fontSize={'12px'}
+            _selected={{ color: '#FFF' }}
             onClick={() => {
               // mixpanel.track('Strategies opened')
             }}
           >
-            Withdraw
+            WITHDRAW
           </Tab>
         </TabList>
         <TabIndicator
           mt="-1.5px"
           height="2px"
-          bg="purple"
-          color="color1"
+          bg="linear-gradient(to right, #2E45D0, #B1525C)"
+          color="#5C5959"
           borderRadius="1px"
         />
         <TabPanels>
           <TabPanel
-            bg="highlight"
+            bg="#212121"
             float={'left'}
             width={'100%'}
             padding={'10px 0'}
+            marginTop={'20px'}
           >
             {tabIndex == 0 && (
               <>
@@ -82,13 +89,19 @@ export function TokenDeposit(props: TokenDepositProps) {
                         <Alert
                           status={alert.type}
                           fontSize={'12px'}
-                          color={'light_grey'}
+                          color={'#8E8E8E'}
                           borderRadius={'10px'}
-                          bg="color2_50p"
+                          bg="#2D2D2D"
                           padding={'10px'}
                           key={index}
                         >
-                          <AlertIcon />
+                          <Image
+                            src={info.src}
+                            alt="info icon"
+                            width={'15px'}
+                            height={'15px'}
+                            marginRight={'15px'}
+                          />
                           {alert.text}
                         </Alert>
                       ))}
@@ -98,10 +111,11 @@ export function TokenDeposit(props: TokenDepositProps) {
             )}
           </TabPanel>
           <TabPanel
-            bg="highlight"
+            bg="#212121"
             width={'100%'}
             float={'left'}
             padding={'10px 0'}
+            marginTop={'20px'}
           >
             {tabIndex == 1 && (
               <>
@@ -119,13 +133,19 @@ export function TokenDeposit(props: TokenDepositProps) {
                         <Alert
                           status={alert.type}
                           fontSize={'12px'}
-                          color={'light_grey'}
+                          color={'#8E8E8E'}
                           borderRadius={'10px'}
-                          bg="color2_50p"
+                          bg="#2D2D2D"
                           padding={'10px'}
                           key={index}
                         >
-                          <AlertIcon />
+                          <Image
+                            src={info.src}
+                            alt="info icon"
+                            width={'15px'}
+                            height={'15px'}
+                            marginRight={'15px'}
+                          />
                           {alert.text}
                         </Alert>
                       ))}

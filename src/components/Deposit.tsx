@@ -387,8 +387,10 @@ function InternalDeposit(props: DepositProps) {
             </Text>
           </Flex>
           <Progress
-            colorScheme="gray"
-            bg="bg"
+            colorScheme="grey"
+            bg="linear-gradient(to right, #2E45D0, #B1525C)"
+            borderRadius={'5px'}
+            marginTop={'5px'}
             value={
               (100 *
                 (Number(tvlInfo.data?.amounts[0].amount.toFixed(2)) ||

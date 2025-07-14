@@ -19,9 +19,10 @@ import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { RpcProviderOptions, constants } from 'starknet';
 
-import { Inter } from 'next/font/google';
+import { IBM_Plex_Mono } from 'next/font/google';
 import { isMobile } from 'react-device-detect';
-const inter = Inter({ subsets: ['latin'] });
+const ibmPlexMonoHeader = IBM_Plex_Mono({ subsets: ['latin'], weight: '700' });
+const ibmPlexMonoMain = IBM_Plex_Mono({ subsets: ['latin'], weight: '500' });
 
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
 
@@ -70,8 +71,8 @@ const theme = extendTheme({
     },
   },
   fonts: {
-    heading: inter.style.fontFamily,
-    body: inter.style.fontFamily,
+    heading: ibmPlexMonoHeader.style.fontFamily,
+    body: ibmPlexMonoMain.style.fontFamily,
   },
 });
 
@@ -112,9 +113,14 @@ export default function Template({ children }: { children: React.ReactNode }) {
         connectors={getConnectors(isMobile)}
       >
         <ChakraBaseProvider theme={theme}>
-          <Flex minHeight={'100vh'} bgColor={'bg'}>
+          <Flex minHeight={'100vh'} bgColor={'#171717'}>
             <React.Suspense>
-              <Container width={'100%'} padding="0px" paddingTop="100px">
+              <Container
+                width={'100%'}
+                padding="0px"
+                paddingTop="100px"
+                display={'block'}
+              >
                 <Navbar
                   hideTg={pathname.includes('slinks')}
                   forceShowConnect={pathname.includes('slinks')}

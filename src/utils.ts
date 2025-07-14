@@ -74,17 +74,18 @@ export function standariseAddress(address: string | bigint) {
 }
 
 export const MyMenuListProps: MenuListProps = {
-  bg: 'highlight',
+  bg: '#2F2F2F',
   color: 'white',
   borderColor: 'bg',
-  padding: 0,
+  padding: '0px 16px',
+  textAlign: 'center',
+  minWidth: '120px',
+  // borderRadius: '146px'
 };
 
 export const MyMenuItemProps: MenuItemProps = {
-  bg: 'highlight',
-  _hover: {
-    bg: 'bg',
-  },
+  bg: '#2F2F2F',
+  textAlign: 'center',
 };
 
 export function getTokenInfoFromAddr(tokenAddr: string) {

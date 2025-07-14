@@ -33,6 +33,7 @@ import mixpanel from 'mixpanel-browser';
 import { useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 import { FaWallet } from 'react-icons/fa';
+import arrow from '@public/arrow_left.png';
 
 export interface YieldCardProps {
   pool: PoolInfo;
@@ -170,7 +171,7 @@ function StrategyAPY(props: YieldCardProps) {
   }, [pool]);
 
   return (
-    <Box width={'100%'} marginBottom={'5px'}>
+    <Box width={'100%'} marginBottom={'5px'} alignItems={'center'}>
       {isRetired ? (
         <Text ml="auto" w="fit-content" mr="6">
           -
@@ -499,20 +500,22 @@ export default function YieldCard(props: YieldCardProps) {
     <>
       <Tr
         color={'white'}
-        bg={getStratCardBg(pool.additional.tags[0], index)}
-        borderBottom={'1px solid #313144 !important'}
+        bg="#212121"
+        borderBottom={'10px solid #131313 !important'}
+        borderRadius="9px"
+        backgroundClip="padding-box"
         display={{ base: 'none', md: 'table-row' }}
         as={'a'}
         {...getLinkProps(pool, props.showProtocolName)}
       >
-        <Td>
+        <Td borderLeft={'10px solid #131313 !important'}>
           <StrategyInfo
             pool={pool}
             index={index}
             showProtocolName={props.showProtocolName}
           />
         </Td>
-        <Td>
+        <Td alignContent={'center'}>
           {isRetired ? (
             <Text ml="auto" w="fit-content" mr="2">
               -
@@ -532,7 +535,7 @@ export default function YieldCard(props: YieldCardProps) {
             '-'
           )}
         </Td> */}
-        <Td>
+        <Td alignContent={'center'}>
           {isRetired ? (
             <Text ml="auto" w="fit-content" mr="2">
               -
@@ -540,6 +543,19 @@ export default function YieldCard(props: YieldCardProps) {
           ) : (
             <StrategyTVL pool={pool} index={index} />
           )}
+        </Td>
+        <Td
+          alignContent={'center'}
+          width={'70px'}
+          borderRight={'10px solid #131313 !important'}
+        >
+          <Image
+            src={arrow.src}
+            alt="logo"
+            height="13px"
+            width="9px"
+            marginBottom={'2px'}
+          />
         </Td>
       </Tr>
       <StrategyMobileCard

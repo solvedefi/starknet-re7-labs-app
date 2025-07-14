@@ -1,15 +1,19 @@
 import { dAppStatsAtom, userStatsAtom } from '@/store/utils.atoms';
 import {
   Card,
+  Container,
   Grid,
   GridItem,
+  Image,
   Spinner,
   Stat,
   StatLabel,
   StatNumber,
+  Text,
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
 import React from 'react';
+import chart from '@public/chart.png';
 
 const TVL: React.FC = () => {
   const { data, isPending } = useAtomValue(dAppStatsAtom);
@@ -33,9 +37,30 @@ const TVL: React.FC = () => {
       marginTop="40px"
     >
       <GridItem display="flex">
-        <Card width="100%" padding={'15px 30px'} color="white" bg="color2_50p">
+        <Card
+          width="100%"
+          padding={'25px 43px'}
+          color="#FFFFFF"
+          bg="#1D1D1D"
+          borderRadius="15px"
+        >
           <Stat>
-            <StatLabel>Total Value locked (TVL)</StatLabel>
+            <StatLabel>
+              <Container
+                display={'flex'}
+                alignItems="center"
+                justifyContent={'space-between'}
+                padding={'0px'}
+              >
+                <Text marginTop={'3px'}>Total Value locked (TVL)</Text>
+                <Image
+                  src={chart.src}
+                  alt="pfp"
+                  width={{ base: '13px', sm: '15px' }}
+                  height={{ base: '13px', sm: '15px' }}
+                />
+              </Container>
+            </StatLabel>
             <StatNumber>
               $
               {isPending ? (
@@ -51,9 +76,30 @@ const TVL: React.FC = () => {
       </GridItem>
 
       <GridItem display="flex">
-        <Card width="100%" padding={'15px 30px'} color="white" bg="color2_50p">
+        <Card
+          width="100%"
+          padding={'25px 43px'}
+          color="#FFFFFF"
+          bg="#1D1D1D"
+          borderRadius="15px"
+        >
           <Stat>
-            <StatLabel>Your holdings</StatLabel>
+            <StatLabel>
+              <Container
+                display={'flex'}
+                alignItems="center"
+                justifyContent={'space-between'}
+                padding={'0px'}
+              >
+                <Text marginTop={'3px'}>Total Position Value</Text>
+                <Image
+                  src={chart.src}
+                  alt="pfp"
+                  width={{ base: '13px', sm: '15px' }}
+                  height={{ base: '13px', sm: '15px' }}
+                />
+              </Container>
+            </StatLabel>
             <StatNumber>
               $
               {userStatsPending ? (

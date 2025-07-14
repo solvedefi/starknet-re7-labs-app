@@ -13,9 +13,6 @@ import {
   NumberInput,
   NumberInputField,
   Image as ImageC,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
   Button,
   Tooltip,
   Grid,
@@ -305,7 +302,7 @@ const AmountInput = forwardRef(
 
       return (
         <Box color={'light_grey'} textAlign={'right'}>
-          <Text>Available balance </Text>
+          <Text fontSize={'12px'}>Available balance </Text>
           <LoadingWrap
             isLoading={isLoading}
             isError={balData.isError}
@@ -322,30 +319,38 @@ const AmountInput = forwardRef(
             }}
           >
             <Tooltip label={balance.toEtherStr()}>
-              <b style={{ marginLeft: '5px' }}>
+              <b
+                style={{
+                  marginLeft: '5px',
+                  fontSize: '12px',
+                  fontWeight: '400',
+                }}
+              >
                 {balance.toEtherToFixedDecimals(4)}
               </b>
             </Tooltip>
             <Button
               size={'sm'}
-              marginLeft={'5px'}
-              color="color2"
-              bg="highlight"
-              padding="0"
-              maxHeight={'25px'}
+              marginLeft={'15px'}
+              color="#FFF"
+              bg="#323232"
+              padding="3px 12px"
+              maxHeight={'21px'}
+              fontSize={'12px'}
+              fontWeight={'400'}
               _hover={{
-                bg: 'highlight',
-                color: 'color_50p',
+                bg: '#323232',
+                color: '#FFF',
               }}
               _active={{
-                bg: 'highlight',
-                color: 'color_50p',
+                bg: '#323232',
+                color: '#FFF',
               }}
               onClick={handleMaxClick}
               isDisabled={isLoading || balData.isError}
               aria-label="Set maximum amount"
             >
-              [Max]
+              Max
             </Button>
           </LoadingWrap>
         </Box>
@@ -474,12 +479,13 @@ const AmountInput = forwardRef(
                 as={Button}
                 height={'100%'}
                 rightIcon={<ChevronDownIcon />}
-                bgColor={'highlight'}
-                borderColor={'bg'}
+                bgColor={'#212121'}
+                borderColor={'#363636'}
                 borderWidth={'1px'}
-                color="color2"
+                borderRadius={'46px'}
+                color="#FFF"
                 _hover={{
-                  bg: 'bg',
+                  bg: '#212121',
                 }}
               >
                 <Center>
@@ -487,7 +493,7 @@ const AmountInput = forwardRef(
                     src={props.tokenInfo.logo}
                     alt={props.tokenInfo.symbol}
                     width={'20px'}
-                    marginRight="5px"
+                    marginRight="20px"
                   />
                   {props.tokenInfo.symbol}
                 </Center>
@@ -497,6 +503,8 @@ const AmountInput = forwardRef(
                   <MenuItem
                     key={token.symbol}
                     {...MyMenuItemProps}
+                    borderRadius={'9px'}
+                    width={'120px'}
                     onClick={() => {
                       if (selectedMarket.name !== token.symbol) {
                         setSelectedMarket(token);
@@ -510,12 +518,12 @@ const AmountInput = forwardRef(
                       }
                     }}
                   >
-                    <Center>
+                    <Center padding={'5px 0px'}>
                       <ImageC
                         src={token.logo}
                         alt={token.symbol}
                         width={'20px'}
-                        marginRight="5px"
+                        marginRight="20px"
                       />
                       {token.symbol}
                     </Center>
@@ -537,9 +545,10 @@ const AmountInput = forwardRef(
         <NumberInput
           min={0}
           max={parseFloat(maxAmount.toEtherStr())}
-          color={'white'}
-          bg={'bg'}
+          color={'#FFF'}
+          bg={'#1A1919'}
           borderRadius={'10px'}
+          height={'60px'}
           onChange={(valueStr, n) => {
             const newAmount =
               valueStr && Number(valueStr) > 0
@@ -558,7 +567,7 @@ const AmountInput = forwardRef(
             });
             handleDebouncedChange(newAmount, valueStr, inputsInfo, depositInfo);
           }}
-          marginTop={'10px'}
+          marginTop={'20px'}
           keepWithinRange={false}
           clampValueOnBlur={false}
           value={inputInfo.rawAmount}
@@ -566,13 +575,10 @@ const AmountInput = forwardRef(
         >
           <NumberInputField
             border={'0px'}
+            height={'60px'}
             borderRadius={'10px'}
             placeholder="Amount"
           />
-          <NumberInputStepper>
-            <NumberIncrementStepper color={'white'} border={'0px'} />
-            <NumberDecrementStepper color={'white'} border={'0px'} />
-          </NumberInputStepper>
         </NumberInput>
 
         {/* Validation error messages */}

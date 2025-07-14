@@ -1,0 +1,21 @@
+.border {
+  position: relative;
+  padding: 5px;
+  border-radius: 15px;
+  background:
+    linear-gradient(#1A1919, #1A1919) padding-box,
+    linear-gradient(to right, #2E45D0, #B1525C) border-box;
+  border: 2px solid transparent;
+}
+
+
+.border_alt {
+  position: relative;
+  padding: 5px;
+  border-radius: 15px;
+  background:
+    linear-gradient(#1A1919, #1A1919) padding-box,
+    linear-gradient(to right, #372C57, #B1525C) border-box;
+  border: 2px solid transparent;
+  padding: 16px 21px;
+}

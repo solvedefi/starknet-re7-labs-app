@@ -82,7 +82,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
     const token0Info = getTokenInfoFromName(strategy.depositTokens[0].symbol);
     const token1Info = getTokenInfoFromName(strategy.depositTokens[1].symbol);
     super(
-      `ekubo_cl_${strategy.name.split(' ')[2].toLowerCase().replaceAll('/', '')}`,
+      `ekubo_cl_${strategy.name.toLowerCase().replaceAll('/', '')}`,
       name,
       name,
       description,

@@ -5,7 +5,6 @@ import {
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
-  MarkerType,
 } from '@xyflow/react';
 import Dagre from '@dagrejs/dagre';
 import STRKFarmAtoms, {
@@ -189,17 +188,17 @@ function getNodesAndEdges(
         source: parent.id,
         target: _node.id,
         animated: false,
-        type: 'smoothstep',
-        style: {
-          stroke: 'linear-gradient(to right, #2E45D0, #B1525C)',
-          strokeWidth: 2,
-        },
-        marketEnd: {
-          type: MarkerType.ArrowClosed,
-          width: 20,
-          height: 20,
-          color: '#B1525C',
-        },
+        // type: 'smoothstep',
+        // style: {
+        //   stroke: 'linear-gradient(to right, #2E45D0, #B1525C)',
+        //   strokeWidth: 2,
+        // },
+        // marketEnd: {
+        //   type: MarkerType.ArrowClosed,
+        //   width: 20,
+        //   height: 20,
+        //   color: '#B1525C',
+        // },
       });
     }
     const { nodes: _nodes, edges: _edges } = getNodesAndEdges(

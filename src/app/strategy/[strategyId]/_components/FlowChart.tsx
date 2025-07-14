@@ -188,7 +188,6 @@ function getNodesAndEdges(
         source: parent.id,
         target: _node.id,
         animated: false,
-        type: 'smoothstep',
         style: {
           stroke: 'linear-gradient(to right, #2E45D0, #B1525C)',
           strokeWidth: 2,

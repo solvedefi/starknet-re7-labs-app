@@ -201,7 +201,7 @@ const Strategy = ({ params }: StrategyParams) => {
                   marginLeft={'55px'}
                   marginBottom={'20px'}
                 >
-                  By Rekubo
+                  Deployed on Ekubo
                 </Text>
                 {!strategy?.isRetired() && (
                   <HarvestTime strategy={strategy} balData={balData} />
@@ -220,7 +220,7 @@ const Strategy = ({ params }: StrategyParams) => {
                           width={'100%'}
                         >
                           <Text>
-                            <b>Total Position Value </b>
+                            <b>Your Total Position Value </b>
                           </Text>
                           <Text>
                             {address

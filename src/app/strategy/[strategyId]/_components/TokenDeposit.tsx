@@ -1,4 +1,5 @@
 import Deposit from '@/components/Deposit';
+import Redeem from '@/components/Redeem';
 import { StrategyInfo } from '@/store/strategies.atoms';
 import {
   Alert,
@@ -119,7 +120,7 @@ export function TokenDeposit(props: TokenDepositProps) {
           >
             {tabIndex == 1 && (
               <>
-                <Deposit
+                <Redeem
                   strategy={strategy}
                   buttonText="Redeem"
                   callsInfo={strategy.withdrawMethods}

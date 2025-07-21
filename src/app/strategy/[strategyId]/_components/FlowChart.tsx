@@ -1,5 +1,7 @@
 import React, { ReactNode, useEffect, useMemo } from 'react';
 import {
+  Handle,
+  MarkerType,
   Position,
   ReactFlow,
   ReactFlowProvider,
@@ -30,10 +32,13 @@ const boxStyle = {
 const getLayoutedElements = (nodes: any[], edges: any[]) => {
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
   g.setGraph({
-    ranker: 'network-simplex',
+    // ranker: 'network-simplex',
     rankdir: 'TB',
-    nodesep: 100, // Set to 100px as requested
+    nodesep: 100,
     ranksep: 100,
+    marginx: 50,
+    marginy: 50,
+    align: 'DR',
   });
 
   edges.forEach((edge) => g.setEdge(edge.source, edge.target));
@@ -49,8 +54,7 @@ const getLayoutedElements = (nodes: any[], edges: any[]) => {
 
   // Custom positioning logic - all nodes in one column
   const newNodes = nodes.map((node, index) => {
-    console.log('Node width', node.position);
-    const baseX = 200;
+    const baseX = 150;
     const baseY = 50;
     let x = 0;
     let y = 0;
@@ -74,53 +78,6 @@ const getLayoutedElements = (nodes: any[], edges: any[]) => {
   return { nodes: newNodes, edges };
 };
 
-// const elk = new ELK();
-
-// const useLayoutedElements = (options: any) => {
-//   const { getNodes, setNodes, getEdges, fitView } = useReactFlow();
-//   console.log('nodes2')
-//   const defaultOptions = {
-//     "elk.algorithm": "org.eclipse.elk.rectpacking",
-//     "elk.padding": "[top=20, left=20, bottom=20, right=20]",
-//     "elk.spacing.nodeNode": "30",  // Increase spacing to prevent overlap
-//     "elk.spacing.edgeNode": "20",  // Avoid edges covering nodes
-
-//     // 'elk.algorithm': 'layered',
-//     // 'elk.layered.spacing.nodeNodeBetweenLayers': 30,
-//     // 'elk.spacing.nodeNode': 30,
-//     // "elk.layered.spacing.nodeNode": 30
-//   };
-
-//   const layoutOptions = { ...defaultOptions, ...options };
-//   const graph: any = {
-//     id: 'root',
-//     layoutOptions: layoutOptions,
-//     children: getNodes().map((node) => ({
-//       ...node,
-//       width: node.measured?.width || 0,
-//       height: node.measured?.height || 0,
-//       // layoutOptions: { "elk.layered.layerConstraint": "same" }
-//     })),
-//     edges: getEdges(),
-//   };
-
-//   console.log('nodes2', graph)
-//   elk.layout(graph).then(({ children }) => {
-//     console.log('nodes3', children)
-//     // By mutating the children in-place we saves ourselves from creating a
-//     // needless copy of the nodes array.
-//     children?.forEach((node) => {
-//       node.position = { x: node.x, y: node.y };
-//     });
-
-//     setNodes(children || []);
-//     window.requestAnimationFrame(() => {
-//       fitView();
-//     });
-//   });
-
-// };
-
 interface FlowChartProps {
   strategyId: string;
 }
@@ -133,6 +90,7 @@ interface FlowNode {
   level: number;
   targetPosition?: Position;
   sourcePosition?: Position;
+  connectable: boolean;
 }
 
 interface FlowEdge {
@@ -140,6 +98,9 @@ interface FlowEdge {
   source: string;
   target: string;
   animated: boolean;
+  type: string;
+  style: any;
+  marketEnd: any;
 }
 
 function getNodesAndEdges(
@@ -152,12 +113,65 @@ function getNodesAndEdges(
   for (const flow of investmentFlows) {
     const reactElement = (
       <div
-        style={{ alignItems: 'center', textAlign: 'end', fontWeight: '300' }}
+        style={{
+          position: 'relative',
+          padding: '10px',
+          borderRadius: '25px',
+          background: flow.title.includes('/')
+            ? `
+            linear-gradient(#1A1A1A, #1A1A1A) padding-box,
+            linear-gradient(to right, #2E45D0, #B1525C) border-box
+          `
+            : `
+            linear-gradient(#1A1A1A, #1A1A1A) padding-box,
+            linear-gradient(to right, #372C57, #B1525C) border-box
+          `,
+          border: '2px dashed transparent',
+          color: 'white',
+          fontSize: '12px',
+          minHeight: '120px',
+          width: '100%',
+          height: '100%',
+          alignItems: 'end',
+          textAlign: 'end',
+          fontWeight: '300',
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'right',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+        }}
       >
-        <b style={{ fontWeight: '700', margin: '10px' }}>{flow.title}</b>
+        <Handle
+          type="source"
+          position={flow.title.includes('/') ? Position.Left : Position.Right}
+          style={{
+            background: flow.title.includes('/') ? '#B1525C' : '#2E45D0',
+            border: '2px solid #1A2B8A',
+            width: '10px',
+            height: '2px',
+            zIndex: 10,
+          }}
+        />
+
+        <b
+          style={{ fontWeight: '700', marginTop: '20px', marginRight: '20px' }}
+        >
+          {flow.title}
+        </b>
         {flow.subItems.map((item) => (
-          <div key={item.key}>
-            {item.key} <b style={{ fontWeight: '700' }}>{item.value}</b>
+          <div key={item.key} style={{ height: '100%' }}>
+            {item.key}{' '}
+            <b
+              style={{
+                fontWeight: '700',
+                marginTop: '20px',
+                marginRight: '20px',
+              }}
+            >
+              {item.value}
+            </b>
           </div>
         ))}
       </div>
@@ -173,6 +187,9 @@ function getNodesAndEdges(
       data: { label: reactElement },
       style,
       level,
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+      connectable: false,
     };
     if (flow.linkedFlows.length) {
       _node.sourcePosition = Position.Right;
@@ -182,23 +199,22 @@ function getNodesAndEdges(
     }
     nodes.push(_node);
     if (parent) {
-      // @ts-ignore
       edges.push({
         id: `e${parent.id}-${_node.id}`,
         source: parent.id,
         target: _node.id,
         animated: false,
-        // type: 'smoothstep',
-        // style: {
-        //   stroke: 'linear-gradient(to right, #2E45D0, #B1525C)',
-        //   strokeWidth: 2,
-        // },
-        // marketEnd: {
-        //   type: MarkerType.ArrowClosed,
-        //   width: 20,
-        //   height: 20,
-        //   color: '#B1525C',
-        // },
+        type: 'smoothstep',
+        style: {
+          stroke: 'url(#gradient-edge)',
+          strokeWidth: 2,
+        },
+        marketEnd: {
+          type: MarkerType.ArrowClosed,
+          width: 20,
+          height: 20,
+          color: '#B1525C',
+        },
       });
     }
     const { nodes: _nodes, edges: _edges } = getNodesAndEdges(
@@ -254,15 +270,15 @@ function InternalFlowChart(props: FlowChartProps) {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          // minZoom={1}
-          // maxZoom={1}
-          // nodesDraggable={false}
+          minZoom={1}
+          maxZoom={1}
+          nodesDraggable={false}
           nodesConnectable={false}
-          // elementsSelectable={false}
-          // panOnScroll={false}
-          // zoomOnScroll={false}
-          // zoomOnDoubleClick={false}
-          // panOnDrag={false}
+          elementsSelectable={false}
+          panOnScroll={false}
+          zoomOnScroll={false}
+          zoomOnDoubleClick={false}
+          panOnDrag={false}
           proOptions={proOptions}
         />
       </div>
@@ -277,8 +293,20 @@ function InternalFlowChart(props: FlowChartProps) {
 
 export default function FlowChart(props: FlowChartProps) {
   return (
-    <ReactFlowProvider>
-      <InternalFlowChart {...props} />
-    </ReactFlowProvider>
+    <>
+      <svg
+        style={{ position: 'absolute', top: 0, left: 0, width: 0, height: 0 }}
+      >
+        <defs>
+          <linearGradient id="gradient-edge" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#B1525C" />
+            <stop offset="100%" stopColor="#2E45D0" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <ReactFlowProvider>
+        <InternalFlowChart {...props} />
+      </ReactFlowProvider>
+    </>
   );
 }

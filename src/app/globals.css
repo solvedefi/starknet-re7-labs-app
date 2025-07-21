@@ -181,6 +181,21 @@ th {
   color: orange;
 }
 
+.react-flow__edge-path {
+  stroke: url(#gradient-edge) !important;
+  stroke-width: 2px !important;
+}
+
+.react-flow__edge .react-flow__edge-path {
+  stroke: url(#gradient-edge) !important;
+  stroke-width: 2px !important;
+}
+
+/* Arrow marker gradient */
+.react-flow__arrowhead {
+  fill: #B1525C !important;
+}
+
 .react-flow__node {
   /*position: relative !important;*/
   padding: 0 !important;

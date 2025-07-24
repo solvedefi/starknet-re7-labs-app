@@ -1,11 +1,3 @@
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<div align="center" style="margin-top:50px">
-  <img src="https://avatars.githubusercontent.com/u/165751591?s=200&v=4" height="150">
-</div>
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end --> 
-
 # Re7 Labs
 
 Starknet Re7 Labs is a platform that allows users to better navigate DeFi on Starknet. It has the following features:  

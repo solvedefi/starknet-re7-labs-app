@@ -460,15 +460,19 @@ function InternalRedeem(props: RedeemProps) {
   }, [callsInfo, firstInputInfo.amount]);
 
   const txInfo: StrategyTxProps = useMemo(() => {
+    const tokenAddr = selectedToken?.address
+      ? typeof selectedToken.address === 'string'
+        ? selectedToken.address
+        : selectedToken.address.address
+      : props.strategy.settings.quoteToken.address.address;
+
     return {
       strategyId: props.strategy.id,
-      actionType: 'withdraw',
+      actionType: props.buttonText === 'Redeem' ? 'withdraw' : 'deposit',
       amount: investedSummary
         ? convertToMyNumber(investedSummary)
         : MyNumber.fromZero(),
-      tokenAddr:
-        selectedToken?.address ||
-        props.strategy.settings.quoteToken.address.address,
+      tokenAddr,
     };
   }, [props, investedSummary, selectedToken]);
 
@@ -665,7 +669,7 @@ function InternalRedeem(props: RedeemProps) {
               <SliderTrack bg="#323232" height="6px">
                 <SliderFilledTrack bg="linear-gradient(to right, #2E45D0, #B1525C)" />
               </SliderTrack>
-              <SliderThumb bg="#B1525C" margin={'0px 16px 0px 8px'} size={5} />
+              <SliderThumb bg="#B1525C" margin={'0px 16px 0px 8px'} />
             </Slider>
 
             {/*<Flex justify="space-between" marginTop={'5px'}>*/}

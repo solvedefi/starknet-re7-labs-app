@@ -62,7 +62,7 @@ import TncModal from './TncModal';
 export function getConnectors(isMobile: boolean) {
   const mobileConnector = ArgentMobileConnector.init({
     options: {
-      dappName: 'STRKFarm',
+      dappName: 'Re7',
       url: getEndpoint(),
       chainId: constants.NetworkName.SN_MAIN,
     },
@@ -185,11 +185,11 @@ export default function Navbar(props: NavbarProps) {
       modalTheme: 'dark',
       webWalletUrl: 'https://web.argent.xyz',
       argentMobileOptions: {
-        dappName: 'STRKFarm',
+        dappName: 'Re7',
         chainId: constants.NetworkName.SN_MAIN,
         url: getEndpoint(),
       },
-      dappName: 'STRKFarm',
+      dappName: 'Re7',
       connectors: getConnectors(isMobile) as StarknetkitConnector[],
     };
   }, [isMobile]);
@@ -231,6 +231,8 @@ export default function Navbar(props: NavbarProps) {
         mixpanel.track('wallet connect trigger', userProps);
         mixpanel.identify(standariseAddress(standardAddr));
         mixpanel.people.set(userProps);
+      } else {
+        setIsWalletConnected(false);
       }
     })();
   }, [address]);
@@ -296,23 +298,18 @@ export default function Navbar(props: NavbarProps) {
                   bg: isWalletConnected
                     ? 'linear-gradient(to right, #2E45D0, #B1525C)'
                     : '#2F2F2F',
-                  borderColor: '#2F2F2F',
-                  borderWidth: '1px',
-                  color: '#FFF',
+                  borderColor: '#FFF',
                 }}
                 _active={{
                   bg: isWalletConnected
                     ? 'linear-gradient(to right, #2E45D0, #B1525C)'
                     : '#2F2F2F',
                   borderColor: '#2F2F2F',
-                  color: '#FFF',
                 }}
-                // marginLeft={'10px'}
                 display={{ base: 'flex' }}
-                // height={{ base: '50px', sm: '64px' }}
                 my={{ base: 'auto', sm: 'initial' }}
-                paddingX={{ base: '0.5rem', sm: '25px' }}
-                paddingY={{ base: '10px', sm: '25px' }}
+                paddingX={{ base: '0.5rem', sm: '20px' }}
+                paddingY={{ base: '10px', sm: '20px' }}
                 fontSize={{ base: '0.8rem', sm: '15px' }}
                 onClick={
                   address
@@ -325,7 +322,7 @@ export default function Navbar(props: NavbarProps) {
               >
                 <Center>
                   {address ? (
-                    <Center display="flex" alignItems="center" gap=".5rem">
+                    <Flex alignItems="center" gap=".5rem">
                       <Image
                         src={active.src}
                         alt="pfp"
@@ -338,9 +335,13 @@ export default function Navbar(props: NavbarProps) {
                           ? truncate(starkProfile.name, 6, isMobile ? 0 : 6)
                           : shortAddress(address, 4, isMobile ? 0 : 4)}
                       </Text>
-                    </Center>
+                    </Flex>
                   ) : (
-                    <Center display="flex" alignItems="center" gap="40px">
+                    <Flex
+                      alignItems="center"
+                      gap={{ base: '10px', sm: '20px' }}
+                      p={2}
+                    >
                       <Text as="h3" marginTop={'3px !important'}>
                         CONNECT
                       </Text>
@@ -349,10 +350,10 @@ export default function Navbar(props: NavbarProps) {
                         alt="pfp"
                         width={{ base: '12px', sm: '18px' }}
                         height={{ base: '12px', sm: '18px' }}
-                        marginRight={'-10px'}
+                        marginRight={{ base: '-5px', sm: '-10px' }}
                         rounded="full"
                       />
-                    </Center>
+                    </Flex>
                   )}
                 </Center>
               </MenuButton>

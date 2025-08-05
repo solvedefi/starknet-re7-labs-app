@@ -291,7 +291,7 @@ export default function Navbar(props: NavbarProps) {
                     : '#2F2F2F',
                 }}
                 color="white"
-                borderColor={'#2F2F2F'}
+                borderColor="#2F2F2F"
                 borderRadius="146px"
                 borderWidth="1px"
                 _hover={{
@@ -304,7 +304,6 @@ export default function Navbar(props: NavbarProps) {
                   bg: isWalletConnected
                     ? 'linear-gradient(to right, #2E45D0, #B1525C)'
                     : '#2F2F2F',
-                  borderColor: '#2F2F2F',
                 }}
                 display={{ base: 'flex' }}
                 my={{ base: 'auto', sm: 'initial' }}

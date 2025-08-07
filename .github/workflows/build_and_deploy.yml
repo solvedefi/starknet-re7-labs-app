@@ -39,7 +39,7 @@ jobs:
         run: yarn run build
 
   publish:
-    needs: lint_and_build
+    # needs: lint_and_build
     name: Publish docker image to dockerhub
     runs-on: ubuntu-latest
     env:

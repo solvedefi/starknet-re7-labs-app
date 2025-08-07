@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Login to dockerhub
-        run:  echo $PASS | docker login -u $LOGIN --password-stdin
+        run:  echo ${{ secrets.DOCKER_PASS }} | docker login -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
 
       - name: Build image
         run: docker build -t $OWNER/$PATH_NAME:${GITHUB_REF_NAME} -f Dockerfile .

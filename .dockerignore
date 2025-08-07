@@ -4,13 +4,13 @@ node_modules
 npm-debug.log
 README.md
 .next
+.idea
 .vscode
 .git
 .github
 .gitignore
 .yarn
 next-env.d.ts
-CONTRIBUTING.md
 LICENSE
 vercel.json
 generateChangelog.js

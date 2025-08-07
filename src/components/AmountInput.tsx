@@ -304,7 +304,7 @@ const AmountInput = forwardRef(
         <Box color={'light_grey'} textAlign={'right'}>
           <Text fontSize={'12px'}>Available balance </Text>
           <LoadingWrap
-            isLoading={false}
+            isLoading={isLoading}
             isError={balData.isError}
             skeletonProps={{
               height: '10px',

@@ -18,7 +18,6 @@ The project is build using NextJS and Typescript. Below is the broad project str
 
 ## How to get started
 
-[![Pull Requests welcome](https://img.shields.io/badge/PRs-welcome-ff69b4.svg?style=flat-square)](https://github.com/solvedefi/starknet-re7-labs-app/issues)
 Requirements:
 1. Node 20+
 

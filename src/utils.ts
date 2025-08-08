@@ -204,9 +204,10 @@ export function getHosturl() {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
       // Check if hostname is an IPv4 or IPv6 address
+      // prettier-ignore
       const isIP =
-        /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || // IPv4
-        /^\[?([a-fA-F0-9:]+)\]?$/.test(hostname); // IPv6 (with or without brackets)
+        (/^(\d{1,3}\.){3}\d{1,3}$/).test(hostname) || // IPv4
+        (/^\[?([a-fA-F0-9:]+)\]?$/).test(hostname); // IPv6 (with or without brackets)
       if (isIP) return FALLBACK;
       return hostname.split('.').slice(-2).join('.');
     }

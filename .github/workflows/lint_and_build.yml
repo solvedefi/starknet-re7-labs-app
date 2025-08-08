@@ -1,0 +1,35 @@
+name: Performs linting, formatting on the application
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint_and_build:
+    name: Check linting, formatting and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the Repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install yarn
+        run: npm install -g yarn
+
+      - name: Install Dependencies
+        run: yarn --legacy-peer-deps
+
+      - name: Set env
+        run: echo "${{secrets.ENV_PROD }}" > .env.local
+
+      - name: Run linting check
+        run: yarn run lint:check
+
+      - name: Check formatting
+        run: yarn run format:check
+
+      - name: Build
+        run: yarn run build

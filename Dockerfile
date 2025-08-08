@@ -1,24 +1,10 @@
-FROM node:22 
-
-RUN corepack enable
+FROM node:22
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
-COPY ./prisma ./prisma
-RUN yarn install
-
-COPY ./src ./src
-COPY ./next.config.mjs ./next.config.mjs
-COPY ./tsconfig.json ./tsconfig.json
+COPY ./.next/ ./.next
 COPY ./public ./public
-COPY ./.env.local ./.env.local
-
-RUN yarn build
-
-
-# COPY --from=builder --chown=nextjs:nodejs /app/.next/ ./.next
-# COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-# COPY --from=builder --chown=nextjs:nodejs /app/yarn.lock ./yarn.lock
+COPY ./node_modules ./node_modules
+COPY ./package.json ./package.json
 
 EXPOSE 3000

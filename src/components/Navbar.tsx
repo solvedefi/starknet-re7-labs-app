@@ -276,7 +276,7 @@ export default function Navbar(props: NavbarProps) {
             <Image
               src={fulllogo.src}
               alt="logo"
-              height={{ base: '30px', md: '40px' }}
+              height={{ base: '40px', md: '50px' }}
             />
           </Link>
           {true && (

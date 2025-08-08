@@ -146,14 +146,11 @@ export default function TxButton(props: TxButtonProps) {
     <>
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
-        <ModalContent borderRadius="5px" maxW="32rem">
+        <ModalContent maxW="32rem" bg="#212121" borderRadius="15px">
           <ModalCloseButton color="white" />
           <ModalBody
-            backgroundColor={'#171717'}
             pt="4rem"
             pb="3rem"
-            border="#363636"
-            borderRadius="15px"
             color="white"
             display="flex"
             alignItems="center"

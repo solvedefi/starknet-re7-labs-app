@@ -347,7 +347,7 @@ const AmountInput = forwardRef(
                 color: '#FFF',
               }}
               onClick={handleMaxClick}
-              isDisabled={isLoading || balData.isError}
+              isDisabled={isLoading || balData.isError || balance.isZero()}
               aria-label="Set maximum amount"
             >
               Max
@@ -635,7 +635,7 @@ const AmountInput = forwardRef(
             color="red"
             fontSize={'13px'}
           >
-            Amount must be less than {maxAmount.toEtherToFixedDecimals(2)}
+            Amount must be less than {maxAmount.toEtherToFixedDecimals(4)}
           </Text>
         )}
       </Box>

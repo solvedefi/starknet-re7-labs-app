@@ -574,13 +574,18 @@ function InternalRedeem(props: RedeemProps) {
                     maxHeight={'21px'}
                     fontSize={'12px'}
                     fontWeight={'400'}
+                    _active={{
+                      bg: '#323232',
+                      color: '#FFF',
+                    }}
                     _hover={{
                       bg: '#323232',
                       color: '#FFF',
                     }}
                     onClick={handleMaxClick}
+                    isDisabled={balance.isZero()}
                   >
-                    MAX
+                    Max
                   </Button>
                 </LoadingWrap>
               </Box>
@@ -607,7 +612,7 @@ function InternalRedeem(props: RedeemProps) {
                   size="sm"
                   width="80px"
                   height={'42px'}
-                  isDisabled={isLoading}
+                  isDisabled={isLoading || balance.isZero()}
                   keepWithinRange={false}
                   clampValueOnBlur={false}
                 >
@@ -664,7 +669,7 @@ function InternalRedeem(props: RedeemProps) {
               min={0}
               max={100}
               step={1}
-              isDisabled={isLoading}
+              isDisabled={isLoading || balance.isZero()}
             >
               <SliderTrack bg="#323232" height="6px">
                 <SliderFilledTrack bg="linear-gradient(to right, #2E45D0, #B1525C)" />

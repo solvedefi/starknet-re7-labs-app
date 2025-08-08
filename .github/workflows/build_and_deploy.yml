@@ -53,9 +53,9 @@ jobs:
 
       - name: Deploy with Rsync
         run: |
-          rsync -avz -e ssh .next starknet:$WORKDIR/.next
-          rsync -avz -e ssh public starknet:$WORKDIR/public
-          rsync -avz -e ssh node_modules starknet:$WORKDIR/node_modules
+          rsync -avz -e ssh .next starknet:$WORKDIR
+          rsync -avz -e ssh public starknet:$WORKDIR
+          rsync -avz -e ssh node_modules starknet:$WORKDIR
           rsync -avz -e ssh package.json starknet:$WORKDIR
         shell: bash
 

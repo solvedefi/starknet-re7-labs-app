@@ -116,7 +116,8 @@ export function generateReferralCode() {
 export function getReferralUrl(referralCode: string) {
   if (
     window.location.origin.includes('app.strkfarm.xyz') ||
-    window.location.origin.includes('app.strkfarm.com')
+    window.location.origin.includes('app.strkfarm.com') ||
+    window.location.origin.includes('troves.fi')
   ) {
     return `https://${getHosturl()}/r/${referralCode}`;
   }

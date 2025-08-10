@@ -609,7 +609,7 @@ const AmountInput = forwardRef(
               }
               .{' '}
               <Link
-                href="https://docs.strkfarm.com/p/ekubo-cl-vaults"
+                href="https://docs.troves.fi/p/ekubo-cl-vaults"
                 textDecoration={'underline'}
               >
                 Learn more

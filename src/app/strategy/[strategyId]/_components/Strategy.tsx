@@ -300,7 +300,7 @@ const Strategy = ({ params }: StrategyParams) => {
                         <AlertIcon />
                         Why did my holdings drop?{' '}
                         <a
-                          href="https://docs.strkfarm.com/p/faq#q.-why-did-my-holdings-decrease-in-the-xstrk-sensei-strategy"
+                          href="https://docs.troves.fi/p/faq#q.-why-did-my-holdings-decrease-in-the-xstrk-sensei-strategy"
                           style={{
                             marginLeft: '5px',
                             textDecoration: 'underline',

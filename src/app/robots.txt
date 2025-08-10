@@ -1,5 +1,5 @@
 User-agent: *
 allow: /
-Sitemap: https://strkfarm.com/sitemap.xml
-Sitemap: https://blog.strkfarm.com/sitemap.xml
-Sitemap: https://docs.strkfarm.com/p/sitemap.xml
+Sitemap: https://troves.fi/sitemap.xml
+Sitemap: https://blog.troves.fi/sitemap.xml
+Sitemap: https://docs.troves.fi/p/sitemap.xml

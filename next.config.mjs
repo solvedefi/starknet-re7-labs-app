@@ -52,7 +52,7 @@ const nextConfig = {
       },
       {
         source: '/api/price/:path*',
-        destination: 'https://app.strkfarm.com/api/price/:path*',
+        destination: 'https://app.troves.fi/api/price/:path*',
       }
     ];
   },

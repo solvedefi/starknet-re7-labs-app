@@ -2162,10 +2162,10 @@
     viem "^2.19.1"
     zod "^3.22.4"
 
-"@strkfarm/sdk@^1.0.49":
-  version "1.0.49"
-  resolved "https://registry.yarnpkg.com/@strkfarm/sdk/-/sdk-1.0.49.tgz#bae8278a2df4e5c3b47ba9a88eec2145200789ec"
-  integrity sha512-kui+5Of7rzWIFzGQI9jk3Aj9ILNADwUiJp5U6lpz0u1Q2zgYIL0PgXiyQhkFks8KtfbBono7zdImb8ujfc+oiw==
+"@strkfarm/sdk@^1.0.54":
+  version "1.0.55"
+  resolved "https://registry.yarnpkg.com/@strkfarm/sdk/-/sdk-1.0.55.tgz#620e13beb39dd91d3f3366a7b96bf2f064a54910"
+  integrity sha512-KZd4nk/EOZtFwWyFKJaaVwCWf+Yezf2HT7PAeUCM9o9/0FDGve4lkJvC3ax/1C7PZRNXUe2EElMVRMYzkeiGew==
   dependencies:
     "@avnu/avnu-sdk" "3.0.2"
     bignumber.js "4.0.4"

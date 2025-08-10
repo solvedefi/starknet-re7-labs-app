@@ -116,7 +116,8 @@ export function generateReferralCode() {
 export function getReferralUrl(referralCode: string) {
   if (
     window.location.origin.includes('app.strkfarm.xyz') ||
-    window.location.origin.includes('app.strkfarm.com')
+    window.location.origin.includes('app.strkfarm.com') ||
+    window.location.origin.includes('troves.fi')
   ) {
     return `https://${getHosturl()}/r/${referralCode}`;
   }
@@ -194,12 +195,12 @@ export function getEndpoint() {
   return (
     (typeof window === 'undefined'
       ? process.env.HOSTNAME
-      : window.location.origin) || 'https://app.strkfarm.com'
+      : window.location.origin) || 'https://app.troves.fi'
   );
 }
 
 export function getHosturl() {
-  const FALLBACK = 'strkfarm.com';
+  const FALLBACK = 'troves.fi';
   try {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;

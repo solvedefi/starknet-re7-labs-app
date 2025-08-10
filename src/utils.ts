@@ -194,12 +194,12 @@ export function getEndpoint() {
   return (
     (typeof window === 'undefined'
       ? process.env.HOSTNAME
-      : window.location.origin) || 'https://app.strkfarm.com'
+      : window.location.origin) || 'https://app.troves.fi'
   );
 }
 
 export function getHosturl() {
-  const FALLBACK = 'strkfarm.com';
+  const FALLBACK = 'troves.fi';
   try {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;

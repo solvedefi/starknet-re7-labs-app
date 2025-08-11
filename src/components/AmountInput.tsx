@@ -191,7 +191,7 @@ const AmountInput = forwardRef(
         return;
       }
       setError('');
-    }, [isMinAmountError, dirty, inputInfo.amount, maxAmount, setError]);
+    }, [isMinAmountError, inputInfo.amount, maxAmount, setError]);
 
     function onAmountChange(
       _amt: MyNumber,

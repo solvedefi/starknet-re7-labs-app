@@ -102,16 +102,11 @@ export async function GET(req: Request) {
 
   const strategies = getStrategies();
 
-  const proms = strategies.map(async (strategy) => {
+  const proms = strategies.map((strategy) => {
     if (!strategy.isLive()) return;
-    for (let i = 0; i < 5; i++) {
-      try {
-        return await strategy.solve([], '1000');
-      } catch {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
-    }
+    return strategy.solve([], '1000');
   });
+
   await Promise.all(proms);
   // strategies.forEach((strategy) => {
   //   try {

@@ -23,7 +23,7 @@ jobs:
         run: yarn --legacy-peer-deps
 
       - name: Set env
-        run: echo "${{ secrets.ENV_PROD }}" > .env.local
+        run: cp .env.sample .env.local
 
       - name: Run linting check
         run: yarn run lint:check

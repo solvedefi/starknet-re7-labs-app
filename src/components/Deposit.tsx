@@ -155,10 +155,12 @@ function InternalDeposit(props: DepositProps) {
 
   const inputRef1 = useRef<AmountInputRef | null>(null);
   const inputRef2 = useRef<AmountInputRef | null>(null);
+  const [inputError1, setInputError1] = useState('');
+  const [inputError2, setInputError2] = useState('');
 
-  const inputRefs = useMemo(() => {
-    return [inputRef1, inputRef2];
-  }, [inputRef1, inputRef2]);
+  const inputRefs = [inputRef1, inputRef2];
+  const inputErrors = [inputError1, inputError2];
+  const setInputErrors = [setInputError1, setInputError2];
 
   // since we use a separate jotai provider,
   // need to set this again here
@@ -294,6 +296,7 @@ function InternalDeposit(props: DepositProps) {
   }, [tvlInfo]);
 
   const canSubmit = useMemo(() => {
+    if (inputError1 || inputError2) return false;
     if (isTVLFull && isDeposit) {
       return false;
     }
@@ -334,6 +337,8 @@ function InternalDeposit(props: DepositProps) {
                 supportedTokens={callsInfo.map(
                   (c) => c.amounts[index].tokenInfo,
                 )}
+                error={inputErrors[index]}
+                setError={setInputErrors[index]}
               />
             );
           })}

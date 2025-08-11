@@ -51,6 +51,8 @@ interface AmountInputProps {
   isDeposit: boolean;
   buttonText: string;
   supportedTokens: TokenInfoV2[];
+  error: string;
+  setError: (error: string) => void;
 }
 
 export interface AmountInputRef {
@@ -66,6 +68,7 @@ const AmountInput = forwardRef(
   (props: AmountInputProps, ref: React.ForwardedRef<AmountInputRef>) => {
     // Input state
     const [dirty, setDirty] = useState(false);
+    const { error, setError } = props;
 
     // External state
     const tvlInfo = useAtomValue(props.strategy.tvlAtom);
@@ -83,6 +86,17 @@ const AmountInput = forwardRef(
         throw new Error(`Invalid index: ${props.index}`);
       return inputsInfo[props.index];
     }, [inputsInfo, props.index]);
+
+    const isMinAmountError: boolean = useMemo(() => {
+      if (!dirty) return false;
+      if (!inputInfo.rawAmount.trim()) return false;
+
+      const isAtleastOneNonZero = inputsInfo.some((item) => item.amount.gt(0));
+      if (isAtleastOneNonZero) {
+        return false;
+      }
+      return true;
+    }, [inputsInfo, dirty, inputInfo.rawAmount]);
 
     // Default token state
     const [selectedMarket, setSelectedMarket] = useState<TokenInfoV2>(
@@ -107,15 +121,6 @@ const AmountInput = forwardRef(
       return balData.data?.amount || MyNumber.fromZero();
     }, [balData]);
 
-    const isMinAmountError: boolean = useMemo(() => {
-      if (!dirty) return false;
-
-      const isAtleastOneNonZero = inputsInfo.some((item) => item.amount.gt(0));
-      if (isAtleastOneNonZero) {
-        return false;
-      }
-      return true;
-    }, [inputsInfo]);
     /**
      * Calculate maximum allowed amount based on:
      * - TVL limits for deposits
@@ -173,6 +178,21 @@ const AmountInput = forwardRef(
       simulatedMaxAmount.amount,
     ]);
 
+    // Error setting
+    useEffect(() => {
+      if (isMinAmountError) {
+        setError('Amount must be greater than 0');
+        return;
+      }
+      if (inputInfo.amount.gt(maxAmount.toEtherStr())) {
+        setError(
+          `Amount must be less than ${maxAmount.toEtherToFixedDecimals(4)}`,
+        );
+        return;
+      }
+      setError('');
+    }, [isMinAmountError, inputInfo.amount, maxAmount, setError]);
+
     function onAmountChange(
       _amt: MyNumber,
       isMaxClicked: boolean,
@@ -208,6 +228,30 @@ const AmountInput = forwardRef(
         _depositInfo.onAmountsChange,
       );
       if (!isAllTokenInfosDefined || !_depositInfo.onAmountsChange) {
+        return;
+      }
+      if (_amt.isZero()) {
+        for (let i = 0; i < _inputsInfo.length; i++) {
+          if (i === props.index) {
+            continue;
+          }
+          setInputInfo({
+            index: i,
+            info: {
+              ..._inputsInfo[i],
+              amount: Web3Number.fromWei(
+                '0',
+                _inputsInfo[i].tokenInfo?.decimals || 0,
+              ),
+              isMaxClicked: false,
+              rawAmount: '0',
+            },
+          });
+        }
+        setDepositInfo({
+          ..._depositInfo,
+          loading: false,
+        });
         return;
       }
       const _amtWeb3 = Web3Number.fromWei(_amt.toString(), _token.decimals);
@@ -618,24 +662,14 @@ const AmountInput = forwardRef(
             </Text>
           </Tooltip>
         )}
-        {isMinAmountError && dirty && (
+        {error && (
           <Text
             marginTop="2px"
             marginLeft={'7px'}
             color="red"
             fontSize={'13px'}
           >
-            Amount must be greater than 0
-          </Text>
-        )}
-        {inputInfo.amount.gt(maxAmount.toEtherStr()) && (
-          <Text
-            marginTop="2px"
-            marginLeft={'7px'}
-            color="red"
-            fontSize={'13px'}
-          >
-            Amount must be less than {maxAmount.toEtherToFixedDecimals(4)}
+            {error}
           </Text>
         )}
       </Box>

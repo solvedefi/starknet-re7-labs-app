@@ -121,7 +121,6 @@ export async function GET(req: Request) {
     stratsDataProms.push(getStrategyInfo(strategies[i]));
   }
   const stratsData = await Promise.all(stratsDataProms);
-
   const _strats = stratsData.sort((a, b) => {
     // sort based on risk factor, live status and apy
     const aRisk = a.riskFactor;

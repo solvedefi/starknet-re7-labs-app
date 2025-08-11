@@ -186,7 +186,7 @@ const AmountInput = forwardRef(
       }
       if (inputInfo.amount.gt(maxAmount.toEtherStr())) {
         setError(
-          `Amount must be less than ${maxAmount.toEtherToFixedDecimals(4)}`,
+          `You do not have enough balance of token ${props.tokenInfo.symbol}`,
         );
         return;
       }
@@ -490,12 +490,25 @@ const AmountInput = forwardRef(
           _inputsInfo: AmountInputInfo[],
           _depositInfo: DepositAtomType,
         ) => {
-          checkAndTriggerOnAmountsChange(
-            newAmount,
-            props.tokenInfo,
-            _inputsInfo,
-            _depositInfo,
-          );
+          if (valueStr.trim() === '') {
+            inputsInfo.forEach((item, index) => {
+              setInputInfo({
+                index,
+                info: {
+                  ...item,
+                  isMaxClicked: false,
+                  rawAmount: '',
+                },
+              });
+            });
+          } else {
+            checkAndTriggerOnAmountsChange(
+              newAmount,
+              props.tokenInfo,
+              _inputsInfo,
+              _depositInfo,
+            );
+          }
 
           // Track user input
           mixpanel.track('Enter amount', {

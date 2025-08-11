@@ -185,9 +185,7 @@ const AmountInput = forwardRef(
         return;
       }
       if (inputInfo.amount.gt(maxAmount.toEtherStr())) {
-        setError(
-          `You do not have enough balance of token ${props.tokenInfo.symbol}`,
-        );
+        setError(`You do not have enough balance of ${props.tokenInfo.symbol}`);
         return;
       }
       setError('');

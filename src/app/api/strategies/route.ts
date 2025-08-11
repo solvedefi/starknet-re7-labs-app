@@ -102,11 +102,16 @@ export async function GET(req: Request) {
 
   const strategies = getStrategies();
 
-  const proms = strategies.map((strategy) => {
+  const proms = strategies.map(async (strategy) => {
     if (!strategy.isLive()) return;
-    return strategy.solve([], '1000');
+    for (let i = 0; i < 5; i++) {
+      try {
+        return await strategy.solve([], '1000');
+      } catch {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    }
   });
-
   await Promise.all(proms);
   // strategies.forEach((strategy) => {
   //   try {
@@ -121,7 +126,6 @@ export async function GET(req: Request) {
     stratsDataProms.push(getStrategyInfo(strategies[i]));
   }
   const stratsData = await Promise.all(stratsDataProms);
-
   const _strats = stratsData.sort((a, b) => {
     // sort based on risk factor, live status and apy
     const aRisk = a.riskFactor;

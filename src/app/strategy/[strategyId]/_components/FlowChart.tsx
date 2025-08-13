@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useMemo } from 'react';
+import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
 import {
   Handle,
   MarkerType,
@@ -54,17 +54,14 @@ const getLayoutedElements = (nodes: any[], edges: any[]) => {
 
   // Custom positioning logic - all nodes in one column
   const newNodes = nodes.map((node, index) => {
-    const baseX = 150;
     const baseY = 50;
-    let x = 0;
+    const x = 350;
     let y = 0;
 
     if (index < 3) {
-      x = baseX;
       y = baseY + index * 100;
       node.sourcePosition = Position.Right;
     } else {
-      x = baseX + 400;
       y = baseY + 100;
       node.sourcePosition = Position.Left;
     }
@@ -100,8 +97,11 @@ interface FlowEdge {
   animated: boolean;
   type: string;
   style: any;
-  marketEnd: any;
+  markerEnd: any;
 }
+
+let targetHandleId = '0';
+let targetHandleCount = 0;
 
 function getNodesAndEdges(
   investmentFlows: IInvestmentFlow[],
@@ -147,14 +147,14 @@ function getNodesAndEdges(
           type="source"
           position={flow.title.includes('/') ? Position.Left : Position.Right}
           style={{
-            background: flow.title.includes('/') ? '#B1525C' : '#2E45D0',
+            background: !flow.title.includes('/') ? '#B1525C' : '#2E45D0',
             border: '2px solid #1A2B8A',
-            width: '10px',
-            height: '2px',
+            width: '15px',
+            height: flow.title.includes('/') ? '40px' : '20px',
             zIndex: 10,
+            borderRadius: '40%',
           }}
         />
-
         <b
           style={{ fontWeight: '700', marginTop: '20px', marginRight: '20px' }}
         >
@@ -191,12 +191,12 @@ function getNodesAndEdges(
       targetPosition: Position.Top,
       connectable: false,
     };
-    if (flow.linkedFlows.length) {
-      _node.sourcePosition = Position.Right;
-    }
-    if (parent) {
-      _node.targetPosition = Position.Left;
-    }
+
+    _node.sourcePosition = flow.linkedFlows.length
+      ? Position.Right
+      : Position.Left;
+    _node.targetPosition = parent ? Position.Left : Position.Right;
+
     nodes.push(_node);
     if (parent) {
       edges.push({
@@ -208,14 +208,18 @@ function getNodesAndEdges(
         style: {
           stroke: 'url(#gradient-edge)',
           strokeWidth: 2,
+          strokeDasharray: '5,5',
+          curveOffset: 50 + targetHandleCount * 10,
         },
-        marketEnd: {
-          type: MarkerType.ArrowClosed,
-          width: 20,
-          height: 20,
-          color: '#B1525C',
+        markerEnd: {
+          type: MarkerType.Arrow,
+          width: 10,
+          height: 10,
+          color: '#2E45D0',
         },
       });
+      targetHandleId = `${targetHandleId}0`;
+      targetHandleCount++;
     }
     const { nodes: _nodes, edges: _edges } = getNodesAndEdges(
       flow.linkedFlows,
@@ -238,6 +242,10 @@ function InternalFlowChart(props: FlowChartProps) {
     return strategiesList.find((s: any) => s.id === props.strategyId);
   }, [strategiesInfo]);
 
+  const [nodes, setNodes, onNodesChange] = useNodesState<any>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<any>([]);
+  const hasMeasuredNodes = useRef(false);
+
   useEffect(() => {
     if (nodes.length == 0 && strategyCached?.investmentFlows.length) {
       const { nodes: _nodes, edges: _edges } = getNodesAndEdges(
@@ -249,8 +257,33 @@ function InternalFlowChart(props: FlowChartProps) {
       setEdges(edges);
     }
   }, [strategyCached]);
-  const [nodes, setNodes, onNodesChange] = useNodesState<any>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<any>([]);
+
+  // Measure nodes and align by right edge after initial render
+  useEffect(() => {
+    if (nodes.length > 0 && !hasMeasuredNodes.current) {
+      // Use setTimeout to ensure nodes are rendered
+      setTimeout(() => {
+        const baseX = 350;
+        const updatedNodes = nodes.map((node, index) => {
+          // Get the actual node element to measure its width
+          const nodeElement = document.querySelector(`[data-id="${node.id}"]`);
+          if (nodeElement) {
+            const rect = nodeElement.getBoundingClientRect();
+            const nodeWidth = rect.width;
+            // Align right edge at baseX by positioning left edge at baseX - nodeWidth
+            const newX = baseX - nodeWidth + (index >= 3 ? 400 : 0);
+            return {
+              ...node,
+              position: { x: newX, y: node.position.y },
+            };
+          }
+          return node;
+        });
+        setNodes(updatedNodes);
+        hasMeasuredNodes.current = true;
+      }, 0);
+    }
+  }, [nodes, setNodes]);
   // useLayoutedElements({
   //   'elk.algorithm': 'org.eclipse.elk.rectpacking',
   // });

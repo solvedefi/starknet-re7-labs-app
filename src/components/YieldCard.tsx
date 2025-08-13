@@ -83,7 +83,11 @@ export function StrategyInfo(props: YieldCardProps) {
             </Heading>
             {pool.additional && pool.additional.auditUrl && (
               <Tooltip label="Audited smart contract. Click to view the audit report.">
-                <Link href={pool.additional.auditUrl} target="_blank">
+                <Link
+                  href={pool.additional.auditUrl}
+                  target="_blank"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Box
                     width={'24px'}
                     height={'24px'}

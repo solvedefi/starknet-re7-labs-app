@@ -20,6 +20,7 @@ import {
 } from '@/store/strkfarm.atoms';
 
 import { YieldStrategyCard } from './YieldCard';
+import { useRouter } from 'next/navigation';
 
 export default function Strategies() {
   const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
@@ -30,11 +31,16 @@ export default function Strategies() {
   }, [strkFarmPoolsRes]);
 
   const _filteredPools = useAtomValue(filteredPools);
+  const router = useRouter();
   const ITEMS_PER_PAGE = 15;
   const { currentPage, setCurrentPage, pagesCount, pages } = usePagination({
     pagesCount: Math.floor(_filteredPools.length / ITEMS_PER_PAGE) + 1,
     initialState: { currentPage: 1 },
   });
+
+  const handleStrategyClick = (strategyId: string) => {
+    router.push(`/strategy/${strategyId}`);
+  };
 
   const pools = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -78,7 +84,12 @@ export default function Strategies() {
             <>
               {strkFarmPools.map((pool, index) => {
                 return (
-                  <YieldStrategyCard key={pool.id} strat={pool} index={index} />
+                  <YieldStrategyCard
+                    key={pool.id}
+                    strat={pool}
+                    index={index}
+                    onClick={handleStrategyClick}
+                  />
                 );
               })}
             </>

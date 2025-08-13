@@ -31,7 +31,6 @@ import { ContractAddr } from '@strkfarm/sdk';
 import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useMemo } from 'react';
-import { isMobile } from 'react-device-detect';
 import { FaWallet } from 'react-icons/fa';
 import arrow from '@public/arrow_left.png';
 
@@ -39,6 +38,7 @@ export interface YieldCardProps {
   pool: PoolInfo;
   index: number;
   showProtocolName?: boolean;
+  onClick?: (strategyId: string) => void;
 }
 
 export function getStratCardBg(status: StrategyLiveStatus, index: number) {
@@ -474,10 +474,12 @@ function StrategyMobileCard(props: YieldCardProps) {
   );
 }
 
-export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
+export function getLinkProps(
+  pool: PoolInfo,
+  showProtocolName?: boolean,
+  onClick?: (strategyId: string) => void,
+) {
   return {
-    href: pool.protocol.link,
-    target: isMobile ? '_self' : '_blank',
     onClick: () => {
       mixpanel.track('Pool clicked', {
         pool: pool.pool.name,
@@ -487,11 +489,12 @@ export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
         tvl: pool.tvl,
         showProtocolName,
       });
+      onClick?.(pool.pool.id);
     },
   };
 }
 export default function YieldCard(props: YieldCardProps) {
-  const { pool, index } = props;
+  const { pool, index, onClick } = props;
 
   const isRetired = useMemo(() => {
     return isPoolRetired(pool);
@@ -502,11 +505,13 @@ export default function YieldCard(props: YieldCardProps) {
         color={'white'}
         bg="#212121"
         borderBottom={'10px solid #131313 !important'}
+        padding={'5px 10px'}
         borderRadius="9px"
         backgroundClip="padding-box"
         display={{ base: 'none', md: 'table-row' }}
         as={'a'}
-        {...getLinkProps(pool, props.showProtocolName)}
+        _hover={{ cursor: 'pointer' }}
+        {...getLinkProps(pool, props.showProtocolName, onClick)}
       >
         <Td borderLeft={'10px solid #131313 !important'}>
           <StrategyInfo
@@ -570,9 +575,17 @@ export default function YieldCard(props: YieldCardProps) {
 export function YieldStrategyCard(props: {
   strat: STRKFarmStrategyAPIResult;
   index: number;
+  onClick: (strategyId: string) => void;
 }) {
   const strat = getPoolInfoFromStrategy(props.strat);
-  return <YieldCard pool={strat} index={props.index} showProtocolName={true} />;
+  return (
+    <YieldCard
+      pool={strat}
+      index={props.index}
+      showProtocolName={true}
+      onClick={props.onClick}
+    />
+  );
 }
 
 export function HeaderSorter(props: {

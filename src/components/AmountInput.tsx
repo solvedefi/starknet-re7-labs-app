@@ -520,7 +520,7 @@ const AmountInput = forwardRef(
             address,
           });
         },
-        400,
+        500,
       ),
       [],
     ); // ms delay

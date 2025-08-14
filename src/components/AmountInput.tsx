@@ -496,6 +496,7 @@ const AmountInput = forwardRef(
                   ...item,
                   isMaxClicked: false,
                   rawAmount: '',
+                  tokenInfo: props.strategy.metadata.depositTokens[index],
                 },
               });
             });

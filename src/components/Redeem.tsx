@@ -44,6 +44,7 @@ import { addressAtom } from '@/store/claims.atoms';
 import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import LoadingWrap from './LoadingWrap';
 import mixpanel from 'mixpanel-browser';
+import debounce from 'lodash.debounce';
 
 interface RedeemProps {
   strategy: StrategyInfo<any>;
@@ -275,25 +276,22 @@ function InternalRedeem(props: RedeemProps) {
   const handlePercentageInputChange = useCallback(
     (valueString: string, valueNumber: number) => {
       // Allow empty string and valid numbers
-      if (
-        valueString === '' ||
-        (!isNaN(valueNumber) && valueNumber >= 0 && valueNumber <= 100)
-      ) {
+      if (isNaN(valueNumber)) valueNumber = 0;
+
+      if (valueString === '' || (valueNumber >= 0 && valueNumber <= 100)) {
         setPercentageInput(valueString);
+        setSliderValue(valueNumber);
 
         // Only update slider if we have a valid number
-        if (!isNaN(valueNumber)) {
-          setSliderValue(valueNumber);
 
-          if (selectedToken) {
-            const percentage = valueNumber / 100;
-            const newAmount = maxAmount.operate('mul', percentage);
-            onAmountChange(
-              newAmount,
-              valueNumber === 100,
-              newAmount.toEtherStr(),
-            );
-          }
+        if (selectedToken) {
+          const percentage = valueNumber / 100;
+          const newAmount = maxAmount.operate('mul', percentage);
+          onAmountChange(
+            newAmount,
+            valueNumber === 100,
+            newAmount.toEtherStr(),
+          );
         }
       }
     },
@@ -344,10 +342,22 @@ function InternalRedeem(props: RedeemProps) {
       },
     });
 
-    checkAndTriggerOnAmountsChange(_amt, selectedToken, inputsInfo, redeemInfo);
+    const updatedInputsInfo = inputsInfo.map((item, index) => {
+      return {
+        ...item,
+        tokenInfo: props.strategy.metadata.depositTokens[index],
+      };
+    });
+
+    checkAndTriggerOnAmountsChange(
+      _amt,
+      selectedToken,
+      updatedInputsInfo,
+      redeemInfo,
+    );
   }
 
-  function checkAndTriggerOnAmountsChange(
+  const checkAndTriggerOnAmountsChange = debounce(function (
     _amt: MyNumber,
     _token: TokenInfoV2,
     _inputsInfo: AmountInputInfo[],
@@ -375,7 +385,11 @@ function InternalRedeem(props: RedeemProps) {
           [
             {
               amount: _amtWeb3,
-              tokenInfo: _token,
+              tokenInfo: _inputsInfo[0].tokenInfo!,
+            },
+            {
+              amount: _amtWeb3,
+              tokenInfo: _inputsInfo[1].tokenInfo!,
             },
           ],
         )
@@ -405,7 +419,7 @@ function InternalRedeem(props: RedeemProps) {
     } catch (err) {
       console.error('onAmountsChange error', err);
     }
-  }
+  }, 200);
 
   // Update callsInfo when selectedToken or amount changes
   useEffect(() => {
@@ -487,8 +501,6 @@ function InternalRedeem(props: RedeemProps) {
     if (!investedSummary || loadingInvestmentSummary) return false;
     return inputsInfo.some((a) => a.amount.greaterThan(0));
   }, [redeemInfo, loadingInvestmentSummary, investedSummary, inputsInfo]);
-
-  const isLoading = redeemInfo.loading;
 
   return (
     <Box>
@@ -612,7 +624,7 @@ function InternalRedeem(props: RedeemProps) {
                   size="sm"
                   width="80px"
                   height={'42px'}
-                  isDisabled={isLoading || balance.isZero()}
+                  isDisabled={balance.isZero()}
                   keepWithinRange={false}
                   clampValueOnBlur={false}
                 >
@@ -666,10 +678,11 @@ function InternalRedeem(props: RedeemProps) {
               aria-label="amount-slider"
               value={sliderValue}
               onChange={handleSliderChange}
+              focusThumbOnChange={false}
               min={0}
               max={100}
               step={1}
-              isDisabled={isLoading || balance.isZero()}
+              isDisabled={balance.isZero()}
             >
               <SliderTrack bg="#323232" height="6px">
                 <SliderFilledTrack bg="linear-gradient(to right, #2E45D0, #B1525C)" />

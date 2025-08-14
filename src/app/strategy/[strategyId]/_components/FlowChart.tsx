@@ -147,6 +147,7 @@ function getNodesAndEdges(
           type="source"
           position={flow.title.includes('/') ? Position.Left : Position.Right}
           style={{
+            pointerEvents: 'none',
             background: !flow.title.includes('/') ? '#B1525C' : '#2E45D0',
             border: '2px solid #1A2B8A',
             width: '15px',
@@ -312,6 +313,8 @@ function InternalFlowChart(props: FlowChartProps) {
           zoomOnScroll={false}
           zoomOnDoubleClick={false}
           panOnDrag={false}
+          onDragStart={() => {}}
+          onDragEnd={() => {}}
           proOptions={proOptions}
         />
       </div>

@@ -18,7 +18,7 @@ export default class MyNumber {
   static fromEther(num: string, decimals: number) {
     try {
       return new MyNumber(
-        Number(ethers.parseUnits(num, decimals)).toFixed(6),
+        Number(ethers.parseUnits(num, decimals)).toFixed(decimals),
         decimals,
       );
     } catch (e) {
@@ -70,7 +70,7 @@ export default class MyNumber {
   }
 
   operate(command: 'div' | 'plus' | 'mul', value: string | number) {
-    const bn = new BigNumber(Number(value).toFixed(6));
+    const bn = new BigNumber(Number(value).toFixed(this.decimals));
     return new MyNumber(this.bigNumber[command](bn).toFixed(0), this.decimals);
   }
 

@@ -159,7 +159,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
     console.log(
       'onAmountsChange [1.2]',
       [input.token0, input.token1].map((item) => ({
-        amount: item.amount.toFixed(6),
+        amount: item.amount.toFixed(item.tokenInfo.decimals),
         tokenInfo: item.tokenInfo,
       })),
     );
@@ -167,7 +167,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
     console.log(
       'onAmountsChange [1.3]',
       [output.token0, output.token1].map((item) => ({
-        amount: item.amount.toFixed(6),
+        amount: item.amount.toFixed(item.tokenInfo.decimals),
         tokenInfo: item.tokenInfo,
       })),
     );

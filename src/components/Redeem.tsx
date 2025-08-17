@@ -388,12 +388,17 @@ function InternalRedeem(props: RedeemProps) {
               tokenInfo: _inputsInfo[0].tokenInfo!,
             },
             {
-              amount: _amtWeb3,
+              amount:
+                _inputsInfo[1].amount ||
+                Web3Number.fromWei(
+                  '0',
+                  _inputsInfo[1].tokenInfo?.decimals || 18,
+                ),
               tokenInfo: _inputsInfo[1].tokenInfo!,
             },
           ],
         )
-        .then((output) => {
+        .then(async (output) => {
           output.map((item, _index) => {
             setInputInfo({
               index: _index,
@@ -404,6 +409,40 @@ function InternalRedeem(props: RedeemProps) {
               },
             });
           });
+
+          // If we have dual token amounts calculated, call withdrawMethods again with both amounts
+          if (
+            output.length >= 2 &&
+            output[0].amount.greaterThan(0) &&
+            output[1].amount.greaterThan(0)
+          ) {
+            try {
+              const amount1 = new MyNumber(
+                output[0].amount.toWei() || '0',
+                output[0].tokenInfo.decimals,
+              );
+              const amount2 = new MyNumber(
+                output[1].amount.toWei() || '0',
+                output[1].tokenInfo.decimals,
+              );
+
+              const updatedCalls = await props.callsInfo({
+                amount: amount1,
+                amount2,
+                address: address || '0x0',
+                provider,
+                isMax: false,
+              });
+
+              setCallsInfo(updatedCalls);
+            } catch (error) {
+              console.error(
+                'Error updating callsInfo with dual amounts:',
+                error,
+              );
+            }
+          }
+
           setRedeemInfo({
             ..._redeemInfo,
             loading: false,

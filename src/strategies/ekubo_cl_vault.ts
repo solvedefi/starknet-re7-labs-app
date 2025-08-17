@@ -245,7 +245,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
 
     console.log('Withdraw calls [1]');
     const amt = Web3Number.fromWei(amount.toString(), amount.decimals);
-    const amt2 = Web3Number.fromWei(amount2.toString(), amount.decimals);
+    const amt2 = Web3Number.fromWei(amount2.toString(), amount2.decimals);
     const calls = await this.clVault.withdrawCall(
       {
         token0: {

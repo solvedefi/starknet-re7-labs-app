@@ -400,7 +400,9 @@ function InternalRedeem(props: RedeemProps) {
               info: {
                 ..._inputsInfo[_index],
                 ...item,
-                rawAmount: Number(item.amount.toFixed(6)).toString(),
+                rawAmount: Number(
+                  item.amount.toFixed(item.tokenInfo.decimals),
+                ).toString(),
               },
             });
           });

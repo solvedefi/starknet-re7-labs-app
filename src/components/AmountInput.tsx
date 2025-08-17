@@ -67,7 +67,6 @@ export interface AmountInputRef {
 const AmountInput = forwardRef(
   (props: AmountInputProps, ref: React.ForwardedRef<AmountInputRef>) => {
     // Input state
-    const [dirty, setDirty] = useState(false);
     const { error, setError } = props;
 
     // External state
@@ -88,15 +87,19 @@ const AmountInput = forwardRef(
     }, [inputsInfo, props.index]);
 
     const isMinAmountError: boolean = useMemo(() => {
-      if (!dirty) return false;
       if (!inputInfo.rawAmount.trim()) return false;
 
-      const isAtleastOneNonZero = inputsInfo.some((item) => item.amount.gt(0));
-      if (isAtleastOneNonZero) {
+      const inputItem = inputsInfo[props.index];
+      const roundedAmount = Number(
+        inputItem.amount.toFixed(props.tokenInfo.decimals),
+      );
+      const isGreaterThanZero = roundedAmount > 0;
+
+      if (isGreaterThanZero) {
         return false;
       }
       return true;
-    }, [inputsInfo, dirty, inputInfo.rawAmount]);
+    }, [inputsInfo, inputInfo.rawAmount]);
 
     // Default token state
     const [selectedMarket, setSelectedMarket] = useState<TokenInfoV2>(
@@ -105,7 +108,6 @@ const AmountInput = forwardRef(
 
     useImperativeHandle(ref, () => ({
       reset: () => {
-        setDirty(false);
         updateTokenInfo({
           amount: Web3Number.fromWei('0', props.tokenInfo.decimals),
           tokenInfo: props.tokenInfo,
@@ -294,7 +296,10 @@ const AmountInput = forwardRef(
                 info: {
                   ..._inputsInfo[_index],
                   ...item,
-                  rawAmount: Number(item.amount.toFixed(6)).toString(),
+                  rawAmount: Number(item.amount).toLocaleString('en-US', {
+                    useGrouping: false,
+                    maximumFractionDigits: props.tokenInfo.decimals, // set higher if needed
+                  }),
                 },
               });
             });
@@ -564,7 +569,6 @@ const AmountInput = forwardRef(
                     onClick={() => {
                       if (selectedMarket.name !== token.symbol) {
                         setSelectedMarket(token);
-                        setDirty(false);
                         onAmountChange(
                           new MyNumber('0', token.decimals),
                           inputInfo.isMaxClicked,
@@ -611,7 +615,6 @@ const AmountInput = forwardRef(
                 ? MyNumber.fromEther(valueStr, selectedMarket.decimals)
                 : new MyNumber('0', selectedMarket.decimals);
 
-            setDirty(true);
             updateTokenInfo({
               tokenInfo: props.tokenInfo,
               amount: Web3Number.fromWei(
@@ -634,6 +637,11 @@ const AmountInput = forwardRef(
             height={'60px'}
             borderRadius={'10px'}
             placeholder="Amount"
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                e.preventDefault();
+              }
+            }}
           />
         </NumberInput>
 

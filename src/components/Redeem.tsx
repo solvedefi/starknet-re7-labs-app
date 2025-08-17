@@ -431,7 +431,7 @@ function InternalRedeem(props: RedeemProps) {
                 amount2,
                 address: address || '0x0',
                 provider,
-                isMax: false,
+                isMax: isMaxClicked,
               });
 
               setCallsInfo(updatedCalls);

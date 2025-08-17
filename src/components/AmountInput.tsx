@@ -296,9 +296,10 @@ const AmountInput = forwardRef(
                 info: {
                   ..._inputsInfo[_index],
                   ...item,
-                  rawAmount: Number(
-                    item.amount.toFixed(item.tokenInfo.decimals),
-                  ).toString(),
+                  rawAmount: Number(item.amount).toLocaleString('en-US', {
+                    useGrouping: false,
+                    maximumFractionDigits: props.tokenInfo.decimals, // set higher if needed
+                  }),
                 },
               });
             });
@@ -636,6 +637,11 @@ const AmountInput = forwardRef(
             height={'60px'}
             borderRadius={'10px'}
             placeholder="Amount"
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                e.preventDefault();
+              }
+            }}
           />
         </NumberInput>
 

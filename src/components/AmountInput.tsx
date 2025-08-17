@@ -91,7 +91,7 @@ const AmountInput = forwardRef(
 
       const inputItem = inputsInfo[props.index];
       const roundedAmount = Number(
-        inputItem.amount.toFixed(inputItem.tokenInfo?.decimals || 18),
+        inputItem.amount.toFixed(props.tokenInfo.decimals),
       );
       const isGreaterThanZero = roundedAmount > 0;
 

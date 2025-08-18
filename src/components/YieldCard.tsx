@@ -33,6 +33,7 @@ import mixpanel from 'mixpanel-browser';
 import { useMemo } from 'react';
 import { FaWallet } from 'react-icons/fa';
 import arrow from '@public/arrow_left.png';
+import AccountDeposit from './AccountDeposit';
 
 export interface YieldCardProps {
   pool: PoolInfo;
@@ -157,7 +158,7 @@ function getAPRWithToolTip(pool: PoolInfo) {
               textAlign={'right'}
               color="white"
               fontSize={'16px'}
-              fontWeight={'bolder'}
+              fontFamily="IBM Plex Mono"
             >
               {(pool.apr * 100).toFixed(2)}%
             </Text>
@@ -523,6 +524,9 @@ export default function YieldCard(props: YieldCardProps) {
             index={index}
             showProtocolName={props.showProtocolName}
           />
+        </Td>
+        <Td alignContent={'center'}>
+          <AccountDeposit strategyAddress={pool.pool.id} />
         </Td>
         <Td alignContent={'center'}>
           {isRetired ? (

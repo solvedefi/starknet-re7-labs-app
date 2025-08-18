@@ -73,6 +73,8 @@ export default function Strategies() {
             borderBottom={'10px solid #131313 !important'}
           >
             <Th borderLeft={'10px solid #131313 !important'}>Strategy name</Th>
+            <Th textAlign={'right'}>Deposit</Th>
+            <Th textAlign={'right'}>Current Yield</Th>
             <Th textAlign={'right'}>APY</Th>
             {/* <Th textAlign={'right'}>Risk</Th> */}
             <Th textAlign={'right'}>TVL</Th>

@@ -457,19 +457,6 @@ function StrategyMobileCard(props: YieldCardProps) {
           fontWeight={'bold'}
           fontSize={'13px'}
         >
-          RISK
-        </Text>
-        {pool.additional?.riskFactor
-          ? GetRiskLevel(pool.additional?.riskFactor)
-          : '-'}
-      </GridItem>
-      <GridItem colSpan={1} rowSpan={2}>
-        <Text
-          textAlign={'right'}
-          color={'color2'}
-          fontWeight={'bold'}
-          fontSize={'13px'}
-        >
           TVL
         </Text>
         <StrategyTVL pool={pool} index={index} />

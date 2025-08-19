@@ -39,12 +39,18 @@ import {
 } from '@/store/strkfarm.atoms';
 import { TokenDeposit } from './TokenDeposit';
 import styles from '../../../border.module.css';
+import { userStrategyWiseTVLAtom } from '@/store/utils.atoms';
+import { ibmPlexMonoLight } from '@/fonts';
 
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
   const strategies = useAtomValue(strategiesAtom);
   const [isMounted, setIsMounted] = useState(false);
-
+  const {
+    data: userStrategyWiseTVL,
+    isPending: userStrategyWiseTVLPending,
+    error: userStrategyWiseTVLError,
+  } = useAtomValue(userStrategyWiseTVLAtom(params.strategyId));
   const strategy: StrategyInfo<any> | undefined = useMemo(() => {
     const id = params.strategyId;
     return strategies.find((s) => s.id === id);
@@ -138,8 +144,8 @@ const Strategy = ({ params }: StrategyParams) => {
     mixpanel.track('Strategy page open', { name: params.strategyId });
   }, [params.strategyId]);
 
-  const colSpan1: any = { base: '5', md: '3' };
-  const colSpan2: any = { base: '5', md: '2' };
+  const colSpan1: any = { base: '10', md: '5' };
+  const colSpan2: any = { base: '10', md: '5' };
 
   useEffect(() => {
     setIsMounted(true);
@@ -158,12 +164,12 @@ const Strategy = ({ params }: StrategyParams) => {
   return (
     <>
       {strategy && (
-        <VStack width={'100%'} bg={'#171717'}>
-          <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
+        <VStack width={'1040px'} bg={'#171717'} gap={'8.86px'}>
+          <Grid width={'100%'} templateColumns="repeat(10, 1fr)" gap={'44px'}>
             <GridItem display="flex" colSpan={colSpan1}>
-              <Card width="100%" padding={'15px'} color="white" bg="#171717">
-                <Flex>
-                  <AvatarGroup size={'md'} spacing={'-20px'} mr={'5px'}>
+              <Card width="100%" color="white" bg="#171717">
+                <Flex mb={'20px'}>
+                  <AvatarGroup size={'lg'} spacing={'-25px'} mr={'5px'}>
                     {strategy &&
                       strategy.metadata.depositTokens.length > 0 &&
                       strategy.metadata.depositTokens.map((token: any) => {
@@ -172,8 +178,8 @@ const Strategy = ({ params }: StrategyParams) => {
                             key={token.address}
                             marginRight={'5px'}
                             src={token.logo}
-                            width={'30px'}
-                            height={'30px'}
+                            width={'47px'}
+                            height={'47px'}
                           />
                         );
                       })}
@@ -185,71 +191,65 @@ const Strategy = ({ params }: StrategyParams) => {
                         />
                       )}
                   </AvatarGroup>
-                  <Text
-                    // marginTop={'6px'}
-                    marginLeft={'10px'}
-                    fontSize={{ base: '18px', md: '25px' }}
-                    fontWeight={'bold'}
-                    color="white"
-                  >
-                    {strategy ? strategy.name : 'Strategy Not found'}
-                  </Text>
+                  <VStack alignItems={'flex-start'} gap={'0px'}>
+                    <Text
+                      // marginTop={'6px'}
+                      marginLeft={'10px'}
+                      fontSize={{ base: '18px', md: '25px' }}
+                      fontWeight={'bold'}
+                      color="white"
+                      lineHeight={'normal'}
+                    >
+                      {strategy ? strategy.name : 'Strategy Not found'}
+                    </Text>
+                    <Text
+                      mt="-5px"
+                      fontSize={'20px'}
+                      marginLeft={'10px'}
+                      fontWeight={'300'}
+                      color={'white'}
+                      fontFamily={ibmPlexMonoLight.style.fontFamily}
+                    >
+                      By Ekubo
+                    </Text>
+                  </VStack>
                 </Flex>
-                <Text
-                  fontSize={'21px'}
-                  fontWeight={'400'}
-                  marginLeft={'55px'}
-                  marginBottom={'20px'}
-                >
-                  Deployed on Ekubo
-                </Text>
+
                 {!strategy?.isRetired() && (
                   <HarvestTime strategy={strategy} balData={balData} />
                 )}
-                <Box className={styles.border_alt} marginTop={'20px'}>
-                  {!balData.isLoading &&
-                    !balData.isError &&
-                    !balData.isPending &&
-                    balData.data &&
-                    balData.data.tokenInfo && (
-                      <Flex width={'100%'} justifyContent={'space-between'}>
-                        <Box
-                          display={'flex'}
-                          alignItems={'center'}
-                          justifyContent={'space-between'}
-                          width={'100%'}
-                        >
-                          <Text>
-                            <b>Your Total Position Value </b>
-                          </Text>
-                          <Text>
-                            {address
-                              ? Number(
-                                  balData.data.amount.toEtherToFixedDecimals(
-                                    balData.data.tokenInfo?.displayDecimals ||
-                                      2,
-                                  ),
-                                ) === 0 || strategy?.isRetired()
-                                ? '-'
-                                : `${balData.data.amount.toEtherToFixedDecimals(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
-                              : 'Connect wallet'}
-                          </Text>
-                        </Box>
-                      </Flex>
-                    )}
-                  {(balData.isLoading || !balData.data?.tokenInfo) && (
-                    <Text>
-                      <b>Your Holdings: </b>
-                      {address ? (
-                        <Spinner size="sm" marginTop={'5px'} />
-                      ) : (
-                        'Connect wallet'
-                      )}
-                    </Text>
+                <Box className={styles.border_gray} marginTop={'20px'}>
+                  {!userStrategyWiseTVLError && (
+                    <Flex width={'100%'} justifyContent={'space-between'}>
+                      <Box
+                        display={'flex'}
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                        width={'100%'}
+                      >
+                        <Text className="theme-strategy-subtitle">
+                          <b>Total Position Value </b>
+                        </Text>
+                        <Text fontSize={'21px'}>
+                          {address ? (
+                            userStrategyWiseTVLPending ? (
+                              <Spinner size="sm" marginTop={'5px'} />
+                            ) : userStrategyWiseTVL === 0 ||
+                              strategy?.isRetired() ? (
+                              '-'
+                            ) : (
+                              `USD ${userStrategyWiseTVL.toFixed(2)}`
+                            )
+                          ) : (
+                            'Connect wallet'
+                          )}
+                        </Text>
+                      </Box>
+                    </Flex>
                   )}
-                  {balData.isError && (
-                    <Text>
-                      <b>Your Holdings: Error</b>
+                  {userStrategyWiseTVLError && (
+                    <Text className="theme-strategy-subtitle">
+                      <b>Total Position Value: Error</b>
                     </Text>
                   )}
 
@@ -260,11 +260,8 @@ const Strategy = ({ params }: StrategyParams) => {
                         <HStack
                           className="flex"
                           gap={2}
-                          fontSize={'12px'}
+                          fontSize={'10px'}
                           color="light_grey"
-                          marginTop={'5px'}
-                          borderTop={'1px solid var(--chakra-colors-highlight)'}
-                          paddingTop={'5px'}
                         >
                           <p>Detailed Split:</p>
                           {individualBalances.map((bx, index) => {
@@ -374,7 +371,7 @@ const Strategy = ({ params }: StrategyParams) => {
               </Card>
             </GridItem>
 
-            <GridItem display="flex" colSpan={colSpan2}>
+            <GridItem display="flex" colSpan={colSpan2} width={'100%'}>
               {!strategy ||
                 (strategy.isSingleTokenDepositView && (
                   <TokenDeposit strategy={strategy} isDualToken={false} />

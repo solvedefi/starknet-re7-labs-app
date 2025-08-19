@@ -19,10 +19,8 @@ import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { RpcProviderOptions, constants } from 'starknet';
 
-import { IBM_Plex_Mono } from 'next/font/google';
 import { isMobile } from 'react-device-detect';
-const ibmPlexMonoHeader = IBM_Plex_Mono({ subsets: ['latin'], weight: '700' });
-const ibmPlexMonoMain = IBM_Plex_Mono({ subsets: ['latin'], weight: '500' });
+import { ibmPlexMonoHeader, ibmPlexMonoMain } from '@/fonts';
 
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
 

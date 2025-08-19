@@ -386,3 +386,11 @@ export function buildStrategyActionHook(
     }),
   };
 }
+
+export function formatUSD(amount: number) {
+  return amount > 1000000
+    ? `${(amount / 1000000).toFixed(2)}M`
+    : amount > 1000
+      ? amount.toFixed(0)
+      : amount.toFixed(2);
+}

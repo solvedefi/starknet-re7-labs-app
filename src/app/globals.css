@@ -156,6 +156,17 @@ body {
   color: transparent;
 }
 
+.theme-gradient-starknet-text {
+background: linear-gradient(90deg, #2E45D0 0%, #B1525C 100%);
+-webkit-background-clip: text;
+color: transparent;
+}
+
+.theme-strategy-subtitle {
+  color: #8A8A8A;
+  font-size: 21px;
+}
+
 .theme-gradient {
   background: linear-gradient(
     to right,

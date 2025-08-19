@@ -4,6 +4,8 @@ import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 import { addressAtom } from './claims.atoms';
 import fetchWithRetry from '@/utils/fetchWithRetry';
 import { SingleTokenInfo } from '@strkfarm/sdk';
+import { atom } from 'jotai';
+import { atomFamily } from 'jotai/utils';
 
 export interface BlockInfo {
   data: {
@@ -114,6 +116,30 @@ export const userStatsAtom = atomWithQuery((get) => ({
     return await res.json();
   },
 }));
+
+export const userStrategyWiseTVLAtom = atomFamily((strategyId: string) => {
+  return atom((get) => {
+    const userStats = get(userStatsAtom);
+    const isPending = userStats.isPending;
+    const error = userStats.error;
+
+    if (!userStats || !userStats.data || !userStats.data.strategyWise) {
+      return {
+        data: 0,
+        isPending,
+        error,
+      };
+    }
+    const strategy = userStats.data.strategyWise.find(
+      (s) => s.id === strategyId,
+    );
+    return {
+      data: strategy ? strategy.usdValue : 0,
+      isPending,
+      error,
+    };
+  });
+});
 
 interface Price {
   tokenName: string;

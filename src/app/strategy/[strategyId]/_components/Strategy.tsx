@@ -39,17 +39,18 @@ import {
 } from '@/store/strkfarm.atoms';
 import { TokenDeposit } from './TokenDeposit';
 import styles from '../../../border.module.css';
-import { userStatsAtom } from '@/store/utils.atoms';
+import { userStrategyWiseTVLAtom } from '@/store/utils.atoms';
 import { ibmPlexMonoLight } from '@/fonts';
 
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
   const strategies = useAtomValue(strategiesAtom);
   const [isMounted, setIsMounted] = useState(false);
-
-  const { data: userStats, isPending: userStatsPending } =
-    useAtomValue(userStatsAtom);
-  const [userStrategyWiseTVL, setUserStrategyWiseTVL] = useState(0);
+  const {
+    data: userStrategyWiseTVL,
+    isPending: userStrategyWiseTVLPending,
+    error: userStrategyWiseTVLError,
+  } = useAtomValue(userStrategyWiseTVLAtom(params.strategyId));
   const strategy: StrategyInfo<any> | undefined = useMemo(() => {
     const id = params.strategyId;
     return strategies.find((s) => s.id === id);
@@ -69,19 +70,6 @@ const Strategy = ({ params }: StrategyParams) => {
   useEffect(() => {
     setBalQueryEnable(true);
   }, []);
-
-  useEffect(() => {
-    const getTVL = () => {
-      if (!userStats || !userStats.strategyWise) {
-        return 0;
-      }
-      const strategy = userStats.strategyWise.find(
-        (s) => s.id === params.strategyId,
-      );
-      return strategy ? strategy.usdValue : 0;
-    };
-    setUserStrategyWiseTVL(getTVL());
-  }, [userStats, params.strategyId]);
 
   const balData = useAtomValue(strategy?.balanceSummaryAtom || DUMMY_BAL_ATOM);
   const individualBalances = useAtomValue(
@@ -231,52 +219,35 @@ const Strategy = ({ params }: StrategyParams) => {
                   <HarvestTime strategy={strategy} balData={balData} />
                 )}
                 <Box className={styles.border_gray} marginTop={'20px'}>
-                  {!balData.isLoading &&
-                    !balData.isError &&
-                    !balData.isPending &&
-                    balData.data &&
-                    balData.data.tokenInfo && (
-                      <Flex width={'100%'} justifyContent={'space-between'}>
-                        <Box
-                          display={'flex'}
-                          alignItems={'center'}
-                          justifyContent={'space-between'}
-                          width={'100%'}
-                        >
-                          <Text className="theme-strategy-subtitle">
-                            <b>Total Position Value </b>
-                          </Text>
-                          <Text fontSize={'21px'}>
-                            {address ? (
-                              Number(
-                                balData.data.amount.toEtherToFixedDecimals(
-                                  balData.data.tokenInfo?.displayDecimals || 2,
-                                ),
-                              ) === 0 || strategy?.isRetired() ? (
-                                '-'
-                              ) : userStatsPending ? (
-                                <Spinner size="sm" marginTop={'5px'} />
-                              ) : (
-                                `USD ${userStrategyWiseTVL.toFixed(2)}`
-                              )
+                  {!userStrategyWiseTVLError && (
+                    <Flex width={'100%'} justifyContent={'space-between'}>
+                      <Box
+                        display={'flex'}
+                        alignItems={'center'}
+                        justifyContent={'space-between'}
+                        width={'100%'}
+                      >
+                        <Text className="theme-strategy-subtitle">
+                          <b>Total Position Value </b>
+                        </Text>
+                        <Text fontSize={'21px'}>
+                          {address ? (
+                            userStrategyWiseTVLPending ? (
+                              <Spinner size="sm" marginTop={'5px'} />
+                            ) : userStrategyWiseTVL === 0 ||
+                              strategy?.isRetired() ? (
+                              '-'
                             ) : (
-                              'Connect wallet'
-                            )}
-                          </Text>
-                        </Box>
-                      </Flex>
-                    )}
-                  {(balData.isLoading || !balData.data?.tokenInfo) && (
-                    <Text className="theme-strategy-subtitle">
-                      <b>Total Position Value </b>
-                      {address ? (
-                        <Spinner size="sm" marginTop={'5px'} />
-                      ) : (
-                        'Connect wallet'
-                      )}
-                    </Text>
+                              `USD ${userStrategyWiseTVL.toFixed(2)}`
+                            )
+                          ) : (
+                            'Connect wallet'
+                          )}
+                        </Text>
+                      </Box>
+                    </Flex>
                   )}
-                  {balData.isError && (
+                  {userStrategyWiseTVLError && (
                     <Text className="theme-strategy-subtitle">
                       <b>Total Position Value: Error</b>
                     </Text>

@@ -16,12 +16,10 @@ import {
   Button,
   Tooltip,
   Grid,
-  Menu,
-  MenuButton,
   Center,
-  MenuList,
-  MenuItem,
   Link,
+  Badge,
+  Flex,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { useAtom, useAtomValue, Atom, useSetAtom } from 'jotai';
@@ -39,8 +37,6 @@ import { BalanceResult, DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import { StrategyInfo } from '@/store/strategies.atoms';
 import MyNumber from '@/utils/MyNumber';
 import LoadingWrap from './LoadingWrap';
-import { ChevronDownIcon } from '@chakra-ui/icons';
-import { MyMenuItemProps, MyMenuListProps } from '@/utils';
 import debounce from 'lodash.debounce';
 
 interface AmountInputProps {
@@ -535,62 +531,29 @@ const AmountInput = forwardRef(
         {/* Token selection and balance display */}
         <Grid templateColumns="repeat(5, 1fr)" gap={6}>
           <GridItem colSpan={2}>
-            <Menu>
-              <MenuButton
-                as={Button}
-                height={'100%'}
-                rightIcon={<ChevronDownIcon />}
-                bgColor={'#212121'}
-                borderColor={'#363636'}
-                borderWidth={'1px'}
-                borderRadius={'46px'}
-                color="#FFF"
-                _hover={{
-                  bg: '#212121',
-                }}
-              >
+            <Badge
+              width={'111px'}
+              height={'100%'}
+              bgColor={'#212121'}
+              borderColor={'#363636'}
+              borderWidth={'1px'}
+              borderRadius={'46px'}
+              color="#FFF"
+            >
+              <Flex justifyContent="space-between">
                 <Center>
                   <ImageC
+                    m="10px"
                     src={props.tokenInfo.logo}
                     alt={props.tokenInfo.symbol}
-                    width={'20px'}
-                    marginRight="20px"
+                    width={'25px'}
                   />
-                  {props.tokenInfo.symbol}
+                  <Text fontSize="15px" align="center" paddingRight={'auto'}>
+                    {props.tokenInfo.symbol}
+                  </Text>
                 </Center>
-              </MenuButton>
-              <MenuList {...MyMenuListProps}>
-                {props.supportedTokens.map((token) => (
-                  <MenuItem
-                    key={token.symbol}
-                    {...MyMenuItemProps}
-                    borderRadius={'9px'}
-                    width={'120px'}
-                    onClick={() => {
-                      if (selectedMarket.name !== token.symbol) {
-                        setSelectedMarket(token);
-                        onAmountChange(
-                          new MyNumber('0', token.decimals),
-                          inputInfo.isMaxClicked,
-                          '',
-                          token,
-                        );
-                      }
-                    }}
-                  >
-                    <Center padding={'5px 0px'}>
-                      <ImageC
-                        src={token.logo}
-                        alt={token.symbol}
-                        width={'20px'}
-                        marginRight="20px"
-                      />
-                      {token.symbol}
-                    </Center>
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
+              </Flex>
+            </Badge>
           </GridItem>
           <GridItem colSpan={3}>
             <BalanceComponent

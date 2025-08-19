@@ -34,6 +34,7 @@ import { useMemo } from 'react';
 import { FaWallet } from 'react-icons/fa';
 import arrow from '@public/arrow_left.png';
 import AccountDeposit from './AccountDeposit';
+import { AccountYield } from './AccountYield';
 
 export interface YieldCardProps {
   pool: PoolInfo;
@@ -526,7 +527,11 @@ export default function YieldCard(props: YieldCardProps) {
           />
         </Td>
         <Td alignContent={'center'}>
-          <AccountDeposit strategyAddress={pool.pool.id} />
+          <AccountDeposit strategyAddress={pool.pool.id} />{' '}
+          {/* FIXME: currently showing tvl, not current deposits */}
+        </Td>
+        <Td alignContent={'center'}>
+          <AccountYield strategyAddress={pool.pool.id} />
         </Td>
         <Td alignContent={'center'}>
           {isRetired ? (

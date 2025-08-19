@@ -7,6 +7,7 @@ import {
   Tag,
   Text,
   Tooltip,
+  VStack,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { StrategyInfo } from '@/store/strategies.atoms';
@@ -145,13 +146,20 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
               className={styles.border}
               marginRight={'5px'}
               padding={'16px 21px'}
-              width={'180px'}
+              width={'160px'}
               alignItems={'center'}
               display={'flex'}
               justifyContent={'space-between'}
             >
-              <Text>APY</Text>
-              <Text>{((strategyInfo?.apy || 0) * 100).toFixed(2)}%</Text>
+              <VStack width={'100%'} gap={'0px'}>
+                <Text className="theme-strategy-subtitle">APY</Text>
+                <Text
+                  fontSize={'27px'}
+                  className="theme-gradient-starknet-text"
+                >
+                  {((strategyInfo?.apy || 0) * 100).toFixed(2)}%
+                </Text>
+              </VStack>
             </Container>
           </Tooltip>
           {strategyInfo && strategyInfo.apySplit.rewardsApy > 0 && (
@@ -178,20 +186,22 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
             label={`This is when your investment increases as STRK rewards are automatically claimed and reinvested into the strategy's tokens.`}
           >
             <Box
-              className={styles.border_alt}
+              className={styles.border_gray}
               display={'flex'}
               justifyContent={'space-between'}
               alignItems={'center'}
               width={'360px'}
             >
-              <Text>
-                Next Harvest in:{' '}
-                {harvestTimestamp.isZero && <Text>Anytime now</Text>}
-              </Text>
-              <Text>
-                {harvestTimestamp.days ?? 0}d {harvestTimestamp.hours ?? 0}h{' '}
-                {harvestTimestamp.minutes ?? 0}m
-              </Text>
+              <VStack width={'100%'} gap={'0px'}>
+                <Text className="theme-strategy-subtitle">
+                  Next Harvest{' '}
+                  {harvestTimestamp.isZero && <Text>Anytime now</Text>}
+                </Text>
+                <Text fontSize={'27px'}>
+                  {harvestTimestamp.days ?? 0}d {harvestTimestamp.hours ?? 0}h{' '}
+                  {harvestTimestamp.minutes ?? 0}m
+                </Text>
+              </VStack>
             </Box>
           </Tooltip>
         )}
@@ -199,14 +209,14 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
 
       {!strategy.settings.hideHarvestInfo && (
         <Box
-          className={styles.border_alt}
+          className={styles.border_gray}
           marginTop={'20px'}
           display="flex"
           width={'100%'}
           alignItems={'center'}
           justifyContent={'space-between'}
         >
-          <Text>Harvested </Text>
+          <Text className="theme-strategy-subtitle">Harvested</Text>
           <Text>
             <b>
               {getDisplayCurrencyAmount(

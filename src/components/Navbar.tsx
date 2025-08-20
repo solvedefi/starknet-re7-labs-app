@@ -12,7 +12,6 @@ import {
   MenuItem,
   MenuList,
   Text,
-  useDisclosure,
 } from '@chakra-ui/react';
 import { useAtom, useSetAtom } from 'jotai';
 import {
@@ -370,30 +369,54 @@ export default function Navbar(props: NavbarProps) {
                   )}
                 </Center>
               </MenuButton>
-              <MenuList {...MyMenuListProps} borderRadius={'146px'}>
+              <MenuList
+                {...MyMenuListProps}
+                borderRadius={'9px'}
+                width={'180px'}
+              >
                 {address && (
-                  <MenuItem
-                    {...MyMenuItemProps}
-                    width={'140px'}
-                    height={'52px'}
-                    borderRadius={'46px'}
-                    onClick={() => {
-                      disconnectAsync().then((data) => {
-                        console.log('wallet disconnected');
-                        setLastWallet(null);
-                        setIsWalletConnected(false);
-                      });
-                    }}
-                  >
-                    DISCONNECT
-                    <Image
-                      src={close.src}
-                      width={'12px'}
-                      height={'12px'}
-                      alt="pfp"
-                      marginLeft={'20px'}
-                    />
-                  </MenuItem>
+                  <>
+                    <MenuItem
+                      as={Button}
+                      {...MyMenuItemProps}
+                      width="100%"
+                      height={'52px'}
+                      onClick={() => {
+                        disconnectAsync().then(() => {
+                          console.log('wallet disconnected');
+                          setLastWallet(null);
+                          setIsWalletConnected(false);
+                        });
+                      }}
+                    >
+                      DISCONNECT
+                      <Image
+                        src={close.src}
+                        width={'12px'}
+                        height={'12px'}
+                        alt="pfp"
+                        marginLeft={'auto'}
+                      />
+                    </MenuItem>
+                    <MenuItem
+                      as={Button}
+                      {...MyMenuItemProps}
+                      width="100%"
+                      height={'52px'}
+                      onClick={() => {
+                        connectWallet();
+                      }}
+                    >
+                      SWITCH
+                      <Image
+                        src={connectImg.src}
+                        width={'14px'}
+                        height={'14px'}
+                        alt="pfp"
+                        marginLeft={'auto'}
+                      />
+                    </MenuItem>
+                  </>
                 )}
               </MenuList>
             </Menu>

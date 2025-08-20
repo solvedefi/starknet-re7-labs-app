@@ -12,7 +12,6 @@ import {
   MenuItem,
   MenuList,
   Text,
-  useDisclosure,
 } from '@chakra-ui/react';
 import { useAtom, useSetAtom } from 'jotai';
 import {
@@ -252,8 +251,6 @@ export default function Navbar(props: NavbarProps) {
     console.log('tncinfo address', address);
     setAddress(address);
   }, [address]);
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Container

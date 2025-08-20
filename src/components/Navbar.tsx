@@ -253,6 +253,20 @@ export default function Navbar(props: NavbarProps) {
     setAddress(address);
   }, [address]);
 
+  const connectorDisplayDetails = useMemo(() => {
+    const icon = connector?.icon;
+    if (icon) {
+      return {
+        icon: typeof icon === 'string' ? icon : icon.dark,
+        rounded: undefined,
+      };
+    }
+    return {
+      icon: active.src,
+      rounded: 'full',
+    };
+  }, [connector]);
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -323,11 +337,11 @@ export default function Navbar(props: NavbarProps) {
                   {address ? (
                     <Flex alignItems="center" gap=".5rem">
                       <Image
-                        src={active.src}
+                        src={connectorDisplayDetails.icon}
                         alt="pfp"
-                        width={{ base: '13px', sm: '13px' }}
-                        height={{ base: '13px', sm: '13px' }}
-                        rounded="full"
+                        width={'15px'}
+                        height={'15px'}
+                        rounded={connectorDisplayDetails.rounded}
                       />{' '}
                       <Text as="h3" marginTop={'3px !important'}>
                         {starkProfile && starkProfile.name

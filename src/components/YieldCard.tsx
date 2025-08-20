@@ -144,11 +144,10 @@ function getAPRWithToolTip(pool: PoolInfo) {
   return (
     <Tooltip hasArrow label={tip} bg="gray.300" color="black">
       <Box
-        width={'100%'}
-        marginRight={'0px'}
-        marginLeft={'auto'}
+        width={''}
+        padding={'auto'}
         display={'flex'}
-        justifyContent={'flex-end'}
+        justifyContent={'flex-start'}
       >
         {pool.isLoading && <Spinner />}
         {!pool.isLoading && (
@@ -181,7 +180,7 @@ function StrategyAPY(props: YieldCardProps) {
           -
         </Text>
       ) : (
-        <>
+        <Box justifyContent={'flex-start'}>
           {getAPRWithToolTip(pool)}
 
           {pool.aprSplits.length &&
@@ -208,7 +207,7 @@ function StrategyAPY(props: YieldCardProps) {
                 </Box>
               </Tooltip>
             )}
-        </>
+        </Box>
       )}
     </Box>
   );
@@ -263,7 +262,7 @@ export function StrategyTVL(props: YieldCardProps) {
       display={'flex'}
       flexDirection={'column'}
       justifyContent={'center'}
-      alignItems={'flex-end'}
+      alignItems={'flex-start'}
     >
       {isPoolLive && (
         <Text fontSize={'16px'}>
@@ -511,14 +510,8 @@ export default function YieldCard(props: YieldCardProps) {
             showProtocolName={props.showProtocolName}
           />
         </Td>
-        <Td alignContent={'center'}>
-          {isRetired ? (
-            <Text ml="auto" w="fit-content" mr="2">
-              -
-            </Text>
-          ) : (
-            <StrategyAPY pool={pool} index={index} />
-          )}
+        <Td alignContent={'center'} justifyContent={'flex-start'}>
+          <StrategyAPY pool={pool} index={index} />
         </Td>
         {/* <Td>
           {isRetired ? (

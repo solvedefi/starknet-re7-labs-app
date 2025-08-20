@@ -1,5 +1,6 @@
 import { usePagination } from '@ajna/pagination';
 import {
+  Box,
   Container,
   Skeleton,
   Stack,
@@ -11,7 +12,7 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { filteredPools } from '@/store/protocols';
 import {
@@ -21,6 +22,7 @@ import {
 
 import { YieldStrategyCard } from './YieldCard';
 import { useRouter } from 'next/navigation';
+import { SortIndicator, SortColumn, SortDirection } from './SortIndicator';
 
 export default function Strategies() {
   const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
@@ -41,6 +43,49 @@ export default function Strategies() {
   const handleStrategyClick = (strategyId: string) => {
     router.push(`/strategy/${strategyId}`);
   };
+
+  const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+
+  // Apply sorting to the data
+  const sortedStrkFarmPools = useMemo(() => {
+    if (!sortColumn) return strkFarmPools;
+
+    return [...strkFarmPools].sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      switch (sortColumn) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'apy':
+          aValue = a.apy;
+          bValue = b.apy;
+          break;
+        case 'tvl':
+          aValue = a.tvlUsd;
+          bValue = b.tvlUsd;
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [strkFarmPools, sortColumn, sortDirection]);
 
   const pools = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -72,17 +117,68 @@ export default function Strategies() {
             borderRadius="15px"
             borderBottom={'10px solid #131313 !important'}
           >
-            <Th borderLeft={'10px solid #131313 !important'}>Strategy name</Th>
-            <Th textAlign={'right'}>APY</Th>
+            <Th
+              borderLeft={'10px solid #131313 !important'}
+              cursor="pointer"
+              onClick={() => handleSort('name')}
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                Position Name
+                <SortIndicator
+                  column="name"
+                  sortColumn={sortColumn}
+                  sortDirection={sortDirection}
+                />
+              </div>
+            </Th>
+            <Th
+              textAlign={'right'}
+              cursor="pointer"
+              onClick={() => handleSort('apy')}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                }}
+              >
+                <Text>APY</Text>
+                <SortIndicator
+                  column="apy"
+                  sortColumn={sortColumn}
+                  sortDirection={sortDirection}
+                />
+              </div>
+            </Th>
             {/* <Th textAlign={'right'}>Risk</Th> */}
-            <Th textAlign={'right'}>TVL</Th>
+            <Th
+              textAlign={'right'}
+              cursor="pointer"
+              onClick={() => handleSort('tvl')}
+            >
+              <Box
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                }}
+              >
+                <Text>TVL</Text>
+                <SortIndicator
+                  column="tvl"
+                  sortColumn={sortColumn}
+                  sortDirection={sortDirection}
+                />
+              </Box>
+            </Th>
             <Th borderRight={'10px solid #131313 !important'}></Th>
           </Tr>
         </Thead>
         <Tbody>
-          {strkFarmPools.length > 0 && (
+          {sortedStrkFarmPools.length > 0 && (
             <>
-              {strkFarmPools.map((pool, index) => {
+              {sortedStrkFarmPools.map((pool, index) => {
                 return (
                   <YieldStrategyCard
                     key={pool.id}
@@ -96,7 +192,7 @@ export default function Strategies() {
           )}
         </Tbody>
       </Table>
-      {strkFarmPools.length === 0 && (
+      {sortedStrkFarmPools.length === 0 && (
         <Stack>
           <Skeleton height="70px" />
           <Skeleton height="70px" />

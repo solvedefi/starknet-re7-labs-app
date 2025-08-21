@@ -1,6 +1,5 @@
 import { usePagination } from '@ajna/pagination';
 import {
-  Box,
   Container,
   Skeleton,
   Stack,
@@ -22,7 +21,8 @@ import {
 
 import { YieldStrategyCard } from './YieldCard';
 import { useRouter } from 'next/navigation';
-import { SortIndicator, SortColumn, SortDirection } from './SortIndicator';
+import { SortColumn, SortDirection } from './SortIndicator';
+import { SortableTitle } from './SortableTitle';
 
 export default function Strategies() {
   const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
@@ -117,61 +117,30 @@ export default function Strategies() {
             borderRadius="15px"
             borderBottom={'10px solid #131313 !important'}
           >
-            <Th
-              borderLeft={'10px solid #131313 !important'}
-              cursor="pointer"
-              onClick={() => handleSort('name')}
+            <SortableTitle
+              columnId="name"
+              selectedColumn={sortColumn}
+              sortDirection={sortDirection}
+              handleSort={handleSort}
             >
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                Position Name
-                <SortIndicator
-                  column="name"
-                  sortColumn={sortColumn}
-                  sortDirection={sortDirection}
-                />
-              </div>
-            </Th>
-            <Th
-              textAlign={'right'}
-              cursor="pointer"
-              onClick={() => handleSort('apy')}
+              <Text>Position Name</Text>
+            </SortableTitle>
+            <SortableTitle
+              columnId="apy"
+              selectedColumn={sortColumn}
+              sortDirection={sortDirection}
+              handleSort={handleSort}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                }}
-              >
-                <Text>APY</Text>
-                <SortIndicator
-                  column="apy"
-                  sortColumn={sortColumn}
-                  sortDirection={sortDirection}
-                />
-              </div>
-            </Th>
-            {/* <Th textAlign={'right'}>Risk</Th> */}
-            <Th
-              textAlign={'right'}
-              cursor="pointer"
-              onClick={() => handleSort('tvl')}
+              <Text>APY</Text>
+            </SortableTitle>
+            <SortableTitle
+              columnId="tvl"
+              selectedColumn={sortColumn}
+              sortDirection={sortDirection}
+              handleSort={handleSort}
             >
-              <Box
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                }}
-              >
-                <Text>TVL</Text>
-                <SortIndicator
-                  column="tvl"
-                  sortColumn={sortColumn}
-                  sortDirection={sortDirection}
-                />
-              </Box>
-            </Th>
+              <Text>TVL</Text>
+            </SortableTitle>
             <Th borderRight={'10px solid #131313 !important'}></Th>
           </Tr>
         </Thead>

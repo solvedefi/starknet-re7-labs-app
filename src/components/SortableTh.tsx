@@ -2,21 +2,22 @@ import { Th, Flex } from '@chakra-ui/react';
 import { SortColumn, SortDirection, SortIndicator } from './SortIndicator';
 import { ReactNode, useState } from 'react';
 
-type SortableTitleProps = {
+type SortableThProps = {
   columnId: SortColumn;
   selectedColumn: SortColumn | null;
   sortDirection: SortDirection;
-  children: ReactNode;
   handleSort: (columnId: SortColumn) => void;
+  defaultSortDirection?: SortDirection;
+  children: ReactNode;
 };
 
-export const SortableTitle = ({
+export const SortableTh = ({
   columnId,
   selectedColumn,
   sortDirection,
   handleSort,
   children,
-}: SortableTitleProps) => {
+}: SortableThProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseEnter = () => setIsHovered(true);

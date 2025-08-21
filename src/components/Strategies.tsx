@@ -22,7 +22,7 @@ import {
 import { YieldStrategyCard } from './YieldCard';
 import { useRouter } from 'next/navigation';
 import { SortColumn, SortDirection } from './SortIndicator';
-import { SortableTitle } from './SortableTitle';
+import { SortableTh } from './SortableTh';
 
 export default function Strategies() {
   const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
@@ -66,8 +66,10 @@ export default function Strategies() {
 
       switch (sortColumn) {
         case 'name':
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
+          // we want to treat letters and numbers differently, as we want A to be
+          // the top of a desc list
+          bValue = a.name.toLowerCase();
+          aValue = b.name.toLowerCase();
           break;
         case 'apy':
           aValue = a.apy;
@@ -117,30 +119,30 @@ export default function Strategies() {
             borderRadius="15px"
             borderBottom={'10px solid #131313 !important'}
           >
-            <SortableTitle
+            <SortableTh
               columnId="name"
               selectedColumn={sortColumn}
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
               <Text>Position Name</Text>
-            </SortableTitle>
-            <SortableTitle
+            </SortableTh>
+            <SortableTh
               columnId="apy"
               selectedColumn={sortColumn}
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
               <Text>APY</Text>
-            </SortableTitle>
-            <SortableTitle
+            </SortableTh>
+            <SortableTh
               columnId="tvl"
               selectedColumn={sortColumn}
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
               <Text>TVL</Text>
-            </SortableTitle>
+            </SortableTh>
             <Th borderRight={'10px solid #131313 !important'}></Th>
           </Tr>
         </Thead>

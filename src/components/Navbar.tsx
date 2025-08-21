@@ -165,8 +165,6 @@ export default function Navbar(props: NavbarProps) {
   });
   const { connect: connectSnReact } = useConnect();
 
-  const isWalletConnect: boolean = false;
-
   const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
 
   const getTokenBalance = async (token: string, address: string) => {
@@ -265,8 +263,6 @@ export default function Navbar(props: NavbarProps) {
       rounded: 'full',
     };
   }, [connector]);
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Container

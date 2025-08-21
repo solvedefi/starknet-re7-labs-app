@@ -529,7 +529,7 @@ const AmountInput = forwardRef(
     return (
       <Box width={'100%'}>
         {/* Token selection and balance display */}
-        <Grid templateColumns="repeat(5, 1fr)" gap={6}>
+        <Grid templateColumns="repeat(5, 1fr)" gap={'16px'}>
           <GridItem colSpan={2}>
             <Badge
               width={'111px'}

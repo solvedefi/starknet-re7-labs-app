@@ -83,7 +83,7 @@ export function TokenDeposit(props: TokenDepositProps) {
                   isDualToken={props.isDualToken || false}
                 />
                 {strategy.settings.alerts != undefined && (
-                  <VStack mt={'20px'}>
+                  <VStack>
                     {strategy.settings.alerts
                       .filter((a) => a.tab == 'deposit' || a.tab == 'all')
                       .map((alert, index) => (

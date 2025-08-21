@@ -319,7 +319,7 @@ function InternalDeposit(props: DepositProps) {
 
   return (
     <Box>
-      <VStack width={'100%'} gap={5}>
+      <VStack width={'100%'} gap={'16px'} paddingTop={'16px'}>
         {/* // todo wont work with multiple token options for now */}
         {callsInfo.length &&
           callsInfo[0].amounts.map((inputAmtInfo, index) => {
@@ -344,7 +344,7 @@ function InternalDeposit(props: DepositProps) {
           })}
       </VStack>
 
-      <Center marginTop={'10px'}>
+      <Center paddingY={'32px'}>
         <TxButton
           txInfo={txInfo}
           buttonText={props.buttonText}

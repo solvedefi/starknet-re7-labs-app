@@ -12,14 +12,10 @@ import {
   GridItem,
   NumberInput,
   NumberInputField,
-  Image as ImageC,
   Button,
   Tooltip,
   Grid,
-  Center,
   Link,
-  Badge,
-  Flex,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { useAtom, useAtomValue, Atom, useSetAtom } from 'jotai';
@@ -38,6 +34,7 @@ import { StrategyInfo } from '@/store/strategies.atoms';
 import MyNumber from '@/utils/MyNumber';
 import LoadingWrap from './LoadingWrap';
 import debounce from 'lodash.debounce';
+import TokenBadge from './TokenbBadge';
 
 interface AmountInputProps {
   index: number;
@@ -531,29 +528,10 @@ const AmountInput = forwardRef(
         {/* Token selection and balance display */}
         <Grid templateColumns="repeat(5, 1fr)" gap={'16px'}>
           <GridItem colSpan={2}>
-            <Badge
-              width={'111px'}
-              height={'100%'}
-              bgColor={'#212121'}
-              borderColor={'#363636'}
-              borderWidth={'1px'}
-              borderRadius={'46px'}
-              color="#FFF"
-            >
-              <Flex justifyContent="space-between">
-                <Center>
-                  <ImageC
-                    m="10px"
-                    src={props.tokenInfo.logo}
-                    alt={props.tokenInfo.symbol}
-                    width={'25px'}
-                  />
-                  <Text fontSize="15px" align="center" paddingRight={'auto'}>
-                    {props.tokenInfo.symbol}
-                  </Text>
-                </Center>
-              </Flex>
-            </Badge>
+            <TokenBadge
+              symbol={props.tokenInfo.symbol}
+              iconSrc={props.tokenInfo.logo}
+            />
           </GridItem>
           <GridItem colSpan={3}>
             <BalanceComponent

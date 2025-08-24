@@ -5,12 +5,7 @@ import {
   IStrategyActionHook,
   onStratAmountsChangeFn,
 } from '@/strategies/IStrategy';
-import {
-  convertToMyNumber,
-  convertToV1TokenInfo,
-  MyMenuItemProps,
-  MyMenuListProps,
-} from '@/utils';
+import { convertToMyNumber, convertToV1TokenInfo } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
 import {
   Box,
@@ -20,17 +15,11 @@ import {
   VStack,
   NumberInput,
   NumberInputField,
-  Grid,
-  GridItem,
-  Image as ImageC,
   Button,
   Slider,
   SliderTrack,
   SliderFilledTrack,
   SliderThumb,
-  Menu,
-  MenuList,
-  MenuItem,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
@@ -165,6 +154,7 @@ function InternalRedeem(props: RedeemProps) {
   const [percentageInput, setPercentageInput] = useState('');
   const [selectedToken, setSelectedToken] = useState<TokenInfoV2 | null>(null);
   const [availableTokens, setAvailableTokens] = useState<TokenInfoV2[]>([]);
+  const strategyBalances = useAtomValue(props.strategy.balancesAtom);
 
   useEffect(() => {
     resetRedeemForm();
@@ -184,16 +174,15 @@ function InternalRedeem(props: RedeemProps) {
         // Get initial callsInfo to determine available tokens
         const initialCalls = await props.callsInfo({
           amount: MyNumber.fromZero(),
-          amount2: undefined,
+          amount2: MyNumber.fromZero(),
           address: address || '0x0',
           provider,
           isMax: false,
         });
 
         if (initialCalls.length > 0) {
-          const tokens = initialCalls.map((c) => c.amounts[0].tokenInfo);
+          const tokens = initialCalls[0].amounts.map((a) => a.tokenInfo);
           setAvailableTokens(tokens);
-
           // Set the first token as selected if none is selected
           if (tokens.length > 0 && !selectedToken) {
             setSelectedToken(tokens[0]);
@@ -544,8 +533,8 @@ function InternalRedeem(props: RedeemProps) {
 
   return (
     <Box>
-      <VStack width={'100%'} gap={5}>
-        <Flex gap={'15px'} width="100%" align="center" marginBottom={'10px'}>
+      <VStack width={'100%'} gap={'24px'}>
+        <Flex gap={'15px'} width="100%" align="center" paddingBottom={'24px'}>
           <Box
             position="relative"
             borderRadius="6px"
@@ -562,13 +551,16 @@ function InternalRedeem(props: RedeemProps) {
               precision={0}
               step={1}
               size="sm"
-              width="80px"
-              height={'42px'}
+              width="103px"
+              height={'60px'}
               isDisabled={balance.isZero()}
               keepWithinRange={false}
               clampValueOnBlur={false}
             >
               <NumberInputField
+                display={'flex'}
+                alignItems={'center'}
+                justifyContent={'center'}
                 bg="transparent"
                 color="white"
                 border="none"
@@ -577,7 +569,7 @@ function InternalRedeem(props: RedeemProps) {
                 fontSize={'16px'}
                 textAlign="center"
                 paddingRight="20px"
-                height={'42px'}
+                height={'100%'}
                 borderRadius={'6px'}
               />
             </NumberInput>
@@ -608,7 +600,12 @@ function InternalRedeem(props: RedeemProps) {
             <SliderTrack bg="#323232" height="6px">
               <SliderFilledTrack bg="linear-gradient(to right, #2E45D0, #B1525C)" />
             </SliderTrack>
-            <SliderThumb bg="#B1525C" margin={'0px 16px 0px 8px'} />
+            <SliderThumb
+              height={'22px'}
+              width={'22px'}
+              bg="#B1525C"
+              margin={'0px 16px 0px 8px'}
+            />
           </Slider>
           <Button
             borderRadius={'146px'}
@@ -633,39 +630,19 @@ function InternalRedeem(props: RedeemProps) {
             Max
           </Button>
         </Flex>
-        <Box width="100%">
-          <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-            <GridItem>
+        <VStack width={'100%'} gap="24px">
+          {availableTokens.map((token, index) => (
+            <Box key={token.symbol} width="100%">
+              {/* <Grid templateColumns="repeat(2, 1fr)" gap={4}> */}
+              {/* <GridItem> */}
               <Box>
-                <Menu>
-                  <TokenBadge
-                    symbol={selectedToken?.symbol || ''}
-                    iconSrc={selectedToken?.logo || ''}
-                  />
-                  <MenuList {...MyMenuListProps}>
-                    {availableTokens.map((token) => (
-                      <MenuItem
-                        key={token.symbol}
-                        {...MyMenuItemProps}
-                        borderRadius={'9px'}
-                        onClick={() => handleTokenChange(token)}
-                      >
-                        <Center>
-                          <ImageC
-                            src={token.logo}
-                            alt={token.symbol}
-                            width={'20px'}
-                            marginRight="20px"
-                          />
-                          {token.symbol}
-                        </Center>
-                      </MenuItem>
-                    ))}
-                  </MenuList>
-                </Menu>
+                <TokenBadge
+                  symbol={token.symbol || ''}
+                  iconSrc={token.logo || ''}
+                />
               </Box>
-            </GridItem>
-            <GridItem>
+              {/* </GridItem> */}
+              {/* <GridItem> */}
               <Box color={'light_grey'} textAlign={'right'}>
                 <LoadingWrap
                   isLoading={balData.isLoading || balData.isPending}
@@ -683,67 +660,67 @@ function InternalRedeem(props: RedeemProps) {
                   }}
                 ></LoadingWrap>
               </Box>
-            </GridItem>
-          </Grid>
+              {/* </GridItem> */}
+              {/* </Grid>/ */}
 
-          <Box marginTop={'20px'}>
-            <Flex align="center" marginBottom={'10px'}>
-              <Box
-                padding={'0px 12px'}
-                bg={'#1A1919'}
-                height={'42px'}
-                width={'100%'}
-                marginLeft={'20px'}
-                alignItems={'center'}
-              >
-                <Text
-                  fontSize={'16px'}
-                  color="white"
-                  fontWeight={'bold'}
-                  width={'100%'}
-                  marginTop={'9px'}
-                >
-                  {actualAmount.toEtherToFixedDecimals(4)}{' '}
-                  {selectedToken?.symbol || ''}
-                </Text>
+              <Box marginTop={'12px'} width="100%">
+                <Flex align="center" marginBottom={'10px'}>
+                  <Box
+                    padding={'0px 12px'}
+                    bg={'#1A1919'}
+                    height={'60px'}
+                    width={'100%'}
+                    alignItems={'center'}
+                  >
+                    <Text
+                      display="flex"
+                      alignItems="center"
+                      height="60px"
+                      fontSize={'15px'}
+                      color="#595959"
+                      fontWeight={'bold'}
+                      width={'100%'}
+                      // marginTop={'9px'}
+                      paddingLeft={'12px'}
+                    >
+                      {token.symbol || ''}{' '}
+                      {strategyBalances[index].amount
+                        .operate('mul', Number(percentageInput) / 100)
+                        .toEtherToFixedDecimals(4)}
+                      {/* {actualAmount.toEtherToFixedDecimals(4)} */}
+                    </Text>
+                  </Box>
+                </Flex>
               </Box>
-            </Flex>
+            </Box>
+          ))}
+        </VStack>
 
-            {/*<Flex justify="space-between" marginTop={'5px'}>*/}
-            {/*  <Text fontSize={'10px'} color="light_grey">0%</Text>*/}
-            {/*  <Text fontSize={'10px'} color="light_grey">25%</Text>*/}
-            {/*  <Text fontSize={'10px'} color="light_grey">50%</Text>*/}
-            {/*  <Text fontSize={'10px'} color="light_grey">75%</Text>*/}
-            {/*  <Text fontSize={'10px'} color="light_grey">100%</Text>*/}
-            {/*</Flex>*/}
-          </Box>
-        </Box>
+        <Center width="100%">
+          <TxButton
+            txInfo={txInfo}
+            buttonText={props.buttonText}
+            text={
+              redeemInfo.loading || loadingInvestmentSummary
+                ? 'Loading...'
+                : props.buttonText
+            }
+            calls={calls}
+            buttonProps={{
+              isDisabled: !canSubmit,
+            }}
+            selectedMarket={convertToV1TokenInfo(
+              selectedToken || props.strategy.settings.quoteToken,
+            )}
+            strategy={props.strategy}
+            resetDepositForm={() => {
+              resetRedeemForm();
+              setSliderValue(0);
+              setPercentageInput('');
+            }}
+          />
+        </Center>
       </VStack>
-
-      <Center marginTop={'10px'}>
-        <TxButton
-          txInfo={txInfo}
-          buttonText={props.buttonText}
-          text={
-            redeemInfo.loading || loadingInvestmentSummary
-              ? 'Loading...'
-              : props.buttonText
-          }
-          calls={calls}
-          buttonProps={{
-            isDisabled: !canSubmit,
-          }}
-          selectedMarket={convertToV1TokenInfo(
-            selectedToken || props.strategy.settings.quoteToken,
-          )}
-          strategy={props.strategy}
-          resetDepositForm={() => {
-            resetRedeemForm();
-            setSliderValue(0);
-            setPercentageInput('');
-          }}
-        />
-      </Center>
     </Box>
   );
 }

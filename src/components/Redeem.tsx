@@ -32,7 +32,7 @@ import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import LoadingWrap from './LoadingWrap';
 import mixpanel from 'mixpanel-browser';
 import debounce from 'lodash.debounce';
-import TokenBadge from './TokenbBadge';
+import TokenBadge from './TokenBadge';
 
 interface RedeemProps {
   strategy: StrategyInfo<any>;

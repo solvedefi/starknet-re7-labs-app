@@ -34,7 +34,7 @@ import { StrategyInfo } from '@/store/strategies.atoms';
 import MyNumber from '@/utils/MyNumber';
 import LoadingWrap from './LoadingWrap';
 import debounce from 'lodash.debounce';
-import TokenBadge from './TokenbBadge';
+import TokenBadge from './TokenBadge';
 
 interface AmountInputProps {
   index: number;

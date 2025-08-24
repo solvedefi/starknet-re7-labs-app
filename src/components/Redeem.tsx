@@ -534,7 +534,13 @@ function InternalRedeem(props: RedeemProps) {
   return (
     <Box>
       <VStack width={'100%'} gap={'24px'}>
-        <Flex gap={'15px'} width="100%" align="center" paddingBottom={'24px'}>
+        <Flex
+          gap={'15px'}
+          width="100%"
+          align="center"
+          paddingBottom={'24px'}
+          borderBottom="1px solid #2F2F2F"
+        >
           <Box
             position="relative"
             borderRadius="6px"
@@ -607,28 +613,44 @@ function InternalRedeem(props: RedeemProps) {
               margin={'0px 16px 0px 8px'}
             />
           </Slider>
-          <Button
-            borderRadius={'146px'}
-            size={'sm'}
-            color="#FFF"
-            bg="#323232"
-            padding="3px 12px"
-            maxHeight={'21px'}
-            fontSize={'12px'}
-            fontWeight={'400'}
-            _active={{
-              bg: '#323232',
-              color: '#FFF',
+          <LoadingWrap
+            isLoading={balData.isLoading || balData.isPending}
+            isError={balData.isError}
+            skeletonProps={{
+              height: '10px',
+              width: '50px',
+              float: 'right',
+              marginTop: '8px',
+              marginLeft: '5px',
             }}
-            _hover={{
-              bg: '#323232',
-              color: '#FFF',
+            iconProps={{
+              marginLeft: '5px',
+              boxSize: '15px',
             }}
-            onClick={handleMaxClick}
-            isDisabled={balance.isZero()}
           >
-            Max
-          </Button>
+            <Button
+              borderRadius={'146px'}
+              size={'sm'}
+              color="#FFF"
+              bg="#323232"
+              padding="3px 12px"
+              maxHeight={'21px'}
+              fontSize={'12px'}
+              fontWeight={'400'}
+              _active={{
+                bg: '#323232',
+                color: '#FFF',
+              }}
+              _hover={{
+                bg: '#323232',
+                color: '#FFF',
+              }}
+              onClick={handleMaxClick}
+              isDisabled={balance.isZero()}
+            >
+              Max
+            </Button>
+          </LoadingWrap>
         </Flex>
         <VStack width={'100%'} gap="24px">
           {availableTokens.map((token, index) => (
@@ -645,23 +667,6 @@ function InternalRedeem(props: RedeemProps) {
                   </Text>
                 </VStack>
               </Flex>
-              <Box color={'light_grey'} textAlign={'right'}>
-                <LoadingWrap
-                  isLoading={balData.isLoading || balData.isPending}
-                  isError={balData.isError}
-                  skeletonProps={{
-                    height: '10px',
-                    width: '50px',
-                    float: 'right',
-                    marginTop: '8px',
-                    marginLeft: '5px',
-                  }}
-                  iconProps={{
-                    marginLeft: '5px',
-                    boxSize: '15px',
-                  }}
-                ></LoadingWrap>
-              </Box>
 
               <Box marginTop={'12px'} width="100%">
                 <Flex align="center" marginBottom={'10px'}>

@@ -12,6 +12,7 @@ import {
   TabPanels,
   Tabs,
   VStack,
+  Text,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import info from '@public/info.png';
@@ -37,26 +38,31 @@ export function TokenDeposit(props: TokenDepositProps) {
         <TabList>
           <Tab
             color="#5C5959"
-            paddingLeft={'0px'}
-            marginRight={'20px'}
             fontSize={'12px'}
             _selected={{ color: '#FFF' }}
             onClick={() => {
               // mixpanel.track('All pools clicked')
             }}
+            paddingX={'0px'}
+            marginX={'10px'}
           >
-            DEPOSIT
+            <Text textAlign="center" width="100%">
+              DEPOSIT
+            </Text>
           </Tab>
           <Tab
             color="#5C5959"
-            paddingLeft={'0px'}
             fontSize={'12px'}
             _selected={{ color: '#FFF' }}
             onClick={() => {
               // mixpanel.track('Strategies opened')
             }}
+            paddingX={'0px'}
+            marginX={'10px'}
           >
-            WITHDRAW
+            <Text textAlign="center" width="100%">
+              WITHDRAW
+            </Text>
           </Tab>
         </TabList>
         <TabIndicator

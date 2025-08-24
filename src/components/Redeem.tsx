@@ -174,7 +174,7 @@ function InternalRedeem(props: RedeemProps) {
         // Get initial callsInfo to determine available tokens
         const initialCalls = await props.callsInfo({
           amount: MyNumber.fromZero(),
-          amount2: MyNumber.fromZero(),
+          amount2: undefined,
           address: address || '0x0',
           provider,
           isMax: false,

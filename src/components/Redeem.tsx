@@ -633,16 +633,18 @@ function InternalRedeem(props: RedeemProps) {
         <VStack width={'100%'} gap="24px">
           {availableTokens.map((token, index) => (
             <Box key={token.symbol} width="100%">
-              {/* <Grid templateColumns="repeat(2, 1fr)" gap={4}> */}
-              {/* <GridItem> */}
-              <Box>
+              <Flex justifyContent={'space-between'}>
                 <TokenBadge
                   symbol={token.symbol || ''}
                   iconSrc={token.logo || ''}
                 />
-              </Box>
-              {/* </GridItem> */}
-              {/* <GridItem> */}
+                <VStack alignItems={'flex-end'} gap={'6px'} fontSize={'12px'}>
+                  <Text>Available balance</Text>
+                  <Text>
+                    {strategyBalances[index].amount.toEtherToFixedDecimals(4)}
+                  </Text>
+                </VStack>
+              </Flex>
               <Box color={'light_grey'} textAlign={'right'}>
                 <LoadingWrap
                   isLoading={balData.isLoading || balData.isPending}
@@ -660,8 +662,6 @@ function InternalRedeem(props: RedeemProps) {
                   }}
                 ></LoadingWrap>
               </Box>
-              {/* </GridItem> */}
-              {/* </Grid>/ */}
 
               <Box marginTop={'12px'} width="100%">
                 <Flex align="center" marginBottom={'10px'}>
@@ -680,7 +680,6 @@ function InternalRedeem(props: RedeemProps) {
                       color="#595959"
                       fontWeight={'bold'}
                       width={'100%'}
-                      // marginTop={'9px'}
                       paddingLeft={'12px'}
                     >
                       {token.symbol || ''}{' '}

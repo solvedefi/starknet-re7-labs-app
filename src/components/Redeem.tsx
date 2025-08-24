@@ -603,7 +603,7 @@ function InternalRedeem(props: RedeemProps) {
             step={1}
             isDisabled={balance.isZero()}
           >
-            <SliderTrack bg="#323232" height="6px">
+            <SliderTrack bg="#323232" height="10px" borderRadius="146px">
               <SliderFilledTrack bg="linear-gradient(to right, #2E45D0, #B1525C)" />
             </SliderTrack>
             <SliderThumb

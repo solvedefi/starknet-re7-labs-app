@@ -5,12 +5,7 @@ import {
   IStrategyActionHook,
   onStratAmountsChangeFn,
 } from '@/strategies/IStrategy';
-import {
-  convertToMyNumber,
-  convertToV1TokenInfo,
-  MyMenuItemProps,
-  MyMenuListProps,
-} from '@/utils';
+import { convertToMyNumber, convertToV1TokenInfo } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
 import {
   Box,
@@ -20,20 +15,12 @@ import {
   VStack,
   NumberInput,
   NumberInputField,
-  Grid,
-  GridItem,
-  Image as ImageC,
   Button,
   Slider,
   SliderTrack,
   SliderFilledTrack,
   SliderThumb,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
 } from '@chakra-ui/react';
-import { ChevronDownIcon } from '@chakra-ui/icons';
 import { useAccount } from '@starknet-react/core';
 import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
@@ -45,6 +32,7 @@ import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import LoadingWrap from './LoadingWrap';
 import mixpanel from 'mixpanel-browser';
 import debounce from 'lodash.debounce';
+import TokenBadge from './TokenBadge';
 
 interface RedeemProps {
   strategy: StrategyInfo<any>;
@@ -166,6 +154,7 @@ function InternalRedeem(props: RedeemProps) {
   const [percentageInput, setPercentageInput] = useState('');
   const [selectedToken, setSelectedToken] = useState<TokenInfoV2 | null>(null);
   const [availableTokens, setAvailableTokens] = useState<TokenInfoV2[]>([]);
+  const strategyBalances = useAtomValue(props.strategy.balancesAtom);
 
   useEffect(() => {
     resetRedeemForm();
@@ -192,9 +181,8 @@ function InternalRedeem(props: RedeemProps) {
         });
 
         if (initialCalls.length > 0) {
-          const tokens = initialCalls.map((c) => c.amounts[0].tokenInfo);
+          const tokens = initialCalls[0].amounts.map((a) => a.tokenInfo);
           setAvailableTokens(tokens);
-
           // Set the first token as selected if none is selected
           if (tokens.length > 0 && !selectedToken) {
             setSelectedToken(tokens[0]);
@@ -545,227 +533,198 @@ function InternalRedeem(props: RedeemProps) {
 
   return (
     <Box>
-      <VStack width={'100%'} gap={5}>
-        <Box width="100%">
-          <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-            <GridItem>
-              <Box>
-                <Menu>
-                  <MenuButton
-                    as={Button}
-                    height={'100%'}
-                    minHeight={'42px'}
-                    rightIcon={<ChevronDownIcon />}
-                    bgColor={'#212121'}
-                    borderColor={'#363636'}
-                    borderWidth={'1px'}
-                    borderRadius={'46px'}
-                    color="#FFF"
-                    padding={'0px 12px'}
-                    _hover={{
-                      bg: '#212121',
-                    }}
-                  >
-                    <Center>
-                      {selectedToken && (
-                        <ImageC
-                          src={selectedToken.logo}
-                          alt={selectedToken.symbol}
-                          width={'20px'}
-                          marginRight="20px"
-                        />
-                      )}
-                      {selectedToken ? selectedToken.symbol : 'Select token'}
-                    </Center>
-                  </MenuButton>
-                  <MenuList {...MyMenuListProps}>
-                    {availableTokens.map((token) => (
-                      <MenuItem
-                        key={token.symbol}
-                        {...MyMenuItemProps}
-                        borderRadius={'9px'}
-                        onClick={() => handleTokenChange(token)}
-                      >
-                        <Center>
-                          <ImageC
-                            src={token.logo}
-                            alt={token.symbol}
-                            width={'20px'}
-                            marginRight="20px"
-                          />
-                          {token.symbol}
-                        </Center>
-                      </MenuItem>
-                    ))}
-                  </MenuList>
-                </Menu>
-              </Box>
-            </GridItem>
-            <GridItem>
-              <Box color={'light_grey'} textAlign={'right'}>
-                <LoadingWrap
-                  isLoading={balData.isLoading || balData.isPending}
-                  isError={balData.isError}
-                  skeletonProps={{
-                    height: '10px',
-                    width: '50px',
-                    float: 'right',
-                    marginTop: '8px',
-                    marginLeft: '5px',
-                  }}
-                  iconProps={{
-                    marginLeft: '5px',
-                    boxSize: '15px',
-                  }}
-                >
-                  <Button
-                    size={'sm'}
-                    marginLeft={'15px'}
-                    color="#FFF"
-                    bg="#323232"
-                    padding="3px 12px"
-                    maxHeight={'21px'}
-                    fontSize={'12px'}
-                    fontWeight={'400'}
-                    _active={{
-                      bg: '#323232',
-                      color: '#FFF',
-                    }}
-                    _hover={{
-                      bg: '#323232',
-                      color: '#FFF',
-                    }}
-                    onClick={handleMaxClick}
-                    isDisabled={balance.isZero()}
-                  >
-                    Max
-                  </Button>
-                </LoadingWrap>
-              </Box>
-            </GridItem>
-          </Grid>
-
-          <Box marginTop={'20px'}>
-            <Flex align="center" marginBottom={'10px'}>
-              <Box
-                position="relative"
-                borderRadius="6px"
-                background="linear-gradient(#1A1919, #1A1919) padding-box, linear-gradient(to right, #2E45D0, #B1525C) border-box"
-                border="2px solid transparent"
-                minHeight={'42px'}
-                p="0"
-              >
-                <NumberInput
-                  value={percentageInput}
-                  onChange={handlePercentageInputChange}
-                  min={0}
-                  max={100}
-                  precision={0}
-                  step={1}
-                  size="sm"
-                  width="80px"
-                  height={'42px'}
-                  isDisabled={balance.isZero()}
-                  keepWithinRange={false}
-                  clampValueOnBlur={false}
-                >
-                  <NumberInputField
-                    bg="transparent"
-                    color="white"
-                    border="none"
-                    _hover={{ borderColor: '#1A1919' }}
-                    _focus={{ borderColor: '#1A1919' }}
-                    fontSize={'16px'}
-                    textAlign="center"
-                    paddingRight="20px"
-                    height={'42px'}
-                    borderRadius={'6px'}
-                  />
-                </NumberInput>
-                <Text
-                  position="absolute"
-                  right="16px"
-                  top="50%"
-                  transform="translateY(-50%)"
-                  fontSize={'16px'}
-                  color="#FFF"
-                  pointerEvents="none"
-                  fontWeight="bold"
-                >
-                  %
-                </Text>
-              </Box>
-              <Box
-                padding={'0px 12px'}
-                bg={'#1A1919'}
-                height={'42px'}
-                width={'100%'}
-                marginLeft={'20px'}
-                alignItems={'center'}
-              >
-                <Text
-                  fontSize={'16px'}
-                  color="white"
-                  fontWeight={'bold'}
-                  width={'100%'}
-                  marginTop={'9px'}
-                >
-                  {actualAmount.toEtherToFixedDecimals(4)}{' '}
-                  {selectedToken?.symbol || ''}
-                </Text>
-              </Box>
-            </Flex>
-            <Slider
-              aria-label="amount-slider"
-              value={sliderValue}
-              onChange={handleSliderChange}
-              focusThumbOnChange={false}
+      <VStack width={'100%'} gap={'24px'}>
+        <Flex
+          gap={'15px'}
+          width="100%"
+          align="center"
+          paddingBottom={'24px'}
+          borderBottom="1px solid #2F2F2F"
+        >
+          <Box
+            position="relative"
+            borderRadius="6px"
+            background="linear-gradient(#1A1919, #1A1919) padding-box, linear-gradient(to right, #2E45D0, #B1525C) border-box"
+            border="2px solid transparent"
+            minHeight={'42px'}
+            p="0"
+          >
+            <NumberInput
+              value={percentageInput}
+              onChange={handlePercentageInputChange}
               min={0}
               max={100}
+              precision={0}
               step={1}
+              size="sm"
+              width="103px"
+              height={'60px'}
+              isDisabled={balance.isZero()}
+              keepWithinRange={false}
+              clampValueOnBlur={false}
+            >
+              <NumberInputField
+                display={'flex'}
+                alignItems={'center'}
+                justifyContent={'center'}
+                bg="transparent"
+                color="white"
+                border="none"
+                _hover={{ borderColor: '#1A1919' }}
+                _focus={{ borderColor: '#1A1919' }}
+                fontSize={'16px'}
+                textAlign="center"
+                paddingRight="20px"
+                height={'100%'}
+                borderRadius={'6px'}
+              />
+            </NumberInput>
+            <Text
+              position="absolute"
+              right="16px"
+              top="50%"
+              transform="translateY(-50%)"
+              fontSize={'16px'}
+              color="#FFF"
+              pointerEvents="none"
+              fontWeight="bold"
+            >
+              %
+            </Text>
+          </Box>
+
+          <Slider
+            aria-label="amount-slider"
+            value={sliderValue}
+            onChange={handleSliderChange}
+            focusThumbOnChange={false}
+            min={0}
+            max={100}
+            step={1}
+            isDisabled={balance.isZero()}
+          >
+            <SliderTrack bg="#323232" height="10px" borderRadius="146px">
+              <SliderFilledTrack bg="linear-gradient(to right, #2E45D0, #B1525C)" />
+            </SliderTrack>
+            <SliderThumb
+              height={'22px'}
+              width={'22px'}
+              bg="#B1525C"
+              margin={'0px 16px 0px 8px'}
+            />
+          </Slider>
+          <LoadingWrap
+            isLoading={balData.isLoading || balData.isPending}
+            isError={balData.isError}
+            skeletonProps={{
+              height: '10px',
+              width: '50px',
+              float: 'right',
+              marginTop: '8px',
+              marginLeft: '5px',
+            }}
+            iconProps={{
+              marginLeft: '5px',
+              boxSize: '15px',
+            }}
+          >
+            <Button
+              borderRadius={'146px'}
+              size={'sm'}
+              color="#FFF"
+              bg="#323232"
+              padding="3px 12px"
+              maxHeight={'21px'}
+              fontSize={'12px'}
+              fontWeight={'400'}
+              _active={{
+                bg: '#323232',
+                color: '#FFF',
+              }}
+              _hover={{
+                bg: '#323232',
+                color: '#FFF',
+              }}
+              onClick={handleMaxClick}
               isDisabled={balance.isZero()}
             >
-              <SliderTrack bg="#323232" height="6px">
-                <SliderFilledTrack bg="linear-gradient(to right, #2E45D0, #B1525C)" />
-              </SliderTrack>
-              <SliderThumb bg="#B1525C" margin={'0px 16px 0px 8px'} />
-            </Slider>
+              Max
+            </Button>
+          </LoadingWrap>
+        </Flex>
+        <VStack width={'100%'} gap="24px">
+          {availableTokens.map((token, index) => (
+            <Box key={token.symbol} width="100%">
+              <Flex justifyContent={'space-between'}>
+                <TokenBadge
+                  symbol={token.symbol || ''}
+                  iconSrc={token.logo || ''}
+                />
+                <VStack alignItems={'flex-end'} gap={'6px'} fontSize={'12px'}>
+                  <Text>Available balance</Text>
+                  <Text>
+                    {strategyBalances[index].amount.toEtherToFixedDecimals(4)}
+                  </Text>
+                </VStack>
+              </Flex>
 
-            {/*<Flex justify="space-between" marginTop={'5px'}>*/}
-            {/*  <Text fontSize={'10px'} color="light_grey">0%</Text>*/}
-            {/*  <Text fontSize={'10px'} color="light_grey">25%</Text>*/}
-            {/*  <Text fontSize={'10px'} color="light_grey">50%</Text>*/}
-            {/*  <Text fontSize={'10px'} color="light_grey">75%</Text>*/}
-            {/*  <Text fontSize={'10px'} color="light_grey">100%</Text>*/}
-            {/*</Flex>*/}
-          </Box>
-        </Box>
+              <Box marginTop={'12px'} width="100%">
+                <Flex align="center" marginBottom={'10px'}>
+                  <Box
+                    padding={'0px 12px'}
+                    bg={'#1A1919'}
+                    height={'60px'}
+                    width={'100%'}
+                    alignItems={'center'}
+                  >
+                    <Text
+                      display="flex"
+                      alignItems="center"
+                      height="60px"
+                      fontSize={'15px'}
+                      color="#595959"
+                      fontWeight={'bold'}
+                      width={'100%'}
+                      paddingLeft={'12px'}
+                    >
+                      {token.symbol || ''}{' '}
+                      {strategyBalances[index].amount
+                        .operate('mul', Number(percentageInput) / 100)
+                        .toEtherToFixedDecimals(4)}
+                      {/* {actualAmount.toEtherToFixedDecimals(4)} */}
+                    </Text>
+                  </Box>
+                </Flex>
+              </Box>
+            </Box>
+          ))}
+        </VStack>
+
+        <Center width="100%">
+          <TxButton
+            txInfo={txInfo}
+            buttonText={props.buttonText}
+            text={
+              redeemInfo.loading || loadingInvestmentSummary
+                ? 'Loading...'
+                : props.buttonText
+            }
+            calls={calls}
+            buttonProps={{
+              isDisabled: !canSubmit,
+            }}
+            selectedMarket={convertToV1TokenInfo(
+              selectedToken || props.strategy.settings.quoteToken,
+            )}
+            strategy={props.strategy}
+            resetDepositForm={() => {
+              resetRedeemForm();
+              setSliderValue(0);
+              setPercentageInput('');
+            }}
+          />
+        </Center>
       </VStack>
-
-      <Center marginTop={'10px'}>
-        <TxButton
-          txInfo={txInfo}
-          buttonText={props.buttonText}
-          text={
-            redeemInfo.loading || loadingInvestmentSummary
-              ? 'Loading...'
-              : props.buttonText
-          }
-          calls={calls}
-          buttonProps={{
-            isDisabled: !canSubmit,
-          }}
-          selectedMarket={convertToV1TokenInfo(
-            selectedToken || props.strategy.settings.quoteToken,
-          )}
-          strategy={props.strategy}
-          resetDepositForm={() => {
-            resetRedeemForm();
-            setSliderValue(0);
-            setPercentageInput('');
-          }}
-        />
-      </Center>
     </Box>
   );
 }

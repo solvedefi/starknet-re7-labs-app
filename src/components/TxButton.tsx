@@ -217,7 +217,6 @@ export default function TxButton(props: TxButtonProps) {
           variant={'ghost'}
           height={'60px'}
           width={'100%'}
-          marginTop={'20px'}
           _active={{
             bg: 'linear-gradient(to right, #2E45D0, #B1525C)',
           }}

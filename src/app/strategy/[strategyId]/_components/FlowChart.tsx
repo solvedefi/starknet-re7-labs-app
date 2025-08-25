@@ -1,6 +1,5 @@
 import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
 import {
-  Handle,
   MarkerType,
   Position,
   ReactFlow,
@@ -17,6 +16,7 @@ import '@xyflow/react/dist/style.css';
 import { IInvestmentFlow } from '@strkfarm/sdk';
 import { useAtomValue } from 'jotai';
 import { Spinner } from '@chakra-ui/react';
+import { StructuredFlowNode } from './StructuredFlowNode';
 // import ELK from 'elkjs/lib/elk.bundled.js';
 
 const boxStyle = {
@@ -100,9 +100,6 @@ interface FlowEdge {
   markerEnd: any;
 }
 
-let targetHandleId = '0';
-let targetHandleCount = 0;
-
 function getNodesAndEdges(
   investmentFlows: IInvestmentFlow[],
   parent: FlowNode | null,
@@ -111,72 +108,7 @@ function getNodesAndEdges(
   const nodes: FlowNode[] = [];
   const edges: FlowEdge[] = [];
   for (const flow of investmentFlows) {
-    const reactElement = (
-      <div
-        style={{
-          position: 'relative',
-          padding: '10px',
-          borderRadius: '25px',
-          background: flow.title.includes('/')
-            ? `
-            linear-gradient(#1A1A1A, #1A1A1A) padding-box,
-            linear-gradient(to right, #2E45D0, #B1525C) border-box
-          `
-            : `
-            linear-gradient(#1A1A1A, #1A1A1A) padding-box,
-            linear-gradient(to right, #372C57, #B1525C) border-box
-          `,
-          border: '2px dashed transparent',
-          color: 'white',
-          fontSize: '12px',
-          minHeight: '120px',
-          width: '100%',
-          height: '100%',
-          alignItems: 'end',
-          textAlign: 'end',
-          fontWeight: '300',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'right',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-        }}
-      >
-        <Handle
-          type="source"
-          position={flow.title.includes('/') ? Position.Left : Position.Right}
-          style={{
-            pointerEvents: 'none',
-            background: !flow.title.includes('/') ? '#B1525C' : '#2E45D0',
-            border: '2px solid #1A2B8A',
-            width: '15px',
-            height: flow.title.includes('/') ? '40px' : '20px',
-            zIndex: 10,
-            borderRadius: '40%',
-          }}
-        />
-        <b
-          style={{ fontWeight: '700', marginTop: '20px', marginRight: '20px' }}
-        >
-          {flow.title}
-        </b>
-        {flow.subItems.map((item) => (
-          <div key={item.key} style={{ height: '100%' }}>
-            {item.key}{' '}
-            <b
-              style={{
-                fontWeight: '700',
-                marginTop: '20px',
-                marginRight: '20px',
-              }}
-            >
-              {item.value}
-            </b>
-          </div>
-        ))}
-      </div>
-    );
+    const reactElement = <StructuredFlowNode flow={flow} />;
     let style = boxStyle;
     if (flow.style) {
       style = { ...style, ...flow.style };
@@ -210,7 +142,6 @@ function getNodesAndEdges(
           stroke: 'url(#gradient-edge)',
           strokeWidth: 2,
           strokeDasharray: '5,5',
-          curveOffset: 50 + targetHandleCount * 10,
         },
         markerEnd: {
           type: MarkerType.Arrow,
@@ -219,8 +150,6 @@ function getNodesAndEdges(
           color: '#2E45D0',
         },
       });
-      targetHandleId = `${targetHandleId}0`;
-      targetHandleCount++;
     }
     const { nodes: _nodes, edges: _edges } = getNodesAndEdges(
       flow.linkedFlows,

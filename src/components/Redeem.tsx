@@ -20,6 +20,7 @@ import {
   SliderTrack,
   SliderFilledTrack,
   SliderThumb,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
@@ -660,11 +661,14 @@ function InternalRedeem(props: RedeemProps) {
                   symbol={token.symbol || ''}
                   iconSrc={token.logo || ''}
                 />
+
                 <VStack alignItems={'flex-end'} gap={'6px'} fontSize={'12px'}>
                   <Text>Available balance</Text>
-                  <Text>
-                    {strategyBalances[index].amount.toEtherToFixedDecimals(4)}
-                  </Text>
+                  <Tooltip label={strategyBalances[index].amount.toEtherStr()}>
+                    <Text>
+                      {strategyBalances[index].amount.toEtherToFixedDecimals(4)}
+                    </Text>
+                  </Tooltip>
                 </VStack>
               </Flex>
 
@@ -690,8 +694,7 @@ function InternalRedeem(props: RedeemProps) {
                       {token.symbol || ''}{' '}
                       {strategyBalances[index].amount
                         .operate('mul', Number(percentageInput) / 100)
-                        .toEtherToFixedDecimals(4)}
-                      {/* {actualAmount.toEtherToFixedDecimals(4)} */}
+                        .toEtherStr()}
                     </Text>
                   </Box>
                 </Flex>

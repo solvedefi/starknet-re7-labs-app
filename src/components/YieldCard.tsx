@@ -33,6 +33,7 @@ import mixpanel from 'mixpanel-browser';
 import { useMemo } from 'react';
 import { FaWallet } from 'react-icons/fa';
 import arrow from '@public/arrow_left.png';
+import NextLink from 'next/link';
 
 export interface YieldCardProps {
   pool: PoolInfo;
@@ -428,7 +429,8 @@ function StrategyMobileCard(props: YieldCardProps) {
       padding={'20px'}
       gap={2}
       borderBottom={'1px solid var(--chakra-colors-bg)'}
-      as={'a'}
+      as={NextLink}
+      href={`/strategies/${pool.pool.id}`}
       {...getLinkProps(pool, props.showProtocolName)}
     >
       <GridItem colSpan={3} rowSpan={props.showProtocolName ? 2 : 1}>
@@ -464,11 +466,7 @@ function StrategyMobileCard(props: YieldCardProps) {
   );
 }
 
-export function getLinkProps(
-  pool: PoolInfo,
-  showProtocolName?: boolean,
-  onClick?: (strategyId: string) => void,
-) {
+export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
   return {
     onClick: () => {
       mixpanel.track('Pool clicked', {
@@ -479,12 +477,11 @@ export function getLinkProps(
         tvl: pool.tvl,
         showProtocolName,
       });
-      onClick?.(pool.pool.id);
     },
   };
 }
 export default function YieldCard(props: YieldCardProps) {
-  const { pool, index, onClick } = props;
+  const { pool, index } = props;
 
   const isRetired = useMemo(() => {
     return isPoolRetired(pool);
@@ -499,9 +496,9 @@ export default function YieldCard(props: YieldCardProps) {
         borderRadius="9px"
         backgroundClip="padding-box"
         display={{ base: 'none', md: 'table-row' }}
-        as={'a'}
-        _hover={{ cursor: 'pointer' }}
-        {...getLinkProps(pool, props.showProtocolName, onClick)}
+        as={NextLink}
+        href={`/strategy/${pool.pool.id}`}
+        {...getLinkProps(pool, props.showProtocolName)}
       >
         <Td borderLeft={'10px solid #131313 !important'}>
           <StrategyInfo
@@ -559,17 +556,9 @@ export default function YieldCard(props: YieldCardProps) {
 export function YieldStrategyCard(props: {
   strat: STRKFarmStrategyAPIResult;
   index: number;
-  onClick: (strategyId: string) => void;
 }) {
   const strat = getPoolInfoFromStrategy(props.strat);
-  return (
-    <YieldCard
-      pool={strat}
-      index={props.index}
-      showProtocolName={true}
-      onClick={props.onClick}
-    />
-  );
+  return <YieldCard pool={strat} index={props.index} showProtocolName={true} />;
 }
 
 export function HeaderSorter(props: {

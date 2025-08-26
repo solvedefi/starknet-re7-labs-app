@@ -20,6 +20,7 @@ import {
   SliderTrack,
   SliderFilledTrack,
   SliderThumb,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
@@ -653,51 +654,64 @@ function InternalRedeem(props: RedeemProps) {
           </LoadingWrap>
         </Flex>
         <VStack width={'100%'} gap="24px">
-          {availableTokens.map((token, index) => (
-            <Box key={token.symbol} width="100%">
-              <Flex justifyContent={'space-between'}>
-                <TokenBadge
-                  symbol={token.symbol || ''}
-                  iconSrc={token.logo || ''}
-                />
-                <VStack alignItems={'flex-end'} gap={'6px'} fontSize={'12px'}>
-                  <Text>Available balance</Text>
-                  <Text>
-                    {strategyBalances[index].amount.toEtherToFixedDecimals(4)}
-                  </Text>
-                </VStack>
-              </Flex>
+          {availableTokens.map((token, index) => {
+            const balance = strategyBalances[index].amount;
+            const calculatedAmount = balance.operate(
+              'mul',
+              Number(percentageInput) / 100,
+            );
+            return (
+              <Box key={token.symbol} width="100%">
+                <Flex justifyContent={'space-between'}>
+                  <TokenBadge
+                    symbol={token.symbol || ''}
+                    iconSrc={token.logo || ''}
+                  />
 
-              <Box marginTop={'12px'} width="100%">
-                <Flex align="center" marginBottom={'10px'}>
-                  <Box
-                    padding={'0px 12px'}
-                    bg={'#1A1919'}
-                    height={'60px'}
-                    width={'100%'}
-                    alignItems={'center'}
-                  >
-                    <Text
-                      display="flex"
-                      alignItems="center"
-                      height="60px"
-                      fontSize={'15px'}
-                      color="#595959"
-                      fontWeight={'bold'}
-                      width={'100%'}
-                      paddingLeft={'12px'}
+                  <VStack alignItems={'flex-end'} gap={'6px'} fontSize={'12px'}>
+                    <Text>Available balance</Text>
+                    <Tooltip
+                      label={
+                        Number(balance.toEtherStr()) < 0.000001
+                          ? balance.toEtherStr()
+                          : balance.toEtherToFixedDecimals(6)
+                      }
                     >
-                      {token.symbol || ''}{' '}
-                      {strategyBalances[index].amount
-                        .operate('mul', Number(percentageInput) / 100)
-                        .toEtherToFixedDecimals(4)}
-                      {/* {actualAmount.toEtherToFixedDecimals(4)} */}
-                    </Text>
-                  </Box>
+                      <Text>{balance.toEtherToFixedDecimals(4)}</Text>
+                    </Tooltip>
+                  </VStack>
                 </Flex>
+
+                <Box marginTop={'12px'} width="100%">
+                  <Flex align="center" marginBottom={'10px'}>
+                    <Box
+                      padding={'0px 12px'}
+                      bg={'#1A1919'}
+                      height={'60px'}
+                      width={'100%'}
+                      alignItems={'center'}
+                    >
+                      <Text
+                        display="flex"
+                        alignItems="center"
+                        height="60px"
+                        fontSize={'15px'}
+                        color="#595959"
+                        fontWeight={'bold'}
+                        width={'100%'}
+                        paddingLeft={'12px'}
+                      >
+                        {token.symbol || ''}{' '}
+                        {Number(calculatedAmount.toEtherStr()) < 0.0001
+                          ? calculatedAmount.toEtherStr()
+                          : calculatedAmount.toEtherToFixedDecimals(4)}
+                      </Text>
+                    </Box>
+                  </Flex>
+                </Box>
               </Box>
-            </Box>
-          ))}
+            );
+          })}
         </VStack>
 
         <Center width="100%">

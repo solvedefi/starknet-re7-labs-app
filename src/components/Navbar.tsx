@@ -13,6 +13,7 @@ import {
   MenuList,
   Text,
 } from '@chakra-ui/react';
+import NextLink from 'next/link';
 import { useAtom, useSetAtom } from 'jotai';
 import {
   connect,
@@ -281,7 +282,12 @@ export default function Navbar(props: NavbarProps) {
         padding={'20px 20px 10px'}
       >
         <Flex width={'100%'}>
-          <Link href="/" margin="auto auto auto 0" textAlign={'left'}>
+          <Link
+            as={NextLink}
+            href="/"
+            margin="auto auto auto 0"
+            textAlign={'left'}
+          >
             <Image
               src={fulllogo.src}
               alt="logo"

@@ -579,12 +579,7 @@ const AmountInput = forwardRef(
             borderRadius={'10px'}
             placeholder="Amount"
             onKeyDown={(e) => {
-              if (
-                e.key === 'ArrowUp' ||
-                e.key === 'ArrowDown' ||
-                e.key === 'End' ||
-                e.key === 'Home'
-              ) {
+              if (['ArrowUp', 'ArrowDown', 'End', 'Home'].includes(e.key)) {
                 e.preventDefault();
               }
             }}

@@ -579,8 +579,7 @@ function InternalRedeem(props: RedeemProps) {
                 height={'100%'}
                 borderRadius={'6px'}
                 onKeyDown={(e) => {
-                  console.log('e.key', e.key);
-                  if (e.key === 'End' || e.key === 'Home') {
+                  if (['End', 'Home'].includes(e.key)) {
                     e.preventDefault();
                   }
                 }}

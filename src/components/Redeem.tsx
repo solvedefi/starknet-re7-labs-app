@@ -266,6 +266,7 @@ function InternalRedeem(props: RedeemProps) {
     (valueString: string, valueNumber: number) => {
       // Allow empty string and valid numbers
       if (isNaN(valueNumber)) valueNumber = 0;
+      if (isNaN(Number(valueString))) valueString = percentageInput;
 
       if (valueString === '' || (valueNumber >= 0 && valueNumber <= 100)) {
         setPercentageInput(valueString);
@@ -284,7 +285,7 @@ function InternalRedeem(props: RedeemProps) {
         }
       }
     },
-    [maxAmount, selectedToken],
+    [maxAmount, selectedToken, percentageInput],
   );
 
   // Handle token selection
@@ -353,6 +354,18 @@ function InternalRedeem(props: RedeemProps) {
     _redeemInfo: RedeemAtomType,
   ) {
     if (!_redeemInfo.onAmountsChange) return;
+
+    if (_amt.isZero()) {
+      for (let i = 0; i < _inputsInfo.length; i++) {
+        setInputInfo({
+          index: i,
+          info: {
+            amount: Web3Number.fromWei('0', _token.decimals),
+          },
+        });
+      }
+      return;
+    }
 
     const _amtWeb3 = Web3Number.fromWei(_amt.toString(), _token.decimals);
 
@@ -656,10 +669,7 @@ function InternalRedeem(props: RedeemProps) {
         <VStack width={'100%'} gap="24px">
           {availableTokens.map((token, index) => {
             const balance = strategyBalances[index].amount;
-            const calculatedAmount = balance.operate(
-              'mul',
-              Number(percentageInput) / 100,
-            );
+            const calculatedAmount = balance.operate('mul', sliderValue / 100);
             return (
               <Box key={token.symbol} width="100%">
                 <Flex justifyContent={'space-between'}>

@@ -83,7 +83,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
     }
 
     return formatTimediff(nextHarvest);
-  }, [lastHarvest, currentTime]);
+  }, [data?.timestamp, lastHarvest, currentTime]);
 
   const strategiesInfo = useAtomValue(STRKFarmAtoms.baseAPRs!);
 

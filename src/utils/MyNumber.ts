@@ -18,7 +18,7 @@ export default class MyNumber {
   static fromEther(num: string, decimals: number) {
     try {
       return new MyNumber(
-        ethers.parseUnits(num, decimals).toString(),
+        Number(ethers.parseUnits(num, decimals)).toFixed(decimals),
         decimals,
       );
     } catch (e) {

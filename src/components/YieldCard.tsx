@@ -442,7 +442,7 @@ function StrategyMobileCard(props: YieldCardProps) {
       </GridItem>
       <GridItem colSpan={1} rowSpan={2}>
         <Text
-          textAlign={'right'}
+          textAlign={'left'}
           color={'color2'}
           fontWeight={'bold'}
           fontSize={'13px'}
@@ -453,7 +453,7 @@ function StrategyMobileCard(props: YieldCardProps) {
       </GridItem>
       <GridItem colSpan={1} rowSpan={2}>
         <Text
-          textAlign={'right'}
+          textAlign={'left'}
           color={'color2'}
           fontWeight={'bold'}
           fontSize={'13px'}

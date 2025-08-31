@@ -192,6 +192,7 @@ export default function Navbar(props: NavbarProps) {
   async function connectWallet(config = connectorConfig) {
     try {
       const { connector } = await connect(config);
+
       if (connector) {
         connectSnReact({ connector: connector as any });
         setIsWalletConnected(true);

@@ -154,7 +154,7 @@ const AmountInput = forwardRef(
       const postSimulationMax = MyNumber.min(
         adjustedMaxAllowed,
         MyNumber.fromEther(
-          simulatedMaxAmount.amount.toFixed(13),
+          simulatedMaxAmount.amount.toString(),
           selectedMarket.decimals,
         ),
       );
@@ -284,17 +284,19 @@ const AmountInput = forwardRef(
                 item.amount.toString(),
                 item.tokenInfo.symbol,
               );
-              setInputInfo({
-                index: _index,
-                info: {
-                  ..._inputsInfo[_index],
-                  ...item,
-                  rawAmount: Number(item.amount).toLocaleString('en-US', {
-                    useGrouping: false,
-                    maximumFractionDigits: props.tokenInfo.decimals, // set higher if needed
-                  }),
-                },
-              });
+              if (_index !== props.index) {
+                setInputInfo({
+                  index: _index,
+                  info: {
+                    ..._inputsInfo[_index],
+                    ...item,
+                    rawAmount: Number(item.amount).toLocaleString('en-US', {
+                      useGrouping: false,
+                      maximumFractionDigits: item.tokenInfo.decimals, // set higher if needed
+                    }),
+                  },
+                });
+              }
             });
             setDepositInfo({
               ..._depositInfo,
@@ -471,7 +473,7 @@ const AmountInput = forwardRef(
             if (_index == props.index) {
               setSimulatedMaxAmount({
                 isSet: true,
-                amount: Number(item.amount.toFixed(13)),
+                amount: Number(item.amount.toString()),
               });
             }
           });
@@ -518,7 +520,7 @@ const AmountInput = forwardRef(
             address,
           });
         },
-        500,
+        800,
       ),
       [],
     ); // ms delay

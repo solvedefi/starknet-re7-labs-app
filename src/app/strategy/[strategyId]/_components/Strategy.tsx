@@ -164,7 +164,11 @@ const Strategy = ({ params }: StrategyParams) => {
   return (
     <>
       {strategy && (
-        <VStack width={'1040px'} bg={'#171717'} gap={'8.86px'}>
+        <VStack
+          width={isMobile ? '100%' : '1040px'}
+          bg={'#171717'}
+          gap={'8.86px'}
+        >
           <Grid width={'100%'} templateColumns="repeat(10, 1fr)" gap={'44px'}>
             <GridItem display="flex" colSpan={colSpan1}>
               <Card width="100%" color="white" bg="#171717">

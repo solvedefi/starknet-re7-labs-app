@@ -154,7 +154,7 @@ const AmountInput = forwardRef(
       const postSimulationMax = MyNumber.min(
         adjustedMaxAllowed,
         MyNumber.fromEther(
-          simulatedMaxAmount.amount.toString(),
+          simulatedMaxAmount.amount.toFixed(13),
           selectedMarket.decimals,
         ),
       );
@@ -473,7 +473,7 @@ const AmountInput = forwardRef(
             if (_index == props.index) {
               setSimulatedMaxAmount({
                 isSet: true,
-                amount: Number(item.amount.toString()),
+                amount: Number(item.amount.toFixed(13)),
               });
             }
           });
@@ -520,7 +520,7 @@ const AmountInput = forwardRef(
             address,
           });
         },
-        800,
+        500,
       ),
       [],
     ); // ms delay

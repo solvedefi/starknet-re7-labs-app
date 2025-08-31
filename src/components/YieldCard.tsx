@@ -430,7 +430,7 @@ function StrategyMobileCard(props: YieldCardProps) {
       gap={2}
       borderBottom={'1px solid var(--chakra-colors-bg)'}
       as={NextLink}
-      href={`/strategies/${pool.pool.id}`}
+      href={`/strategy/${pool.pool.id}`}
       {...getLinkProps(pool, props.showProtocolName)}
     >
       <GridItem colSpan={3} rowSpan={props.showProtocolName ? 2 : 1}>

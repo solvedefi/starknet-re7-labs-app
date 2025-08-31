@@ -115,12 +115,7 @@ export function getConnectors(isMobile: boolean) {
   } else if (isInBraavosMobileAppBrowser()) {
     return [mobileBraavosConnector];
   } else if (isMobile) {
-    return [
-      braavosConnector,
-      mobileConnector,
-      mobileBraavosConnector,
-      webWalletConnector,
-    ];
+    return [mobileConnector, mobileBraavosConnector, webWalletConnector];
   }
 
   const defaultConnectors = [
@@ -197,7 +192,6 @@ export default function Navbar(props: NavbarProps) {
   async function connectWallet(config = connectorConfig) {
     try {
       const { connector } = await connect(config);
-
       if (connector) {
         connectSnReact({ connector: connector as any });
         setIsWalletConnected(true);

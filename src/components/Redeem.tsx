@@ -588,7 +588,7 @@ function InternalRedeem(props: RedeemProps) {
                 _focus={{ borderColor: '#1A1919' }}
                 fontSize={'16px'}
                 textAlign="center"
-                paddingRight="20px"
+                paddingRight="30px"
                 height={'100%'}
                 borderRadius={'6px'}
               />

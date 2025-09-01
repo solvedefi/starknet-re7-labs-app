@@ -284,17 +284,19 @@ const AmountInput = forwardRef(
                 item.amount.toString(),
                 item.tokenInfo.symbol,
               );
-              setInputInfo({
-                index: _index,
-                info: {
-                  ..._inputsInfo[_index],
-                  ...item,
-                  rawAmount: Number(item.amount).toLocaleString('en-US', {
-                    useGrouping: false,
-                    maximumFractionDigits: props.tokenInfo.decimals, // set higher if needed
-                  }),
-                },
-              });
+              if (_index !== props.index) {
+                setInputInfo({
+                  index: _index,
+                  info: {
+                    ..._inputsInfo[_index],
+                    ...item,
+                    rawAmount: Number(item.amount).toLocaleString('en-US', {
+                      useGrouping: false,
+                      maximumFractionDigits: item.tokenInfo.decimals, // set higher if needed
+                    }),
+                  },
+                });
+              }
             });
             setDepositInfo({
               ..._depositInfo,

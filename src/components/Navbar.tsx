@@ -115,12 +115,7 @@ export function getConnectors(isMobile: boolean) {
   } else if (isInBraavosMobileAppBrowser()) {
     return [mobileBraavosConnector];
   } else if (isMobile) {
-    return [
-      braavosConnector,
-      mobileConnector,
-      mobileBraavosConnector,
-      webWalletConnector,
-    ];
+    return [mobileConnector, mobileBraavosConnector, webWalletConnector];
   }
 
   const defaultConnectors = [

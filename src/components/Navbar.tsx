@@ -170,8 +170,6 @@ export default function Navbar(props: NavbarProps) {
     return balance.amount.toEtherToFixedDecimals(6);
   };
 
-  console.log(account, 'account');
-
   const connectorConfig: ConnectOptionsWithConnectors = useMemo(() => {
     return {
       modalMode: 'alwaysAsk',
@@ -249,8 +247,12 @@ export default function Navbar(props: NavbarProps) {
   const connectorDisplayDetails = useMemo(() => {
     const icon = connector?.icon;
     if (icon) {
+      const iconString = typeof icon === 'string' ? icon : icon?.dark;
+      const iconSrc = iconString.startsWith('data:image')
+        ? iconString
+        : `data:image/svg+xml;utf8,${encodeURIComponent(iconString)}`;
       return {
-        icon: typeof icon === 'string' ? icon : icon.dark,
+        icon: iconSrc,
         rounded: undefined,
       };
     }

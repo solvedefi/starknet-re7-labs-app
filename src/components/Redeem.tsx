@@ -591,6 +591,11 @@ function InternalRedeem(props: RedeemProps) {
                 paddingRight="30px"
                 height={'100%'}
                 borderRadius={'6px'}
+                onKeyDown={(e) => {
+                  if (['End', 'Home'].includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
               />
             </NumberInput>
             <Text

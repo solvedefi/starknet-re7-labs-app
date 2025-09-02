@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -37,6 +37,17 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
 
   const harvestTime = useAtomValue(harvestTimeAtom);
 
+  // State to force re-calculation every minute
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 20000); // Update every 20 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   const data = harvestTime.data?.findManyHarvests[0];
 
   const lastHarvest = useMemo(() => {
@@ -72,7 +83,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
     }
 
     return formatTimediff(nextHarvest);
-  }, [data?.timestamp, lastHarvest]);
+  }, [data?.timestamp, lastHarvest, currentTime]);
 
   const strategiesInfo = useAtomValue(STRKFarmAtoms.baseAPRs!);
 

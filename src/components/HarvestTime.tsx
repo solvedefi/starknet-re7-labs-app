@@ -14,7 +14,6 @@ import { StrategyInfo } from '@/store/strategies.atoms';
 import { HarvestTimeAtom } from '@/store/harvest.atom';
 import { useAtomValue } from 'jotai';
 import { formatTimediff, getDisplayCurrencyAmount, timeAgo } from '@/utils';
-import { isMobile } from 'react-device-detect';
 import STRKFarmAtoms, {
   STRKFarmStrategyAPIResult,
 } from '@/store/strkfarm.atoms';
@@ -192,7 +191,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
           )}
         </Flex>
 
-        {!isMobile && !strategy.settings.hideHarvestInfo && (
+        {!strategy.settings.hideHarvestInfo && (
           <Tooltip
             label={`This is when your investment increases as STRK rewards are automatically claimed and reinvested into the strategy's tokens.`}
           >

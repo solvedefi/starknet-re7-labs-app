@@ -11,7 +11,7 @@ import { StrategyInfo, strategiesAtom } from './strategies.atoms';
 import { createAtomWithStorage } from './utils.atoms';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { gql } from '@apollo/client';
-import apolloClient from '@/utils/apolloClient';
+import apolloClient, { apolloClientForUserValues } from '@/utils/apolloClient';
 
 export interface StrategyTxProps {
   strategyId: string;
@@ -27,6 +27,90 @@ export interface TransactionInfo {
   status: 'pending' | 'success' | 'failed';
   createdAt: Date;
 }
+
+export type UserTxHistory = Array<{
+  type: 'deposit' | 'withdraw';
+  amount0: string;
+  amount1: string;
+  token0: string;
+  token1: string;
+}>;
+
+type EkuboVaultFlow = {
+  type: 'deposit' | 'withdraw';
+  amount0: string;
+  amount1: string;
+  token0: string;
+  token1: string;
+  txHash: string;
+  block_number: number;
+  txIndex: number;
+  eventIndex: number;
+  timestamp: number;
+  liquidity_delta: string;
+};
+
+export const getUserTxHistory = async (
+  strategyContract: string,
+  owner: string,
+): Promise<UserTxHistory> => {
+  const contractAddrFormatted = standariseAddress(strategyContract);
+  const ownerAddrFormatted = standariseAddress(owner);
+  try {
+    const { data }: { data: { ekuboVaultFlows: EkuboVaultFlow[] } } =
+      await apolloClientForUserValues.query({
+        query: gql`
+          query ContractFeeEarnings(
+            $userAddress: String!
+            $vaultContract: String!
+          ) {
+            ekuboVaultFlows(
+              user_address: $userAddress
+              vault_contract: $vaultContract
+            ) {
+              type
+              txHash
+              block_number
+              txIndex
+              eventIndex
+              token0
+              token1
+              amount0
+              amount1
+              liquidity_delta
+              timestamp
+            }
+          }
+        `,
+        variables: {
+          userAddress: ownerAddrFormatted,
+          vaultContract: contractAddrFormatted,
+        },
+      });
+
+    console.log('getUserTxHistory data', data);
+
+    return data.ekuboVaultFlows.map((tx: EkuboVaultFlow) => ({
+      type: tx.type,
+      amount0: tx.amount0,
+      amount1: tx.amount1,
+      token0: tx.token0,
+      token1: tx.token1,
+    }));
+  } catch (error) {
+    console.error('GraphQL Error:', error);
+    throw error;
+  }
+};
+
+export const UserTxHistoryAtom = (strategyContract: string, owner: string) =>
+  atomWithQuery(() => ({
+    queryKey: ['user_tx_history', strategyContract, owner],
+    queryFn: async (): Promise<UserTxHistory> => {
+      const res = await getUserTxHistory(strategyContract, owner);
+      return res;
+    },
+  }));
 
 export interface TxHistory {
   findManyInvestment_flows: {

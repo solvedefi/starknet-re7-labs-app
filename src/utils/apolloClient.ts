@@ -5,4 +5,9 @@ const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+export const apolloClientForUserValues = new ApolloClient({
+  uri: 'https://troves-indexers-graph-api-ekubo-temp.onrender.com/',
+  cache: new InMemoryCache(),
+});
+
 export default apolloClient;

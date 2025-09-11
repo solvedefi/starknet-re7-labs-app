@@ -10,6 +10,7 @@ import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
 import DeltaNeutralAbi2 from '@/abi/deltaNeutral.2.abi.json';
 import { Atom } from 'jotai';
 import {
+  getPrice,
   getTokenInfoFromAddr,
   getTokenInfoFromName,
   standariseAddress,
@@ -198,3 +199,32 @@ export const DUMMY_BAL_ATOM = atomWithQuery((get) => {
     refetchInterval: 100000000,
   };
 });
+
+export const tokenPricesAtom = (tokens: TokenInfo[]) =>
+  atomWithQuery(() => {
+    return {
+      queryKey: ['tokenPrice', ...tokens.map((token) => token.name)],
+      queryFn: async (): Promise<Record<string, number>> => {
+        // const tokenPrices: Record<string, number> = {};
+        console.log('tokenPricesAtom', tokens);
+        const queryPromises = tokens.map(async (token) => {
+          return {
+            price: await getPrice(token),
+            token: token.name,
+          };
+        });
+        const tokenPriceList = await Promise.all(queryPromises);
+
+        const tokenPriceMap: Record<string, number> = tokenPriceList.reduce(
+          (acc, token) => {
+            acc[token.token] = token.price;
+            return acc;
+          },
+          {} as Record<string, number>,
+        );
+
+        return tokenPriceMap;
+      },
+      refetchInterval: 60000,
+    };
+  });

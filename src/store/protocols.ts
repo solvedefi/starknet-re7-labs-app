@@ -8,9 +8,9 @@ import {
   PoolType,
   ProtocolAtoms2,
 } from './pools';
-import { STRKFarmStrategyAPIResult } from './strkfarm.atoms';
 import { getLiveStatusEnum } from '@/strategies/IStrategy';
 import { IDapp } from './IDapp.store';
+import { StrategyDetails } from '@/hooks/useStrategiesInfo';
 
 export const getProtocols: () => {
   name: string;
@@ -174,9 +174,7 @@ export const allPoolsAtomUnSorted = atom((get) => {
   );
 });
 
-export function getPoolInfoFromStrategy(
-  strat: STRKFarmStrategyAPIResult,
-): PoolInfo {
+export function getPoolInfoFromStrategy(strat: StrategyDetails): PoolInfo {
   const category = [Category.Others];
   if (strat.name.includes('STRK')) {
     category.push(Category.STRK);
@@ -191,6 +189,8 @@ export function getPoolInfoFromStrategy(
       name: strat.name,
       logos: [...strat.logos],
     },
+    contract: strat.contract,
+    depositDetails: { ...strat.depositDetails, tokens: strat.depositToken },
     protocol: {
       name: 'Re7 Labs',
       link: `/strategy/${strat.id}`,

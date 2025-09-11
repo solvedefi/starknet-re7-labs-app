@@ -563,7 +563,6 @@ function StrategyUserDeposits({
   amount: number;
   isLoading: boolean;
 }) {
-  console.log('StrategyUserDeposits', amount, isLoading);
   if (isLoading) return <Spinner />;
   if (amount === 0) return <Text>-</Text>;
   return <Text>${getDisplayCurrencyAmount(amount, 2)}</Text>;

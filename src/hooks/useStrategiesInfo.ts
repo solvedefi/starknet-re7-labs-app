@@ -81,7 +81,6 @@ const useUserDeposits = (
         [index]: { amount: 0, isLoading: true },
       }));
 
-      console.log('tokenPrices DATA', tokenPrices.data);
       if (!tokenPrices.data) return;
       const dep = await calculateDeposit(
         contract,
@@ -94,7 +93,12 @@ const useUserDeposits = (
         [index]: { amount: dep, isLoading: false },
       }));
     });
-  }, [accountAddress, tokenPrices.data, tokenPrices.isLoading]);
+  }, [
+    accountAddress,
+    tokenPrices.data,
+    tokenPrices.isLoading,
+    tokenPrices.isRefetching,
+  ]);
 
   return deposits;
 };

@@ -2,6 +2,7 @@ import { referralCodeAtom } from '@/store/referral.store';
 import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
 import { IStrategyProps, TokenInfo } from '@/strategies/IStrategy';
 import { getReferralUrl } from '@/utils';
+import apolloClient from '@/utils/apolloClient';
 import {
   Box,
   Button,
@@ -109,6 +110,8 @@ export default function TxButton(props: TxButtonProps) {
 
   async function handleButton() {
     writeAsync().then((tx) => {
+      apolloClient.resetStore();
+
       if (props.buttonText === 'Deposit') onOpen();
       mixpanel.track('Submitted tx', {
         strategyId: props.txInfo.strategyId,

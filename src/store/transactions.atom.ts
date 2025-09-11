@@ -11,7 +11,7 @@ import { StrategyInfo, strategiesAtom } from './strategies.atoms';
 import { createAtomWithStorage } from './utils.atoms';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { gql } from '@apollo/client';
-import apolloClient, { apolloClientForUserValues } from '@/utils/apolloClient';
+import apolloClient from '@/utils/apolloClient';
 
 export interface StrategyTxProps {
   strategyId: string;
@@ -58,7 +58,7 @@ export const getUserTxHistory = async (
   const ownerAddrFormatted = standariseAddress(owner);
   try {
     const { data }: { data: { ekuboVaultFlows: EkuboVaultFlow[] } } =
-      await apolloClientForUserValues.query({
+      await apolloClient.query({
         query: gql`
           query ContractFeeEarnings(
             $userAddress: String!
@@ -87,8 +87,6 @@ export const getUserTxHistory = async (
           vaultContract: contractAddrFormatted,
         },
       });
-
-    console.log('getUserTxHistory data', data);
 
     return data.ekuboVaultFlows.map((tx: EkuboVaultFlow) => ({
       type: tx.type,

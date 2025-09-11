@@ -1,6 +1,9 @@
 import { tokenPricesAtom } from '@/store/balance.atoms';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
-import { getUserTxHistory } from '@/store/transactions.atom';
+import {
+  getFeesHistoryAtom,
+  getUserTxHistory,
+} from '@/store/transactions.atom';
 import { getTokenInfoFromName } from '@/utils';
 import { useAccount } from '@starknet-react/core';
 import { Web3Number } from '@strkfarm/sdk';
@@ -10,6 +13,10 @@ import { useEffect, useMemo, useState } from 'react';
 
 export type StrategyDetails = STRKFarmStrategyAPIResult & {
   depositDetails: {
+    amount: number;
+    isLoading: boolean;
+  };
+  fees: {
     amount: number;
     isLoading: boolean;
   };
@@ -44,6 +51,17 @@ const calculateDeposit = async (
     tokenAmounts[0] * tokenPrices[token0.name] +
     tokenAmounts[1] * tokenPrices[token1.name]
   );
+};
+
+const useStrategyFees = (contracts: string[]) => {
+  const memoedFees = useMemo(() => {
+    return getFeesHistoryAtom(contracts);
+  }, [JSON.stringify(contracts)]);
+
+  const fees: AtomWithQueryResult<Record<string, number>, Error> = useAtomValue(
+    memoedFees,
+  );
+  return fees;
 };
 
 const useUserDeposits = (
@@ -112,13 +130,20 @@ export const useStrategiesInfo = (
   );
 
   const deposits = useUserDeposits(contracts, tokenSymbols);
+  const { data: fees, isLoading } = useStrategyFees(contracts);
 
   return strkFarmPools.map((pool, index) => {
+    const contract = pool.contract[0].address;
+
     return {
       ...pool,
       depositDetails: {
         amount: deposits[index]?.amount || 0,
         isLoading: deposits[index]?.isLoading || false,
+      },
+      fees: {
+        amount: fees?.[contract] || 0,
+        isLoading,
       },
     };
   });

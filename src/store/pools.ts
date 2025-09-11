@@ -49,6 +49,10 @@ export interface PoolInfo extends PoolMetadata {
   };
   contract: { name: string; address: string }[];
   depositDetails: DepositDetails;
+  fees: {
+    amount: number;
+    isLoading: boolean;
+  };
   protocol: {
     name: string;
     link: string;
@@ -83,6 +87,10 @@ export function getDefaultPoolInfo(): PoolInfo {
     },
     depositDetails: {
       tokens: [],
+      amount: 0,
+      isLoading: false,
+    },
+    fees: {
       amount: 0,
       isLoading: false,
     },

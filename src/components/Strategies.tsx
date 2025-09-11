@@ -66,9 +66,14 @@ export default function Strategies() {
         case 'tvl':
           aValue = a.tvlUsd;
           bValue = b.tvlUsd;
+          break;
         case 'deposit':
           aValue = a.depositDetails.amount;
           bValue = b.depositDetails.amount;
+          break;
+        case 'fees':
+          aValue = a.fees.amount;
+          bValue = b.fees.amount;
           break;
         default:
           return 0;
@@ -120,6 +125,14 @@ export default function Strategies() {
               handleSort={handleSort}
             >
               <Text>Deposit</Text>
+            </SortableTh>
+            <SortableTh
+              columnId="fees"
+              selectedColumn={sortColumn}
+              sortDirection={sortDirection}
+              handleSort={handleSort}
+            >
+              <Text>Fees</Text>
             </SortableTh>
             <SortableTh
               columnId="apy"

@@ -191,6 +191,7 @@ export function getPoolInfoFromStrategy(strat: StrategyDetails): PoolInfo {
     },
     contract: strat.contract,
     depositDetails: { ...strat.depositDetails, tokens: strat.depositToken },
+    fees: strat.fees,
     protocol: {
       name: 'Re7 Labs',
       link: `/strategy/${strat.id}`,

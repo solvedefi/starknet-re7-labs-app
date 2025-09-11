@@ -8,10 +8,11 @@ import { Getter, Setter, atom } from 'jotai';
 import toast from 'react-hot-toast';
 import { RpcProvider, TransactionExecutionStatus } from 'starknet';
 import { StrategyInfo, strategiesAtom } from './strategies.atoms';
-import { createAtomWithStorage } from './utils.atoms';
+import { createAtomWithStorage, tokenPricesAtom } from './utils.atoms';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/utils/apolloClient';
+import { Web3Number } from '@strkfarm/sdk';
 
 export interface StrategyTxProps {
   strategyId: string;
@@ -49,6 +50,88 @@ type EkuboVaultFlow = {
   timestamp: number;
   liquidity_delta: string;
 };
+
+type ContractFeeEarnings = {
+  contract: string;
+  dailyEarnings: {
+    date: string;
+    tokenAddress: string;
+    amount: string;
+  }[];
+  totalCollections: string;
+};
+
+export const getFeesHistory = async (
+  contract: string,
+): Promise<ContractFeeEarnings> => {
+  const contractAddrFormatted = standariseAddress(contract);
+  const { data } = await apolloClient.query({
+    query: gql`
+      query ContractFeeEarnings($timeframe: String!, $contract: String!) {
+        contractFeeEarnings(timeframe: $timeframe, contract: $contract) {
+          contract
+          dailyEarnings {
+            date
+            tokenAddress
+            amount
+          }
+          totalCollections
+        }
+      }
+    `,
+    variables: {
+      contract: contractAddrFormatted,
+      timeframe: '30d',
+    },
+  });
+  return data.contractFeeEarnings;
+};
+
+export const getFeesHistoryAtom = (contracts: string[]) =>
+  atomWithQuery((get) => {
+    const {
+      data: tokenPrices,
+      isLoading: tokenPricesLoading,
+      isPending: tokenPricesPending,
+    } = get(tokenPricesAtom);
+    return {
+      enabled:
+        !tokenPricesPending &&
+        !tokenPricesLoading &&
+        !!tokenPrices &&
+        !!contracts.length,
+      queryKey: [
+        'fees_history',
+        JSON.stringify(contracts),
+        JSON.stringify(tokenPrices),
+      ],
+      queryFn: async (): Promise<Record<string, number>> => {
+        const feesCollectionPromises = contracts.map(async (contract) => {
+          const feesHistory = await getFeesHistory(contract);
+          return feesHistory.dailyEarnings.reduce((acc, fee) => {
+            const tokenPricePoint = tokenPrices?.find(
+              (token) => token.tokenAddress === fee.tokenAddress,
+            );
+            if (!tokenPricePoint) return acc;
+
+            const { price, decimals } = tokenPricePoint;
+            return (
+              acc + Web3Number.fromWei(fee.amount, decimals).toNumber() * price
+            );
+          }, 0);
+        });
+        const feesCollection = await Promise.all(feesCollectionPromises);
+        const feesCollectionMap = feesCollection.reduce(
+          (acc, fee, index) => {
+            acc[contracts[index]] = fee;
+            return acc;
+          },
+          {} as Record<string, number>,
+        );
+        return feesCollectionMap;
+      },
+    };
+  });
 
 export const getUserTxHistory = async (
   strategyContract: string,

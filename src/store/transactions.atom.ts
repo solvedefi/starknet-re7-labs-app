@@ -89,17 +89,10 @@ export const getFeesHistory = async (
 
 export const getFeesHistoryAtom = (contracts: string[]) =>
   atomWithQuery((get) => {
-    const {
-      data: tokenPrices,
-      isLoading: tokenPricesLoading,
-      isPending: tokenPricesPending,
-    } = get(tokenPricesAtom);
+    const { data: tokenPrices, isPending: tokenPricesPending } =
+      get(tokenPricesAtom);
     return {
-      enabled:
-        !tokenPricesPending &&
-        !tokenPricesLoading &&
-        !!tokenPrices &&
-        !!contracts.length,
+      enabled: !tokenPricesPending && !!tokenPrices && !!contracts.length,
       queryKey: [
         'fees_history',
         JSON.stringify(contracts),
@@ -184,14 +177,99 @@ export const getUserTxHistory = async (
   }
 };
 
-export const UserTxHistoryAtom = (strategyContract: string, owner: string) =>
-  atomWithQuery(() => ({
-    queryKey: ['user_tx_history', strategyContract, owner],
-    queryFn: async (): Promise<UserTxHistory> => {
-      const res = await getUserTxHistory(strategyContract, owner);
-      return res;
-    },
-  }));
+export const UserTxHistoryAtom = (strategyContracts: string[], owner: string) =>
+  atomWithQuery(() => {
+    return {
+      enabled: !!owner,
+      queryKey: ['user_tx_history', owner],
+      queryFn: async (): Promise<Record<string, UserTxHistory>> => {
+        const userTxHistoryPromises = strategyContracts.map(
+          async (strategyContract) => {
+            return await getUserTxHistory(strategyContract, owner);
+          },
+        );
+        const userTxHistory = await Promise.all(userTxHistoryPromises);
+
+        return userTxHistory.reduce(
+          (acc, userTxHistory, index) => {
+            acc[strategyContracts[index]] = userTxHistory;
+            return acc;
+          },
+          {} as Record<string, UserTxHistory>,
+        );
+      },
+    };
+  });
+
+export const UserDepsositsAtom = (
+  strategyContracts: string[],
+  tokens: string[][],
+  accountAddress?: string,
+) => {
+  const userTxHistoryAtom = UserTxHistoryAtom(
+    strategyContracts,
+    accountAddress || '0x0',
+  );
+  return atomWithQuery((get) => {
+    const { data: userTxHistory, isPending: userTxHistoryPending } =
+      get(userTxHistoryAtom);
+    const { data: tokenPrices, isPending: tokenPricesPending } =
+      get(tokenPricesAtom);
+    return {
+      enabled:
+        !!userTxHistory &&
+        !userTxHistoryPending &&
+        !tokenPricesPending &&
+        !!tokenPrices &&
+        !!accountAddress,
+      queryKey: ['user_deposits', accountAddress],
+      queryFn: async (): Promise<Record<string, number>> => {
+        const depositsPromises = strategyContracts.map(
+          async (strategyContract, index) => {
+            const transactions = userTxHistory![strategyContract];
+            const token0 = tokenPrices?.find(
+              (token) => token.tokenName === tokens[index][0],
+            );
+            const token1 = tokenPrices?.find(
+              (token) => token.tokenName === tokens[index][1],
+            );
+            if (!token0 || !token1) return 0;
+            const deposits = transactions.reverse().reduce(
+              (acc, transaction) => {
+                const delta0 = Web3Number.fromWei(
+                  transaction.amount0,
+                  token0.decimals,
+                );
+                const delta1 = Web3Number.fromWei(
+                  transaction.amount1,
+                  token1.decimals,
+                );
+                const update = [
+                  Math.max(0, acc[0] + delta0.toNumber()),
+                  Math.max(0, acc[1] + delta1.toNumber()),
+                ];
+                return update;
+              },
+              [0, 0],
+            );
+
+            const deposit =
+              deposits[0] * token0.price + deposits[1] * token1.price;
+            return deposit;
+          },
+        );
+        const depositsCompleted = await Promise.all(depositsPromises);
+        const res = Object.fromEntries(
+          depositsCompleted.map((deposit, index) => [
+            strategyContracts[index],
+            deposit,
+          ]),
+        );
+        return res;
+      },
+    };
+  });
+};
 
 export interface TxHistory {
   findManyInvestment_flows: {

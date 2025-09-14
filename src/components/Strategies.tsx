@@ -48,7 +48,7 @@ export default function Strategies() {
   const sortedStrategies = useMemo(() => {
     if (!sortColumn) return strategies;
 
-    return [...strategies].sort((a, b) => {
+    return strategies.sort((a, b) => {
       let aValue: any;
       let bValue: any;
 

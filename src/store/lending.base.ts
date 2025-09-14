@@ -82,6 +82,16 @@ export namespace LendingSpace {
             link: info.link,
             logo: info.logo,
           },
+          contract: [],
+          depositDetails: {
+            tokens: [],
+            amount: 0,
+            isLoading: false,
+          },
+          fees: {
+            amount: 0,
+            isLoading: false,
+          },
           apr: arr[arr.length - 1].strk_grant_apr_nrs,
           tvl: arr[arr.length - 1].supply_usd,
           aprSplits: [aprSplit],

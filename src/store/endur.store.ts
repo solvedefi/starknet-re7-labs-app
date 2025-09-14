@@ -51,7 +51,7 @@ const EndurAtoms = {
         },
         contract: [],
         depositDetails: {
-          tokens: [],
+          tokens: stats.data.depositToken,
           amount: 0,
           isLoading: false,
         },

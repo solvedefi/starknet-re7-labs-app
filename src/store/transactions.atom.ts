@@ -81,7 +81,7 @@ export const getFeesHistory = async (
     `,
     variables: {
       contract: contractAddrFormatted,
-      timeframe: '30d',
+      timeframe: '24h',
     },
   });
   return data.contractFeeEarnings;

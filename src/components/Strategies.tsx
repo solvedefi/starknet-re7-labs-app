@@ -132,7 +132,7 @@ export default function Strategies() {
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text>Fees</Text>
+              <Text>Fees(24H)</Text>
             </SortableTh>
             <SortableTh
               columnId="apy"

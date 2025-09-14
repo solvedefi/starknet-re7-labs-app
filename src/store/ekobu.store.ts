@@ -121,6 +121,16 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
             name: pool.pool,
             logos: [logo1, logo2],
           },
+          contract: [],
+          depositDetails: {
+            tokens: [],
+            amount: 0,
+            isLoading: false,
+          },
+          fees: {
+            amount: 0,
+            isLoading: false,
+          },
           protocol: {
             name: this.name,
             link: this.link,

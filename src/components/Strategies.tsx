@@ -75,6 +75,10 @@ export default function Strategies() {
           aValue = a.fees.amount;
           bValue = b.fees.amount;
           break;
+        case 'yield':
+          aValue = 0;
+          bValue = 0;
+          break;
         default:
           return 0;
       }
@@ -125,6 +129,14 @@ export default function Strategies() {
               handleSort={handleSort}
             >
               <Text>Deposit</Text>
+            </SortableTh>
+            <SortableTh
+              columnId="yield"
+              selectedColumn={sortColumn}
+              sortDirection={sortDirection}
+              handleSort={handleSort}
+            >
+              <Text>Current Yield</Text>
             </SortableTh>
             <SortableTh
               columnId="fees"

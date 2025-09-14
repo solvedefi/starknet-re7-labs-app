@@ -97,6 +97,10 @@ export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
           isLoading: false,
         },
         contract: rawPool.contract,
+        fees: {
+          amount: 0,
+          isLoading: false,
+        },
         apr:
           rewardsApy.length && rewardsApy[0].apr != 'Err'
             ? rewardsApy[0].apr

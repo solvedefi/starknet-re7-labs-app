@@ -49,6 +49,16 @@ const EndurAtoms = {
           link: endur.link,
           logo: endur.logo,
         },
+        contract: [],
+        depositDetails: {
+          tokens: stats.data.depositToken,
+          amount: 0,
+          isLoading: false,
+        },
+        fees: {
+          amount: 0,
+          isLoading: false,
+        },
         apr: stats.data.apy,
         tvl: stats.data.tvl,
         aprSplits: [

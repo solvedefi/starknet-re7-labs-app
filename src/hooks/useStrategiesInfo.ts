@@ -65,7 +65,8 @@ const useUserYields = (deposits: Record<string, number>) => {
         [contract]: true,
       }));
       strategy.getUserTVL(address || '0x0').then((tvl) => {
-        const deposit = deposits[contract] || 0;
+        const deposit = deposits[contract];
+        if (deposit === undefined) return;
 
         setUserYields((prev) => ({
           ...prev,
@@ -128,7 +129,9 @@ export const useStrategiesInfo = (
       yields: {
         amount: yields[contract] || 0,
         isLoading:
-          yieldsLoading[contract] || depositsLoading || depositsPending,
+          (yieldsLoading[contract] ?? true) ||
+          depositsLoading ||
+          depositsPending,
       },
     };
   });

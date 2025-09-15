@@ -76,8 +76,8 @@ export default function Strategies() {
           bValue = b.fees.amount;
           break;
         case 'yield':
-          aValue = 0;
-          bValue = 0;
+          aValue = a.yields.amount;
+          bValue = b.yields.amount;
           break;
         default:
           return 0;
@@ -136,7 +136,7 @@ export default function Strategies() {
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text>Current Yield</Text>
+              <Text whiteSpace="nowrap">Current Yield</Text>
             </SortableTh>
             <SortableTh
               columnId="fees"

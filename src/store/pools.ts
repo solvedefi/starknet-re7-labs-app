@@ -53,6 +53,10 @@ export interface PoolInfo extends PoolMetadata {
     amount: number;
     isLoading: boolean;
   };
+  yields?: {
+    amount: number;
+    isLoading: boolean;
+  };
   protocol: {
     name: string;
     link: string;

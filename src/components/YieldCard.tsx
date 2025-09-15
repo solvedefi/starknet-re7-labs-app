@@ -511,6 +511,9 @@ export default function YieldCard(props: YieldCardProps) {
           <StrategyUserDeposits {...pool.depositDetails} />
         </Td>
         <Td alignContent={'center'}>
+          <StrategyUserYields {...pool.yields} />
+        </Td>
+        <Td alignContent={'center'}>
           <StrategyUserFees {...pool.fees} />
         </Td>
         <Td alignContent={'center'} justifyContent={'flex-start'}>
@@ -568,6 +571,18 @@ function StrategyUserDeposits({
 }) {
   if (isLoading) return <Spinner />;
   if (amount === 0) return <Text>-</Text>;
+  return <Text>${getDisplayCurrencyAmount(amount, 2)}</Text>;
+}
+
+function StrategyUserYields({
+  amount,
+  isLoading = false,
+}: {
+  amount?: number;
+  isLoading?: boolean;
+}) {
+  if (isLoading) return <Spinner />;
+  if (amount === 0 || amount === undefined) return <Text>-</Text>;
   return <Text>${getDisplayCurrencyAmount(amount, 2)}</Text>;
 }
 

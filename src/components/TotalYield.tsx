@@ -49,7 +49,7 @@ export const TotalYield = ({ strategies }: TotalYieldProps) => {
             My Total Yield
           </Text>
           <Text fontSize="42px" fontWeight="600">
-            ${totalYield}
+            ${(totalYield || 0).toFixed(3)}
           </Text>
         </VStack>
       </Container>

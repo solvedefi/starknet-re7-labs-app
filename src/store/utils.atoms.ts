@@ -114,7 +114,9 @@ export const userStatsAtom = atomWithQuery((get) => ({
       'Error fetching user stats',
     );
     if (!res) return null;
-    return await res.json();
+    const data: UserStats = await res.json();
+    if (data.holdingsUSD !== 0 && !data.holdingsUSD) return null;
+    return data;
   },
 }));
 
@@ -135,7 +137,7 @@ export const userStrategyWiseTVLAtom = atomFamily((strategyId: string) => {
       (s) => s.id === strategyId,
     );
     return {
-      data: strategy ? strategy.usdValue : 0,
+      data: strategy && strategy.usdValue ? strategy.usdValue : 0,
       isPending,
       error,
     };

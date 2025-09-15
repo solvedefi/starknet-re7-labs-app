@@ -13,18 +13,35 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  VStack,
 } from '@chakra-ui/react';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import mixpanel from 'mixpanel-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { TotalYield } from '@/components/TotalYield';
+import { StrategyDetails, useStrategiesInfo } from '@/hooks/useStrategiesInfo';
+import {
+  STRKFarmBaseAPYsAtom,
+  STRKFarmStrategyAPIResult,
+} from '@/store/strkfarm.atoms';
+import { useAtomValue } from 'jotai';
 
 export default function Home() {
   const [tabIndex, setTabIndex] = useState(0);
 
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
+  const strkFarmPools = useMemo(() => {
+    if (!strkFarmPoolsRes || !strkFarmPoolsRes.data)
+      return [] as STRKFarmStrategyAPIResult[];
+    return strkFarmPoolsRes.data.strategies;
+  }, [strkFarmPoolsRes]);
+
+  const strategies: StrategyDetails[] = useStrategiesInfo(strkFarmPools);
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
@@ -62,7 +79,10 @@ export default function Home() {
 
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
-      <TVL />
+      <VStack gap="22px" pb="38px">
+        <TVL />
+        <TotalYield strategies={strategies} />
+      </VStack>
 
       <Tabs
         position="relative"
@@ -105,7 +125,7 @@ export default function Home() {
         />
         <TabPanels>
           <TabPanel bg="#171717" float={'left'} width={'100%'}>
-            <Strategies />
+            <Strategies strategies={strategies} />
           </TabPanel>
         </TabPanels>
       </Tabs>

@@ -9,29 +9,18 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-import { useAtomValue } from 'jotai';
 import React, { useMemo, useState } from 'react';
-
-import {
-  STRKFarmBaseAPYsAtom,
-  STRKFarmStrategyAPIResult,
-} from '@/store/strkfarm.atoms';
 
 import { YieldStrategyCard } from './YieldCard';
 import { SortColumn, SortDirection } from './SortIndicator';
 import { SortableTh } from './SortableTh';
-import { useStrategiesInfo, StrategyDetails } from '@/hooks/useStrategiesInfo';
+import { StrategyDetails } from '@/hooks/useStrategiesInfo';
 
-export default function Strategies() {
-  const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
-  const strkFarmPools = useMemo(() => {
-    if (!strkFarmPoolsRes || !strkFarmPoolsRes.data)
-      return [] as STRKFarmStrategyAPIResult[];
-    return strkFarmPoolsRes.data.strategies;
-  }, [strkFarmPoolsRes]);
+type StrategiesProps = {
+  strategies: StrategyDetails[];
+};
 
-  const strategies: StrategyDetails[] = useStrategiesInfo(strkFarmPools);
-
+export default function Strategies({ strategies }: StrategiesProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 

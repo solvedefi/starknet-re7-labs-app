@@ -1,3 +1,4 @@
+import { strategiesAtom } from '@/store/strategies.atoms';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 import {
   getFeesHistoryAtom,
@@ -6,7 +7,7 @@ import {
 import { useAccount } from '@starknet-react/core';
 import { useAtomValue } from 'jotai';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export type StrategyDetails = STRKFarmStrategyAPIResult & {
   depositDetails: {
@@ -14,6 +15,10 @@ export type StrategyDetails = STRKFarmStrategyAPIResult & {
     isLoading: boolean;
   };
   fees: {
+    amount: number;
+    isLoading: boolean;
+  };
+  yields: {
     amount: number;
     isLoading: boolean;
   };
@@ -46,6 +51,38 @@ const useUserDeposits = (
   return deposits;
 };
 
+const useUserYields = (deposits: Record<string, number>) => {
+  const [userYields, setUserYields] = useState<Record<string, number>>({});
+  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+  const { address } = useAccount();
+  const strategies = useAtomValue(strategiesAtom);
+
+  useEffect(() => {
+    strategies.forEach((strategy) => {
+      const contract = strategy.metadata.address.toString();
+      setIsLoading((prev) => ({
+        ...prev,
+        [contract]: true,
+      }));
+      strategy.getUserTVL(address || '0x0').then((tvl) => {
+        const deposit = deposits[contract];
+        if (deposit === undefined) return;
+
+        setUserYields((prev) => ({
+          ...prev,
+          [contract]: tvl.usdValue - deposit,
+        }));
+        setIsLoading((prev) => ({
+          ...prev,
+          [contract]: false,
+        }));
+      });
+    });
+  }, [strategies, deposits, address, setIsLoading]);
+
+  return { data: userYields, isLoading };
+};
+
 export const useStrategiesInfo = (
   strkFarmPools: STRKFarmStrategyAPIResult[],
 ) => {
@@ -54,7 +91,6 @@ export const useStrategiesInfo = (
     () => strkFarmPools.map((pool) => pool.contract[0].address),
     [strkFarmPools],
   );
-
   const tokenSymbols = useMemo(
     () =>
       strkFarmPools.map((pool) =>
@@ -63,10 +99,19 @@ export const useStrategiesInfo = (
     [strkFarmPools],
   );
 
-  const { data: fees, isLoading: feesLoading } = useStrategyFees(contracts);
-  const { data: deposits, isLoading: depositsLoading } = useUserDeposits(
-    contracts,
-    tokenSymbols,
+  const {
+    data: fees,
+    isLoading: feesLoading,
+    isPending: feesPending,
+  } = useStrategyFees(contracts);
+  const {
+    data: deposits,
+    isLoading: depositsLoading,
+    isPending: depositsPending,
+  } = useUserDeposits(contracts, tokenSymbols);
+
+  const { data: yields, isLoading: yieldsLoading } = useUserYields(
+    deposits || {},
   );
 
   return strkFarmPools.map((pool) => {
@@ -75,11 +120,18 @@ export const useStrategiesInfo = (
       ...pool,
       depositDetails: {
         amount: deposits?.[contract] || 0,
-        isLoading: depositsLoading,
+        isLoading: depositsLoading || depositsPending,
       },
       fees: {
         amount: fees?.[contract] || 0,
-        isLoading: feesLoading,
+        isLoading: feesLoading || feesPending,
+      },
+      yields: {
+        amount: yields[contract] || 0,
+        isLoading:
+          (yieldsLoading[contract] ?? true) ||
+          depositsLoading ||
+          depositsPending,
       },
     };
   });

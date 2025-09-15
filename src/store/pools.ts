@@ -47,9 +47,9 @@ export interface PoolInfo extends PoolMetadata {
     name: string;
     logos: string[];
   };
-  contract: { name: string; address: string }[];
-  depositDetails: DepositDetails;
-  fees: {
+  contract?: { name: string; address: string }[];
+  depositDetails?: DepositDetails;
+  fees?: {
     amount: number;
     isLoading: boolean;
   };

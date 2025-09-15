@@ -508,13 +508,13 @@ export default function YieldCard(props: YieldCardProps) {
           />
         </Td>
         <Td alignContent={'center'}>
-          <StrategyUserDeposits {...pool.depositDetails} />
+          <LoadedNumericalValue {...pool.depositDetails} />
         </Td>
         <Td alignContent={'center'}>
-          <StrategyUserYields {...pool.yields} />
+          <LoadedNumericalValue {...pool.yields} />
         </Td>
         <Td alignContent={'center'}>
-          <StrategyUserFees {...pool.fees} />
+          <LoadedNumericalValue {...pool.fees} />
         </Td>
         <Td alignContent={'center'} justifyContent={'flex-start'}>
           <StrategyAPY pool={pool} index={index} />
@@ -562,19 +562,7 @@ export default function YieldCard(props: YieldCardProps) {
   );
 }
 
-function StrategyUserDeposits({
-  amount,
-  isLoading,
-}: {
-  amount: number;
-  isLoading: boolean;
-}) {
-  if (isLoading) return <Spinner />;
-  if (amount === 0) return <Text>-</Text>;
-  return <Text>${getDisplayCurrencyAmount(amount, 2)}</Text>;
-}
-
-function StrategyUserYields({
+function LoadedNumericalValue({
   amount,
   isLoading = false,
 }: {
@@ -583,17 +571,6 @@ function StrategyUserYields({
 }) {
   if (isLoading) return <Spinner />;
   if (amount === 0 || amount === undefined) return <Text>-</Text>;
-  return <Text>${getDisplayCurrencyAmount(amount, 2)}</Text>;
-}
-
-function StrategyUserFees({
-  amount,
-  isLoading,
-}: {
-  amount: number;
-  isLoading: boolean;
-}) {
-  if (isLoading) return <Spinner />;
   return <Text>${getDisplayCurrencyAmount(amount, 2)}</Text>;
 }
 

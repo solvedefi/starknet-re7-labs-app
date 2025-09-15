@@ -53,12 +53,17 @@ const useUserDeposits = (
 
 const useUserYields = (deposits: Record<string, number>) => {
   const [userYields, setUserYields] = useState<Record<string, number>>({});
+  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
   const { address } = useAccount();
   const strategies = useAtomValue(strategiesAtom);
 
   useEffect(() => {
     strategies.forEach((strategy) => {
       const contract = strategy.metadata.address.toString();
+      setIsLoading((prev) => ({
+        ...prev,
+        [contract]: true,
+      }));
       strategy.getUserTVL(address || '0x0').then((tvl) => {
         const deposit = deposits[contract] || 0;
 
@@ -66,11 +71,15 @@ const useUserYields = (deposits: Record<string, number>) => {
           ...prev,
           [contract]: tvl.usdValue - deposit,
         }));
+        setIsLoading((prev) => ({
+          ...prev,
+          [contract]: false,
+        }));
       });
     });
-  }, [strategies, deposits, address]);
+  }, [strategies, deposits, address, setIsLoading]);
 
-  return userYields;
+  return { data: userYields, isLoading };
 };
 
 export const useStrategiesInfo = (
@@ -89,13 +98,20 @@ export const useStrategiesInfo = (
     [strkFarmPools],
   );
 
-  const { data: fees, isLoading: feesLoading } = useStrategyFees(contracts);
-  const { data: deposits, isLoading: depositsLoading } = useUserDeposits(
-    contracts,
-    tokenSymbols,
-  );
+  const {
+    data: fees,
+    isLoading: feesLoading,
+    isPending: feesPending,
+  } = useStrategyFees(contracts);
+  const {
+    data: deposits,
+    isLoading: depositsLoading,
+    isPending: depositsPending,
+  } = useUserDeposits(contracts, tokenSymbols);
 
-  const yields = useUserYields(deposits || {});
+  const { data: yields, isLoading: yieldsLoading } = useUserYields(
+    deposits || {},
+  );
 
   return strkFarmPools.map((pool) => {
     const contract = pool.contract[0].address;
@@ -103,15 +119,16 @@ export const useStrategiesInfo = (
       ...pool,
       depositDetails: {
         amount: deposits?.[contract] || 0,
-        isLoading: depositsLoading,
+        isLoading: depositsLoading || depositsPending,
       },
       fees: {
         amount: fees?.[contract] || 0,
-        isLoading: feesLoading,
+        isLoading: feesLoading || feesPending,
       },
       yields: {
         amount: yields[contract] || 0,
-        isLoading: depositsLoading,
+        isLoading:
+          yieldsLoading[contract] || depositsLoading || depositsPending,
       },
     };
   });

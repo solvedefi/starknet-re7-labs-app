@@ -64,7 +64,6 @@ export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
 
   _computePoolsInfo(data: any) {
     const rawPools: STRKFarmStrategyAPIResult[] = data.strategies;
-    const pools: PoolInfo[] = [];
     return rawPools.map((rawPool) => {
       const poolName = rawPool.name;
       const riskFactor = rawPool.riskFactor;
@@ -91,6 +90,16 @@ export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
           name: this.name,
           link: `/strategy/${rawPool.id}`,
           logo: this.logo,
+        },
+        depositDetails: {
+          tokens: rawPool.depositToken,
+          amount: 0,
+          isLoading: false,
+        },
+        contract: rawPool.contract,
+        fees: {
+          amount: 0,
+          isLoading: false,
         },
         apr:
           rewardsApy.length && rewardsApy[0].apr != 'Err'

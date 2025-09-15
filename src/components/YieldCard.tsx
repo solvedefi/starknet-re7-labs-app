@@ -2,7 +2,6 @@ import shield from '@/assets/shield.svg';
 import { addressAtom } from '@/store/claims.atoms';
 import { isPoolRetired, PoolInfo } from '@/store/pools';
 import { getPoolInfoFromStrategy, sortAtom } from '@/store/protocols';
-import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 import { UserStats, userStatsAtom } from '@/store/utils.atoms';
 import { isLive, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { getDisplayCurrencyAmount } from '@/utils';
@@ -34,6 +33,7 @@ import { useMemo } from 'react';
 import { FaWallet } from 'react-icons/fa';
 import arrow from '@public/arrow_left.png';
 import NextLink from 'next/link';
+import { StrategyDetails } from '@/hooks/useStrategiesInfo';
 
 export interface YieldCardProps {
   pool: PoolInfo;
@@ -507,6 +507,12 @@ export default function YieldCard(props: YieldCardProps) {
             showProtocolName={props.showProtocolName}
           />
         </Td>
+        <Td alignContent={'center'}>
+          <StrategyUserDeposits {...pool.depositDetails} />
+        </Td>
+        <Td alignContent={'center'}>
+          <StrategyUserFees {...pool.fees} />
+        </Td>
         <Td alignContent={'center'} justifyContent={'flex-start'}>
           <StrategyAPY pool={pool} index={index} />
         </Td>
@@ -553,8 +559,31 @@ export default function YieldCard(props: YieldCardProps) {
   );
 }
 
+function StrategyUserDeposits({
+  amount,
+  isLoading,
+}: {
+  amount: number;
+  isLoading: boolean;
+}) {
+  if (isLoading) return <Spinner />;
+  if (amount === 0) return <Text>-</Text>;
+  return <Text>${getDisplayCurrencyAmount(amount, 2)}</Text>;
+}
+
+function StrategyUserFees({
+  amount,
+  isLoading,
+}: {
+  amount: number;
+  isLoading: boolean;
+}) {
+  if (isLoading) return <Spinner />;
+  return <Text>${getDisplayCurrencyAmount(amount, 2)}</Text>;
+}
+
 export function YieldStrategyCard(props: {
-  strat: STRKFarmStrategyAPIResult;
+  strat: StrategyDetails;
   index: number;
 }) {
   const strat = getPoolInfoFromStrategy(props.strat);

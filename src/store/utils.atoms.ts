@@ -1,4 +1,4 @@
-import CONSTANTS from '@/constants';
+import CONSTANTS, { TOKENS } from '@/constants';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 import { addressAtom } from './claims.atoms';
@@ -6,6 +6,7 @@ import fetchWithRetry from '@/utils/fetchWithRetry';
 import { SingleTokenInfo } from '@strkfarm/sdk';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import { getPrice, standariseAddress } from '@/utils';
 
 export interface BlockInfo {
   data: {
@@ -143,37 +144,26 @@ export const userStrategyWiseTVLAtom = atomFamily((strategyId: string) => {
 
 interface Price {
   tokenName: string;
-  timestamp: string;
-  price: string;
+  tokenAddress: string;
+  decimals: number;
+  price: number;
 }
 
-// export const pricesAtom = atomWithQuery((get) => ({
-//     queryKey: ['prices'],
-//     queryFn: async ({ queryKey: [] }): Promise<Price[]> => {
-//         let tokenInfos = [
-//             TOKENS.find(t => t.name == 'zSTRK'),
-//             TOKENS.find(t => t.name == 'zUSDC')
-//         ]
-
-//         let promises = tokenInfos.map(async (tokenInfo) => {
-//             if (tokenInfo) {
-//                 const res = await axios.get(`/price/${tokenInfo.ekuboPriceKey}`)
-//                 return {
-//                     tokenName: tokenInfo.name,
-//                     timestamp: res.data.timestamp,
-//                     price: res.data.price
-//                 }
-//             }
-//             return {
-//                 tokenName: '',
-//                 timestamp: '',
-//                 price: ''
-
-//             };
-//         })
-//         return Promise.all(promises);
-//     },
-// }))
+export const tokenPricesAtom = atomWithQuery(() => ({
+  queryKey: ['prices'],
+  queryFn: async (): Promise<Price[]> => {
+    const tokenPrices = TOKENS.map(async (token) => {
+      const price = await getPrice(token);
+      return {
+        tokenName: token.name,
+        tokenAddress: standariseAddress(token.token),
+        decimals: token.decimals,
+        price,
+      };
+    });
+    return await Promise.all(tokenPrices);
+  },
+}));
 
 // export const strategyTVLAtom = atom((get) => {
 //     const prices = get(pricesAtom);

@@ -1,4 +1,3 @@
-import { usePagination } from '@ajna/pagination';
 import {
   Container,
   Skeleton,
@@ -13,7 +12,6 @@ import {
 import { useAtomValue } from 'jotai';
 import React, { useMemo, useState } from 'react';
 
-import { filteredPools } from '@/store/protocols';
 import {
   STRKFarmBaseAPYsAtom,
   STRKFarmStrategyAPIResult,
@@ -22,6 +20,7 @@ import {
 import { YieldStrategyCard } from './YieldCard';
 import { SortColumn, SortDirection } from './SortIndicator';
 import { SortableTh } from './SortableTh';
+import { useStrategiesInfo, StrategyDetails } from '@/hooks/useStrategiesInfo';
 
 export default function Strategies() {
   const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
@@ -31,12 +30,7 @@ export default function Strategies() {
     return strkFarmPoolsRes.data.strategies;
   }, [strkFarmPoolsRes]);
 
-  const _filteredPools = useAtomValue(filteredPools);
-  const ITEMS_PER_PAGE = 15;
-  const { currentPage, setCurrentPage, pagesCount, pages } = usePagination({
-    pagesCount: Math.floor(_filteredPools.length / ITEMS_PER_PAGE) + 1,
-    initialState: { currentPage: 1 },
-  });
+  const strategies: StrategyDetails[] = useStrategiesInfo(strkFarmPools);
 
   const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -51,10 +45,10 @@ export default function Strategies() {
   };
 
   // Apply sorting to the data
-  const sortedStrkFarmPools = useMemo(() => {
-    if (!sortColumn) return strkFarmPools;
+  const sortedStrategies = useMemo(() => {
+    if (!sortColumn) return strategies;
 
-    return [...strkFarmPools].sort((a, b) => {
+    return strategies.sort((a, b) => {
       let aValue: any;
       let bValue: any;
 
@@ -73,6 +67,14 @@ export default function Strategies() {
           aValue = a.tvlUsd;
           bValue = b.tvlUsd;
           break;
+        case 'deposit':
+          aValue = a.depositDetails.amount;
+          bValue = b.depositDetails.amount;
+          break;
+        case 'fees':
+          aValue = a.fees.amount;
+          bValue = b.fees.amount;
+          break;
         default:
           return 0;
       }
@@ -81,12 +83,7 @@ export default function Strategies() {
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [strkFarmPools, sortColumn, sortDirection]);
-
-  const pools = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [_filteredPools, currentPage]);
+  }, [sortColumn, sortDirection, strategies]);
 
   return (
     <Container width="100%" float={'left'} padding={'0px'}>
@@ -122,6 +119,22 @@ export default function Strategies() {
               <Text>Position Name</Text>
             </SortableTh>
             <SortableTh
+              columnId="deposit"
+              selectedColumn={sortColumn}
+              sortDirection={sortDirection}
+              handleSort={handleSort}
+            >
+              <Text>Deposit</Text>
+            </SortableTh>
+            <SortableTh
+              columnId="fees"
+              selectedColumn={sortColumn}
+              sortDirection={sortDirection}
+              handleSort={handleSort}
+            >
+              <Text>Fees(24H)</Text>
+            </SortableTh>
+            <SortableTh
               columnId="apy"
               selectedColumn={sortColumn}
               sortDirection={sortDirection}
@@ -141,18 +154,22 @@ export default function Strategies() {
           </Tr>
         </Thead>
         <Tbody>
-          {sortedStrkFarmPools.length > 0 && (
+          {sortedStrategies.length > 0 && (
             <>
-              {sortedStrkFarmPools.map((pool, index) => {
+              {sortedStrategies.map((strat, index) => {
                 return (
-                  <YieldStrategyCard key={pool.id} strat={pool} index={index} />
+                  <YieldStrategyCard
+                    key={strat.id}
+                    strat={strat}
+                    index={index}
+                  />
                 );
               })}
             </>
           )}
         </Tbody>
       </Table>
-      {sortedStrkFarmPools.length === 0 && (
+      {sortedStrategies.length === 0 && (
         <Stack>
           <Skeleton height="70px" />
           <Skeleton height="70px" />

@@ -1,5 +1,5 @@
 import CONSTANTS from '@/constants';
-import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import { StrategyLiveStatus, TokenInfo } from '@/strategies/IStrategy';
 import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
 import { CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
 import { Atom, atom } from 'jotai';
@@ -36,11 +36,22 @@ export interface PoolMetadata {
   };
 }
 
+export interface DepositDetails {
+  tokens: Pick<TokenInfo, 'name' | 'address' | 'decimals'>[];
+  amount: number;
+  isLoading: boolean;
+}
 export interface PoolInfo extends PoolMetadata {
   pool: {
     id: string;
     name: string;
     logos: string[];
+  };
+  contract: { name: string; address: string }[];
+  depositDetails: DepositDetails;
+  fees: {
+    amount: number;
+    isLoading: boolean;
   };
   protocol: {
     name: string;
@@ -74,6 +85,16 @@ export function getDefaultPoolInfo(): PoolInfo {
       name: '',
       logos: [],
     },
+    depositDetails: {
+      tokens: [],
+      amount: 0,
+      isLoading: false,
+    },
+    fees: {
+      amount: 0,
+      isLoading: false,
+    },
+    contract: [],
     protocol: {
       name: '',
       link: '',

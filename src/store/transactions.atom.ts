@@ -8,10 +8,11 @@ import { Getter, Setter, atom } from 'jotai';
 import toast from 'react-hot-toast';
 import { RpcProvider, TransactionExecutionStatus } from 'starknet';
 import { StrategyInfo, strategiesAtom } from './strategies.atoms';
-import { createAtomWithStorage } from './utils.atoms';
+import { createAtomWithStorage, tokenPricesAtom } from './utils.atoms';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/utils/apolloClient';
+import { Web3Number } from '@strkfarm/sdk';
 
 export interface StrategyTxProps {
   strategyId: string;
@@ -27,6 +28,248 @@ export interface TransactionInfo {
   status: 'pending' | 'success' | 'failed';
   createdAt: Date;
 }
+
+export type UserTxHistory = Array<{
+  type: 'deposit' | 'withdraw';
+  amount0: string;
+  amount1: string;
+  token0: string;
+  token1: string;
+}>;
+
+type EkuboVaultFlow = {
+  type: 'deposit' | 'withdraw';
+  amount0: string;
+  amount1: string;
+  token0: string;
+  token1: string;
+  txHash: string;
+  block_number: number;
+  txIndex: number;
+  eventIndex: number;
+  timestamp: number;
+  liquidity_delta: string;
+};
+
+type ContractFeeEarnings = {
+  contract: string;
+  dailyEarnings: {
+    date: string;
+    tokenAddress: string;
+    amount: string;
+  }[];
+  totalCollections: string;
+};
+
+export const getFeesHistory = async (
+  contract: string,
+): Promise<ContractFeeEarnings> => {
+  const contractAddrFormatted = standariseAddress(contract);
+  const { data } = await apolloClient.query({
+    query: gql`
+      query ContractFeeEarnings($timeframe: String!, $contract: String!) {
+        contractFeeEarnings(timeframe: $timeframe, contract: $contract) {
+          contract
+          dailyEarnings {
+            date
+            tokenAddress
+            amount
+          }
+          totalCollections
+        }
+      }
+    `,
+    variables: {
+      contract: contractAddrFormatted,
+      timeframe: '24h',
+    },
+  });
+  return data.contractFeeEarnings;
+};
+
+export const getFeesHistoryAtom = (contracts: string[]) =>
+  atomWithQuery((get) => {
+    const { data: tokenPrices, isPending: tokenPricesPending } =
+      get(tokenPricesAtom);
+    return {
+      enabled: !tokenPricesPending && !!tokenPrices && !!contracts.length,
+      queryKey: [
+        'fees_history',
+        JSON.stringify(contracts),
+        JSON.stringify(tokenPrices),
+      ],
+      queryFn: async (): Promise<Record<string, number>> => {
+        const feesCollectionPromises = contracts.map(async (contract) => {
+          const feesHistory = await getFeesHistory(contract);
+          return feesHistory.dailyEarnings.reduce((acc, fee) => {
+            const tokenPricePoint = tokenPrices?.find(
+              (token) => token.tokenAddress === fee.tokenAddress,
+            );
+            if (!tokenPricePoint) return acc;
+
+            const { price, decimals } = tokenPricePoint;
+            return (
+              acc + Web3Number.fromWei(fee.amount, decimals).toNumber() * price
+            );
+          }, 0);
+        });
+        const feesCollection = await Promise.all(feesCollectionPromises);
+        const feesCollectionMap = feesCollection.reduce(
+          (acc, fee, index) => {
+            acc[contracts[index]] = fee;
+            return acc;
+          },
+          {} as Record<string, number>,
+        );
+        return feesCollectionMap;
+      },
+    };
+  });
+
+export const getUserTxHistory = async (
+  strategyContract: string,
+  owner: string,
+): Promise<UserTxHistory> => {
+  const contractAddrFormatted = standariseAddress(strategyContract);
+  const ownerAddrFormatted = standariseAddress(owner);
+  try {
+    const { data }: { data: { ekuboVaultFlows: EkuboVaultFlow[] } } =
+      await apolloClient.query({
+        query: gql`
+          query ContractFeeEarnings(
+            $userAddress: String!
+            $vaultContract: String!
+          ) {
+            ekuboVaultFlows(
+              user_address: $userAddress
+              vault_contract: $vaultContract
+            ) {
+              type
+              txHash
+              block_number
+              txIndex
+              eventIndex
+              token0
+              token1
+              amount0
+              amount1
+              liquidity_delta
+              timestamp
+            }
+          }
+        `,
+        variables: {
+          userAddress: ownerAddrFormatted,
+          vaultContract: contractAddrFormatted,
+        },
+      });
+
+    return data.ekuboVaultFlows.map((tx: EkuboVaultFlow) => ({
+      type: tx.type,
+      amount0: tx.amount0,
+      amount1: tx.amount1,
+      token0: tx.token0,
+      token1: tx.token1,
+    }));
+  } catch (error) {
+    console.error('GraphQL Error:', error);
+    throw error;
+  }
+};
+
+export const UserTxHistoryAtom = (strategyContracts: string[], owner: string) =>
+  atomWithQuery(() => {
+    return {
+      enabled: !!owner,
+      queryKey: ['user_tx_history', owner],
+      queryFn: async (): Promise<Record<string, UserTxHistory>> => {
+        const userTxHistoryPromises = strategyContracts.map(
+          async (strategyContract) => {
+            return await getUserTxHistory(strategyContract, owner);
+          },
+        );
+        const userTxHistory = await Promise.all(userTxHistoryPromises);
+
+        return userTxHistory.reduce(
+          (acc, userTxHistory, index) => {
+            acc[strategyContracts[index]] = userTxHistory;
+            return acc;
+          },
+          {} as Record<string, UserTxHistory>,
+        );
+      },
+    };
+  });
+
+export const UserDepsositsAtom = (
+  strategyContracts: string[],
+  tokens: string[][],
+  accountAddress?: string,
+) => {
+  const userTxHistoryAtom = UserTxHistoryAtom(
+    strategyContracts,
+    accountAddress || '0x0',
+  );
+  return atomWithQuery((get) => {
+    const { data: userTxHistory, isPending: userTxHistoryPending } =
+      get(userTxHistoryAtom);
+    const { data: tokenPrices, isPending: tokenPricesPending } =
+      get(tokenPricesAtom);
+    return {
+      enabled:
+        !!userTxHistory &&
+        !userTxHistoryPending &&
+        !tokenPricesPending &&
+        !!tokenPrices &&
+        !!accountAddress,
+      queryKey: ['user_deposits', accountAddress],
+      queryFn: async (): Promise<Record<string, number>> => {
+        const depositsPromises = strategyContracts.map(
+          async (strategyContract, index) => {
+            const transactions = userTxHistory![strategyContract];
+            const token0 = tokenPrices?.find(
+              (token) => token.tokenName === tokens[index][0],
+            );
+            const token1 = tokenPrices?.find(
+              (token) => token.tokenName === tokens[index][1],
+            );
+            if (!token0 || !token1) return 0;
+            const deposits = transactions.reverse().reduce(
+              (acc, transaction) => {
+                const delta0 = Web3Number.fromWei(
+                  transaction.amount0,
+                  token0.decimals,
+                );
+                const delta1 = Web3Number.fromWei(
+                  transaction.amount1,
+                  token1.decimals,
+                );
+                const update = [
+                  Math.max(0, acc[0] + delta0.toNumber()),
+                  Math.max(0, acc[1] + delta1.toNumber()),
+                ];
+                return update;
+              },
+              [0, 0],
+            );
+
+            const deposit =
+              deposits[0] * token0.price + deposits[1] * token1.price;
+            return deposit;
+          },
+        );
+        const depositsCompleted = await Promise.all(depositsPromises);
+        const res = Object.fromEntries(
+          depositsCompleted.map((deposit, index) => [
+            strategyContracts[index],
+            deposit,
+          ]),
+        );
+        return res;
+      },
+    };
+  });
+};
 
 export interface TxHistory {
   findManyInvestment_flows: {

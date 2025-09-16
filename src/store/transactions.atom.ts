@@ -65,26 +65,35 @@ export const getFeesHistory = async (
   contract: string,
 ): Promise<ContractFeeEarnings> => {
   const contractAddrFormatted = standariseAddress(contract);
-  const { data } = await apolloClient.query({
-    query: gql`
-      query ContractFeeEarnings($timeframe: String!, $contract: String!) {
-        contractFeeEarnings(timeframe: $timeframe, contract: $contract) {
-          contract
-          dailyEarnings {
-            date
-            tokenAddress
-            amount
+  try {
+    const { data } = await apolloClient.query({
+      query: gql`
+        query ContractFeeEarnings($timeframe: String!, $contract: String!) {
+          contractFeeEarnings(timeframe: $timeframe, contract: $contract) {
+            contract
+            dailyEarnings {
+              date
+              tokenAddress
+              amount
+            }
+            totalCollections
           }
-          totalCollections
         }
-      }
-    `,
-    variables: {
-      contract: contractAddrFormatted,
-      timeframe: '24h',
-    },
-  });
-  return data.contractFeeEarnings;
+      `,
+      variables: {
+        contract: contractAddrFormatted,
+        timeframe: '24h',
+      },
+    });
+    return data.contractFeeEarnings;
+  } catch (error) {
+    console.error('GraphQL Error:', error);
+    return {
+      contract,
+      dailyEarnings: [],
+      totalCollections: '0',
+    };
+  }
 };
 
 export const getFeesHistoryAtom = (contracts: string[]) =>
@@ -133,36 +142,35 @@ export const getUserTxHistory = async (
   const contractAddrFormatted = standariseAddress(strategyContract);
   const ownerAddrFormatted = standariseAddress(owner);
   try {
-    const { data }: { data: { ekuboVaultFlows: EkuboVaultFlow[] } } =
-      await apolloClient.query({
-        query: gql`
-          query ContractFeeEarnings(
-            $userAddress: String!
-            $vaultContract: String!
+    const { data } = await apolloClient.query({
+      query: gql`
+        query ContractFeeEarnings(
+          $userAddress: String!
+          $vaultContract: String!
+        ) {
+          ekuboVaultFlows(
+            user_address: $userAddress
+            vault_contract: $vaultContract
           ) {
-            ekuboVaultFlows(
-              user_address: $userAddress
-              vault_contract: $vaultContract
-            ) {
-              type
-              txHash
-              block_number
-              txIndex
-              eventIndex
-              token0
-              token1
-              amount0
-              amount1
-              liquidity_delta
-              timestamp
-            }
+            type
+            txHash
+            block_number
+            txIndex
+            eventIndex
+            token0
+            token1
+            amount0
+            amount1
+            liquidity_delta
+            timestamp
           }
-        `,
-        variables: {
-          userAddress: ownerAddrFormatted,
-          vaultContract: contractAddrFormatted,
-        },
-      });
+        }
+      `,
+      variables: {
+        userAddress: ownerAddrFormatted,
+        vaultContract: contractAddrFormatted,
+      },
+    });
 
     return data.ekuboVaultFlows.map((tx: EkuboVaultFlow) => ({
       type: tx.type,
@@ -173,7 +181,7 @@ export const getUserTxHistory = async (
     }));
   } catch (error) {
     console.error('GraphQL Error:', error);
-    throw error;
+    return [];
   }
 };
 
@@ -226,7 +234,8 @@ export const UserDepsositsAtom = (
       queryFn: async (): Promise<Record<string, number>> => {
         const depositsPromises = strategyContracts.map(
           async (strategyContract, index) => {
-            const transactions = userTxHistory![strategyContract];
+            const transactions = userTxHistory?.[strategyContract];
+            if (!transactions) return 0;
             const token0 = tokenPrices?.find(
               (token) => token.tokenName === tokens[index][0],
             );

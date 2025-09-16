@@ -88,11 +88,6 @@ const useVolume = (fees?: Record<string, number>) => {
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
   const strategies = useMemo(getStrategies, []);
   useEffect(() => {
-    if (fees === undefined || Object.keys(fees).length === 0) {
-      setIsLoading({});
-      setVolume({});
-      return;
-    }
     strategies.forEach((strategy) => {
       const contract = strategy.metadata.address.toString();
       setIsLoading((prev) => ({ ...prev, [contract]: true }));
@@ -160,7 +155,7 @@ export const useStrategiesInfo = (
       },
       volume: {
         amount: volume?.[contract] || 0,
-        isLoading: volumeLoading[contract] ?? true,
+        isLoading: volumeLoading[contract] ?? false,
       },
     };
   });

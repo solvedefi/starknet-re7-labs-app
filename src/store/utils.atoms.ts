@@ -155,13 +155,22 @@ export const tokenPricesAtom = atomWithQuery(() => ({
   queryKey: ['prices'],
   queryFn: async (): Promise<Price[]> => {
     const tokenPrices = TOKENS.map(async (token) => {
-      const price = await getPrice(token);
-      return {
-        tokenName: token.name,
-        tokenAddress: standariseAddress(token.token),
-        decimals: token.decimals,
-        price,
-      };
+      try {
+        const price = await getPrice(token);
+        return {
+          tokenName: token.name,
+          tokenAddress: standariseAddress(token.token),
+          decimals: token.decimals,
+          price,
+        };
+      } catch (e) {
+        return {
+          tokenName: token.name,
+          tokenAddress: standariseAddress(token.token),
+          decimals: token.decimals,
+          price: 0,
+        };
+      }
     });
     return await Promise.all(tokenPrices);
   },

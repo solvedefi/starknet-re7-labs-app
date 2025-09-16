@@ -114,6 +114,10 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
     this.balancesAtom = this.getBalancesAtom();
   }
 
+  getPoolKey = async () => {
+    return await this.clVault.getPoolKey();
+  };
+
   getTVL = async (): Promise<AmountsInfo> => {
     console.log('getTVL [1]');
     const res = await this.clVault.getTVL();

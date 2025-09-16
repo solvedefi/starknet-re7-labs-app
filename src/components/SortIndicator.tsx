@@ -2,7 +2,14 @@ import { ArrowUpIcon } from '@chakra-ui/icons';
 import arrowsUpDownIcon from '@/assets/arrows-up-down.svg';
 import { Box, Image } from '@chakra-ui/react';
 
-export type SortColumn = 'name' | 'apy' | 'tvl' | 'deposit' | 'fees' | 'yield';
+export type SortColumn =
+  | 'name'
+  | 'apy'
+  | 'tvl'
+  | 'deposit'
+  | 'fees'
+  | 'yield'
+  | 'volume';
 
 export type SortDirection = 'asc' | 'desc';
 

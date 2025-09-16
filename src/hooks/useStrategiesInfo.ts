@@ -1,27 +1,25 @@
-import { strategiesAtom } from '@/store/strategies.atoms';
+import { getStrategies, strategiesAtom } from '@/store/strategies.atoms';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 import {
   getFeesHistoryAtom,
   UserDepsositsAtom,
 } from '@/store/transactions.atom';
 import { useAccount } from '@starknet-react/core';
+import { EkuboCLVault } from '@strkfarm/sdk';
 import { useAtomValue } from 'jotai';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { useEffect, useMemo, useState } from 'react';
 
+type LoadedNumericalValue = {
+  amount: number;
+  isLoading: boolean;
+};
+
 export type StrategyDetails = STRKFarmStrategyAPIResult & {
-  depositDetails: {
-    amount: number;
-    isLoading: boolean;
-  };
-  fees: {
-    amount: number;
-    isLoading: boolean;
-  };
-  yields: {
-    amount: number;
-    isLoading: boolean;
-  };
+  depositDetails: LoadedNumericalValue;
+  fees: LoadedNumericalValue;
+  yields: LoadedNumericalValue;
+  volume: LoadedNumericalValue;
 };
 
 const useStrategyFees = (contracts: string[]) => {
@@ -83,6 +81,34 @@ const useUserYields = (deposits: Record<string, number>) => {
   return { data: userYields, isLoading };
 };
 
+const useVolume = (fees?: Record<string, number>) => {
+  const [volume, setVolume] = useState<Record<string, number>>({});
+  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+  const strategies = getStrategies();
+  useEffect(() => {
+    if (fees === undefined || Object.keys(fees).length === 0) {
+      setIsLoading({});
+      setVolume({});
+      return;
+    }
+    strategies.forEach((strategy) => {
+      const contract = strategy.metadata.address.toString();
+      setIsLoading((prev) => ({ ...prev, [contract]: true }));
+      const contractFees = fees[contract];
+      if (contractFees === undefined) return;
+      strategy.getPoolKey().then((poolKey) => {
+        const rawFeeQ128 = BigInt(poolKey.fee);
+        const feePct = EkuboCLVault.div2Power128(rawFeeQ128);
+        const volume = contractFees / feePct;
+        setVolume((prev) => ({ ...prev, [contract]: volume }));
+        setIsLoading((prev) => ({ ...prev, [contract]: false }));
+      });
+    });
+  }, [strategies, fees]);
+
+  return { data: volume, isLoading };
+};
+
 export const useStrategiesInfo = (
   strkFarmPools: STRKFarmStrategyAPIResult[],
 ) => {
@@ -114,6 +140,8 @@ export const useStrategiesInfo = (
     deposits || {},
   );
 
+  const { data: volume, isLoading: volumeLoading } = useVolume(fees);
+
   return strkFarmPools.map((pool) => {
     const contract = pool.contract[0].address;
     return {
@@ -132,6 +160,10 @@ export const useStrategiesInfo = (
           (yieldsLoading[contract] ?? true) ||
           depositsLoading ||
           depositsPending,
+      },
+      volume: {
+        amount: volume?.[contract] || 0,
+        isLoading: volumeLoading[contract] ?? true,
       },
     };
   });

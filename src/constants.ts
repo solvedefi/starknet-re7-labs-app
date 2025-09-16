@@ -29,7 +29,6 @@ export type TokenName =
 export const CONSTANTS = {
   DEX_INCENTIVE_URL:
     'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/fetchFile?file=strk_grant.json',
-  NOSTRA_DEGEN_INCENTIVE_URL: 'https://api.nostra.finance/query/pool_aprs',
   CARMINE_INCENTIVES_URL: '/carmine/api/v1/mainnet/defispring',
   CARMINE_URL: '/carmine/api/v2/mainnet',
   LENDING_INCENTIVES_URL:

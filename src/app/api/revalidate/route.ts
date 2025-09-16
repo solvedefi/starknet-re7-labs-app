@@ -1,15 +1,26 @@
 import axios from 'axios';
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
   console.error('Authorization header:', authHeader);
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+
+  const provided = authHeader?.replace(/^Bearer\s+/i, '') || '';
+  const expected = process.env.CRON_SECRET || '';
+
+  const providedBuffer = Buffer.from(provided);
+  const expectedBuffer = Buffer.from(expected);
+
+  const isAuthorized =
+    providedBuffer.length === expectedBuffer.length &&
+    timingSafeEqual(providedBuffer, expectedBuffer);
+
+  if (!isAuthorized) {
     console.error('Unauthorized request');
-    return new Response('Unauthorized', {
-      status: 401,
-    });
+    return new Response('Unauthorized', { status: 401 });
   }
+
   console.error('Revalidating...', `${process.env.HOSTNAME}/api/strategies`);
   const prom1 = axios(`${process.env.HOSTNAME}/api/strategies?no_cache=true`);
   const prom2 = axios(`${process.env.HOSTNAME}/api/stats?no_cache=true`);

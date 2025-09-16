@@ -31,10 +31,6 @@ const nextConfig = {
         destination: 'https://app.haiko.xyz/api/v1/:path*',
       },
       {
-        source: '/nostra/:path*',
-        destination: 'https://us-east-2.aws.data.mongodb-api.com/:path*',
-      },
-      {
         source: '/carmine/:path*',
         destination: 'https://api.carmine.finance/:path*',
       },
@@ -103,6 +99,19 @@ const nextConfig = {
             value:
               'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
           },
+          {
+            key: 'Content-Security-Policy',
+            value: `
+              default-src 'self';
+              script-src 'self';
+              style-src 'self' 'unsafe-inline';
+              img-src * 'self' data: blob: https://app.zklend.com;
+              font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;
+              frame-ancestors 'none';
+              base-uri 'self';
+              form-action 'self'
+            `.replace(/\s{2,}/g, " ").trim(),
+          }
         ],
       },
     ];

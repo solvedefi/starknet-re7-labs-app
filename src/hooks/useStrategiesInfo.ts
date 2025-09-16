@@ -49,32 +49,34 @@ const useUserDeposits = (
   return deposits;
 };
 
-const useUserYields = (deposits: Record<string, number>) => {
+const useUserYields = (deposits?: Record<string, number>) => {
   const [userYields, setUserYields] = useState<Record<string, number>>({});
-  const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { address } = useAccount();
   const strategies = useAtomValue(strategiesAtom);
 
   useEffect(() => {
-    strategies.forEach((strategy) => {
-      const contract = strategy.metadata.address.toString();
-      setIsLoading((prev) => ({
-        ...prev,
-        [contract]: true,
-      }));
-      strategy.getUserTVL(address || '0x0').then((tvl) => {
-        const deposit = deposits[contract];
-        if (deposit === undefined) return;
+    if (
+      !address ||
+      strategies.length === 0 ||
+      deposits === undefined ||
+      Object.keys(deposits).length === 0
+    )
+      return;
+    setIsLoading(true);
 
-        setUserYields((prev) => ({
-          ...prev,
-          [contract]: tvl.usdValue - deposit,
-        }));
-        setIsLoading((prev) => ({
-          ...prev,
-          [contract]: false,
-        }));
-      });
+    const tvlPromises = strategies.map(async (strategy) => {
+      const contract = strategy.metadata.address.toString();
+      const tvl = await strategy.getUserTVL(address || '0x0');
+
+      const deposit = deposits?.[contract];
+      if (deposit === undefined) return [contract, 0];
+
+      return [contract, tvl.usdValue - deposit];
+    });
+    Promise.all(tvlPromises).then((userYields) => {
+      setUserYields(Object.fromEntries(userYields));
+      setIsLoading(false);
     });
   }, [strategies, deposits, address, setIsLoading]);
 
@@ -84,7 +86,7 @@ const useUserYields = (deposits: Record<string, number>) => {
 const useVolume = (fees?: Record<string, number>) => {
   const [volume, setVolume] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
-  const strategies = getStrategies();
+  const strategies = useMemo(getStrategies, []);
   useEffect(() => {
     if (fees === undefined || Object.keys(fees).length === 0) {
       setIsLoading({});
@@ -94,7 +96,7 @@ const useVolume = (fees?: Record<string, number>) => {
     strategies.forEach((strategy) => {
       const contract = strategy.metadata.address.toString();
       setIsLoading((prev) => ({ ...prev, [contract]: true }));
-      const contractFees = fees[contract];
+      const contractFees = fees?.[contract];
       if (contractFees === undefined) return;
       strategy.getPoolKey().then((poolKey) => {
         const rawFeeQ128 = BigInt(poolKey.fee);
@@ -136,9 +138,7 @@ export const useStrategiesInfo = (
     isPending: depositsPending,
   } = useUserDeposits(contracts, tokenSymbols);
 
-  const { data: yields, isLoading: yieldsLoading } = useUserYields(
-    deposits || {},
-  );
+  const { data: yields, isLoading: yieldsLoading } = useUserYields(deposits);
 
   const { data: volume, isLoading: volumeLoading } = useVolume(fees);
 
@@ -156,10 +156,7 @@ export const useStrategiesInfo = (
       },
       yields: {
         amount: yields[contract] || 0,
-        isLoading:
-          (yieldsLoading[contract] ?? true) ||
-          depositsLoading ||
-          depositsPending,
+        isLoading: yieldsLoading || depositsLoading || depositsPending,
       },
       volume: {
         amount: volume?.[contract] || 0,

@@ -68,6 +68,10 @@ export default function Strategies({ strategies }: StrategiesProps) {
           aValue = a.yields.amount;
           bValue = b.yields.amount;
           break;
+        case 'volume':
+          aValue = a.volume.amount;
+          bValue = b.volume.amount;
+          break;
         default:
           return 0;
       }
@@ -126,6 +130,14 @@ export default function Strategies({ strategies }: StrategiesProps) {
               handleSort={handleSort}
             >
               <Text whiteSpace="nowrap">Current Yield</Text>
+            </SortableTh>
+            <SortableTh
+              columnId="volume"
+              selectedColumn={sortColumn}
+              sortDirection={sortDirection}
+              handleSort={handleSort}
+            >
+              <Text>Vol(24H)</Text>
             </SortableTh>
             <SortableTh
               columnId="fees"

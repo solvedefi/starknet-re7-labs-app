@@ -514,6 +514,9 @@ export default function YieldCard(props: YieldCardProps) {
           <LoadedNumericalValue {...pool.yields} />
         </Td>
         <Td alignContent={'center'}>
+          <LoadedNumericalValue {...pool.volume} />
+        </Td>
+        <Td alignContent={'center'}>
           <LoadedNumericalValue {...pool.fees} />
         </Td>
         <Td alignContent={'center'} justifyContent={'flex-start'}>

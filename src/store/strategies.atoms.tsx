@@ -80,7 +80,12 @@ export function getStrategies() {
   const strategyMetadata: IStrategyMetadata<CLVaultStrategySettings> = {
     ...EkuboCLVaultStrategies[0],
     name: 'Re7 Ekubo xSTRK/STRK',
-    description: 'Some description', // can be string too or ReactNode
+    description: `
+      Our vault puts your tokens to work in Ekubo pools to earn fees, auto-claims rewards, 
+      swaps to pool tokens, redeposits, and rebalances - all on-chain and non-custodial. 
+      An off-chain service safely automates harvesting and rebalancing, without ever holding your funds. 
+      You stay in control and can withdraw anytime.
+    `,
     address: ContractAddr.from(
       '0x0684f7fc8ebd6dae56bbae2ea21bc81b2c9c29d014c564a8ae90507ea6d2c4cc',
     ),
@@ -97,7 +102,13 @@ export function getStrategies() {
   const re7EkuboXSTRKSTRK = new EkuboClStrategy(
     `Re7 Ekubo xSTRK/STRK`,
     (
-      <div>Some description</div> // can be string too or ReactNode
+      <div>
+        Our vault puts your tokens to work in Ekubo pools to earn fees,
+        auto-claims rewards, swaps to pool tokens, redeposits, and rebalances -
+        all on-chain and non-custodial. An off-chain service safely automates
+        harvesting and rebalancing, without ever holding your funds. You stay in
+        control and can withdraw anytime.
+      </div>
     ),
     strategyMetadata,
     StrategyLiveStatus.HOT,
@@ -126,7 +137,12 @@ export function getStrategies() {
     const strategyMetadata: IStrategyMetadata<CLVaultStrategySettings> = {
       ...EkuboCLVaultStrategies[0],
       name: vault.name,
-      description: 'Some description', // can be string too or ReactNode
+      description: `
+        Our vault puts your tokens to work in Ekubo pools to earn fees, auto-claims rewards, 
+        swaps to pool tokens, redeposits, and rebalances - all on-chain and non-custodial. 
+        An off-chain service safely automates harvesting and rebalancing, without ever holding your funds. 
+        You stay in control and can withdraw anytime.
+      `,
       address: ContractAddr.from(vault.address),
       launchBlock: vault.launchBlock,
       depositTokens: [
@@ -142,7 +158,13 @@ export function getStrategies() {
     return new EkuboClStrategy(
       vault.name,
       (
-        <div>Some description</div> // can be string too or ReactNode
+        <div>
+          Our vault puts your tokens to work in Ekubo pools to earn fees,
+          auto-claims rewards, swaps to pool tokens, redeposits, and rebalances
+          - all on-chain and non-custodial. An off-chain service safely
+          automates harvesting and rebalancing, without ever holding your funds.
+          You stay in control and can withdraw anytime.
+        </div>
       ),
       strategyMetadata,
       StrategyLiveStatus.HOT,

@@ -61,14 +61,16 @@ const useUserYields = (deposits?: Record<string, number>) => {
       strategies.length === 0 ||
       deposits === undefined ||
       Object.keys(deposits).length === 0
-    )
+    ) {
+      setUserYields({});
+      setIsLoading(false);
       return;
+    }
     setIsLoading(true);
 
     const tvlPromises = strategies.map(async (strategy) => {
       const contract = strategy.metadata.address.toString();
       const tvl = await strategy.getUserTVL(address || '0x0');
-
       const deposit = deposits?.[contract];
       if (deposit === undefined) return [contract, 0];
 

@@ -228,14 +228,14 @@ export const UserDepsositsAtom = (
         !!userTxHistory &&
         !userTxHistoryPending &&
         !tokenPricesPending &&
-        !!tokenPrices &&
-        !!accountAddress,
+        !!tokenPrices,
       queryKey: ['user_deposits', accountAddress],
       queryFn: async (): Promise<Record<string, number>> => {
+        if (!accountAddress) return {};
         const depositsPromises = strategyContracts.map(
           async (strategyContract, index) => {
             const transactions = userTxHistory?.[strategyContract];
-            if (!transactions) return 0;
+            if (!transactions || transactions.length === 0) return;
             const token0 = tokenPrices?.find(
               (token) => token.tokenName === tokens[index][0],
             );
@@ -267,7 +267,9 @@ export const UserDepsositsAtom = (
             return deposit;
           },
         );
-        const depositsCompleted = await Promise.all(depositsPromises);
+        const depositsCompleted = (await Promise.all(depositsPromises)).filter(
+          (deposit) => deposit !== undefined,
+        );
         const res = Object.fromEntries(
           depositsCompleted.map((deposit, index) => [
             strategyContracts[index],

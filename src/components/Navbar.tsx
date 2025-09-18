@@ -232,7 +232,7 @@ export default function Navbar(props: NavbarProps) {
   useEffect(() => {
     console.log('lastWallet connector', connector?.name);
     if (connector) {
-      const name: string = connector.name;
+      const name: string = connector.id;
       setLastWallet(name);
       setIsWalletConnected(true);
     }

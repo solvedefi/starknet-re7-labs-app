@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  LATEST_TNC_DOC_VERSION,
-  RE7_TnC_DOC_URL,
-  SIGNING_DATA,
-} from '@/constants';
+import { RE7_TnC_DOC_URL, SIGNING_DATA } from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import {
   Button,
@@ -25,14 +21,14 @@ import {
 import axios from 'axios';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import React, { useEffect, useMemo, useState } from 'react';
-import { UserTncInfo } from '@/app/api/interfaces';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { referralCodeAtom } from '@/store/referral.store';
 import { useSearchParams } from 'next/navigation';
-import { generateReferralCode } from '@/utils';
+// import { generateReferralCode } from '@/utils';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import mixpanel from 'mixpanel-browser';
 import toast from 'react-hot-toast';
+import { lastWalletAtom } from '@/store/utils.atoms';
 
 interface TncModalProps {}
 
@@ -40,13 +36,17 @@ export const UserTnCAtom = atomWithQuery((get) => {
   return {
     // we use referral code atom as key to ensure user exisits in db by then
     queryKey: ['tnc', get(addressAtom), get(referralCodeAtom)],
-    queryFn: async (): Promise<null | UserTncInfo> => {
-      const address: string | undefined = get(addressAtom);
-      console.log(`address tnc`, address);
-      if (!address) return null;
-      const res = await axios.get(`/api/tnc/getUser/${address}`);
-      return res.data;
+    queryFn: async (): Promise<boolean> => {
+      const tncSigned = sessionStorage.getItem('RE7_Aggregator_tncSigned');
+      return tncSigned === 'true';
     },
+    // queryFn: async (): Promise<null | UserTncInfo> => {
+    // const address: string | undefined = get(addressAtom);
+    // console.log(`address tnc`, address);
+    // if (!address) return null;
+    // const res = await axios.get(`/api/tnc/getUser/${address}`);
+    // return res.data;
+    // },
   };
 });
 
@@ -62,6 +62,7 @@ const TncModal: React.FC<TncModalProps> = (props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSigningPending, setIsSigningPending] = useState(false);
   const { disconnectAsync } = useDisconnect();
+  const setLastWallet = useSetAtom(lastWalletAtom);
 
   const {
     signTypedData,
@@ -71,47 +72,55 @@ const TncModal: React.FC<TncModalProps> = (props) => {
     params: SIGNING_DATA,
   });
 
-  // set ref code of the user if it exists
   useEffect(() => {
-    if (!userTncInfo) return;
-    (async () => {
-      if (userTncInfo.success && userTncInfo.user) {
-        setReferralCode(userTncInfo.user.referralCode);
-        console.log(`tncinfo`, userTncInfo.user);
-        if (
-          (userTncInfo.user.isTncSigned &&
-            userTncInfo.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
-          !userTncInfo.user.isTncSigned
-        ) {
-          onOpen();
-        } else {
-          onClose();
-        }
-        return;
-      }
+    if (!userTncInfo && address) {
+      onOpen();
+    } else {
+      onClose();
+    }
+  }, [userTncInfo, address]);
 
-      if (!userTncInfo.success) {
-        try {
-          let referrer = searchParams.get('referrer');
+  // set ref code of the user if it exists
+  // useEffect(() => {
+  //   if (!userTncInfo) return;
+  //   (async () => {
+  //     if (userTncInfo.success && userTncInfo.user) {
+  //       setReferralCode(userTncInfo.user.referralCode);
+  //       console.log(`tncinfo`, userTncInfo.user);
+  //       if (
+  //         (userTncInfo.user.isTncSigned &&
+  //           userTncInfo.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
+  //         !userTncInfo.user.isTncSigned
+  //       ) {
+  //         onOpen();
+  //       } else {
+  //         onClose();
+  //       }
+  //       return;
+  //     }
 
-          if (address && referrer && address === referrer) {
-            referrer = null;
-          }
+  //     if (!userTncInfo.success) {
+  //       try {
+  //         let referrer = searchParams.get('referrer');
 
-          const res = await axios.post('/api/referral/createUser', {
-            address,
-            myReferralCode: generateReferralCode(),
-            referrerAddress: referrer,
-          });
-          if (res.data.success && res.data.user) {
-            setReferralCode(res.data.user.referralCode);
-          }
-        } catch (error) {
-          console.error('Error while creating user', error);
-        }
-      }
-    })();
-  }, [userTncInfo]);
+  //         if (address && referrer && address === referrer) {
+  //           referrer = null;
+  //         }
+
+  //         const res = await axios.post('/api/referral/createUser', {
+  //           address,
+  //           myReferralCode: generateReferralCode(),
+  //           referrerAddress: referrer,
+  //         });
+  //         if (res.data.success && res.data.user) {
+  //           setReferralCode(res.data.user.referralCode);
+  //         }
+  //       } catch (error) {
+  //         console.error('Error while creating user', error);
+  //       }
+  //     }
+  //   })();
+  // }, [userTncInfo]);
 
   useEffect(() => {
     console.log('signature', sigData);
@@ -159,8 +168,11 @@ const TncModal: React.FC<TncModalProps> = (props) => {
     }
     mixpanel.track('TnC agreed', { address });
 
-    setIsSigningPending(true);
-    signTypedData();
+    sessionStorage.setItem('RE7_Aggregator_tncSigned', 'true');
+    onClose();
+    return;
+    // setIsSigningPending(true);
+    // signTypedData();
   };
 
   return (
@@ -190,8 +202,8 @@ const TncModal: React.FC<TncModalProps> = (props) => {
           </Text>
 
           <Text textAlign="justify" color="white" width={'100%'}>
-            Please read the following terms and conditions carefully before
-            signing. You are required to sign this to continue using the App.
+            Please read the following terms and conditions carefully before you
+            continue.
           </Text>
 
           <Text
@@ -213,12 +225,12 @@ const TncModal: React.FC<TncModalProps> = (props) => {
               outline: 'none',
             }}
           >
-            T&C Document link <ExternalLinkIcon />
+            T&C Document <ExternalLinkIcon />
           </Text>
 
           <Text textAlign="left" width={'100%'}>
-            By clicking agree, you agree to Re7 terms and conditions as stated
-            in above document.
+            By clicking agree, you agree to our terms and conditions as stated
+            in the above document.
           </Text>
 
           <Center>
@@ -250,6 +262,7 @@ const TncModal: React.FC<TncModalProps> = (props) => {
               onClick={() => {
                 mixpanel.track('TnC declined', { address });
                 disconnectAsync();
+                setLastWallet(null);
                 onClose();
               }}
               ml={'10px'}

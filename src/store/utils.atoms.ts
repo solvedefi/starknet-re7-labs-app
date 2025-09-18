@@ -228,9 +228,20 @@ export const blockInfoMinus1DAtom = atomWithQuery((get) => ({
 const ISSERVER = typeof window === 'undefined';
 declare let localStorage: any;
 
-export const lastWalletAtom = createAtomWithStorage<null | string>(
-  'lastWallet',
+export const lastWalletAtom = atomWithStorage<null | string>(
+  'starknetLastConnectedWallet',
   null,
+  {
+    setItem: (key, value) => {
+      localStorage.setItem(key, value);
+    },
+    getItem: (key: string) => {
+      return localStorage.getItem(key);
+    },
+    removeItem: (key: string) => {
+      localStorage.removeItem(key);
+    },
+  },
 );
 
 export function createAtomWithStorage<T>(

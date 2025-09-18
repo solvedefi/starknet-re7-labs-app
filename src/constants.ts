@@ -1,6 +1,6 @@
 import { constants, RpcProvider } from 'starknet';
 import { NFTInfo, TokenInfo } from './strategies/IStrategy';
-import { getEndpoint, standariseAddress } from './utils';
+import { standariseAddress } from './utils';
 import MyNumber from './utils/MyNumber';
 
 const LOGOS = {
@@ -322,7 +322,7 @@ export const provider = new RpcProvider({
 // ? When updating this, ensure there is redirect available for this route
 // ? to respect version of doc in github
 export const LATEST_TNC_DOC_VERSION = 'tnc/v1';
-export const TnC_DOC_URL = `${getEndpoint()}/${LATEST_TNC_DOC_VERSION}`;
+export const RE7_TnC_DOC_URL = `https://www.re7labs.xyz/terms`;
 export const SIGNING_DATA = {
   types: {
     StarkNetDomain: [
@@ -337,13 +337,13 @@ export const SIGNING_DATA = {
   },
   primaryType: 'Tnc',
   domain: {
-    name: 'STRKFarm',
+    name: 'Re7 Labs',
     version: '1',
     chainId: getNetwork(),
   },
   message: {
     message: 'Read and Agree T&C',
-    document: `${TnC_DOC_URL.replace('https://', '').replace('http://', '').slice(0, 25)}`,
+    document: `${RE7_TnC_DOC_URL.replace('https://', '').replace('http://', '').slice(0, 25)}`,
   },
 };
 

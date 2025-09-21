@@ -153,10 +153,10 @@ export const getUserTxHistory = async (
             vault_contract: $vaultContract
           ) {
             type
-            txHash
+            tx_hash
             block_number
-            txIndex
-            eventIndex
+            tx_index
+            event_index
             token0
             token1
             amount0

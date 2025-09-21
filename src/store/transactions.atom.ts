@@ -153,16 +153,10 @@ export const getUserTxHistory = async (
             vault_contract: $vaultContract
           ) {
             type
-            tx_hash
-            block_number
-            tx_index
-            event_index
             token0
             token1
             amount0
             amount1
-            liquidity_delta
-            timestamp
           }
         }
       `,
@@ -242,7 +236,7 @@ export const UserDepsositsAtom = (
             const token1 = tokenPrices?.find(
               (token) => token.tokenName === tokens[index][1],
             );
-            if (!token0 || !token1) return 0;
+            if (!token0 || !token1) return [strategyContract, 0];
             const deposits = transactions.reverse().reduce(
               (acc, transaction) => {
                 const delta0 = Web3Number.fromWei(
@@ -264,18 +258,13 @@ export const UserDepsositsAtom = (
 
             const deposit =
               deposits[0] * token0.price + deposits[1] * token1.price;
-            return deposit;
+            return [strategyContract, deposit];
           },
         );
         const depositsCompleted = (await Promise.all(depositsPromises)).filter(
           (deposit) => deposit !== undefined,
         );
-        const res = Object.fromEntries(
-          depositsCompleted.map((deposit, index) => [
-            strategyContracts[index],
-            deposit,
-          ]),
-        );
+        const res = Object.fromEntries(depositsCompleted);
         return res;
       },
     };

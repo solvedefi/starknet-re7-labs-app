@@ -236,7 +236,7 @@ export const UserDepsositsAtom = (
             const token1 = tokenPrices?.find(
               (token) => token.tokenName === tokens[index][1],
             );
-            if (!token0 || !token1) return [strategyContract, 0];
+            if (!token0 || !token1) return;
             const deposits = transactions.reverse().reduce(
               (acc, transaction) => {
                 const delta0 = Web3Number.fromWei(

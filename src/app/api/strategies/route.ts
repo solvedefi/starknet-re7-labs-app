@@ -6,7 +6,7 @@ import { IStrategy, NFTInfo, TokenInfo } from '@/strategies/IStrategy';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 import { getDataFromRedis, getRewardsInfo, setDataToRedis } from '../lib';
 
-export const revalidate = 1800; // 30 minutes
+export const revalidate = 180; // 3 minutes
 export const dynamic = 'force-dynamic';
 
 const provider = new RpcProvider({

@@ -2,7 +2,7 @@ import { getStrategies } from '@/store/strategies.atoms';
 import { NextResponse } from 'next/server';
 import { getDataFromRedis } from '../lib';
 
-export const revalidate = 1800;
+export const revalidate = 180;
 export const dynamic = 'force-dynamic';
 
 const REDIS_KEY = `${process.env.VK_REDIS_PREFIX}::stats`;

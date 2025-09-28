@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { StrategyInfo } from '@/store/strategies.atoms';
+import { useSelector } from 'react-redux';
 import { HarvestTimeAtom } from '@/store/harvest.atom';
 import { useAtomValue } from 'jotai';
 import { formatTimediff, getDisplayCurrencyAmount, timeAgo } from '@/utils';
@@ -18,6 +19,8 @@ import STRKFarmAtoms, {
   STRKFarmStrategyAPIResult,
 } from '@/store/strkfarm.atoms';
 import styles from '../app/border.module.css';
+import { selectStrategy } from '@/redux/features/strategySlice';
+import { RootState } from '@/redux/store';
 
 interface HarvestTimeProps {
   strategy: StrategyInfo<any>;
@@ -86,6 +89,10 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
 
   const strategiesInfo = useAtomValue(STRKFarmAtoms.baseAPRs!);
 
+  const poolInfo = useSelector((state: RootState) =>
+    selectStrategy(state, strategy.id),
+  );
+
   const strategyInfo = useMemo(() => {
     if (!strategiesInfo || !strategiesInfo.data) return null;
 
@@ -128,7 +135,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                       </Text>
                     </Box>
                     <Text fontWeight={'bold'}>
-                      {(strategyInfo.apySplit.baseApy * 100).toFixed(2)}%
+                      {((poolInfo?.apr || 0) * 100).toFixed(2)}%
                     </Text>
                   </Box>
                 )}
@@ -167,7 +174,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                   fontSize={'27px'}
                   className="theme-gradient-starknet-text"
                 >
-                  {((strategyInfo?.apy || 0) * 100).toFixed(2)}%
+                  {((poolInfo?.apr || 0) * 100).toFixed(2)}%
                 </Text>
               </VStack>
             </Container>

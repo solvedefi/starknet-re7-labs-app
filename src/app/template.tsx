@@ -120,8 +120,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
                 display={'block'}
               >
                 <Navbar
-                  hideTg={pathname.includes('slinks')}
-                  forceShowConnect={pathname.includes('slinks')}
+                  hideTg={pathname!.includes('slinks')}
+                  forceShowConnect={pathname!.includes('slinks')}
                 />
                 {children}
                 <Toaster />

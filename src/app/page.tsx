@@ -68,7 +68,7 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      const tab = searchParams.get('tab');
+      const tab = searchParams!.get('tab') ?? 'strategies';
       if (tab === 'pools') {
         setTabIndex(1);
       } else {

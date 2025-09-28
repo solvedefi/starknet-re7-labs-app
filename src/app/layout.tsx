@@ -1,8 +1,7 @@
+import { Metadata } from 'next';
+import { Providers } from './providers';
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { Analytics } from '@vercel/analytics/react';
-import type { Metadata } from 'next';
 import React from 'react';
-
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -37,10 +36,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#111119" />
       </head>
       <body>
-        {children}
-        <Analytics />
+        <Providers>{children}</Providers>
+        <GoogleAnalytics gaId="G-K05JV94KM9" />
       </body>
-      <GoogleAnalytics gaId="G-K05JV94KM9" />
     </html>
   );
 }

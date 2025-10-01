@@ -5,18 +5,18 @@ import React from 'react';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Re7 Labs | Yield aggregator on Starknet',
+  title: 'Re7 ALMM (Automatic Liquidity Market Maker)',
   description:
     'Find and invest in high yield pools. Re7 Labs is the best yield aggregator on Starknet.',
   openGraph: {
-    title: 'Re7 Labs | Yield aggregator on Starknet',
+    title: 'Re7 ALMM (Automatic Liquidity Market Maker)',
     description:
       'Find and invest in high yield pools. Re7 Labs is the best yield aggregator on Starknet.',
     images: ['https://www.re7labs.xyz/opengraph-image.png?fba144fde61dab4a'],
   },
   twitter: {
     creator: '',
-    title: 'Re7 Labs | Yield aggregator on Starknet',
+    title: 'Re7 ALMM (Automatic Liquidity Market Maker)',
     description:
       'Find and invest in high yield pools. Re7 Labs is the best yield aggregator on Starknet.',
     card: 'player',

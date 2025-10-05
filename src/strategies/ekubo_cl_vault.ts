@@ -269,7 +269,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
       ContractAddr.from(address),
       ContractAddr.from(address),
     );
-
     return [
       {
         ...output,
@@ -319,7 +318,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
             console.log('getEkuboStratBalanceAtom [1]', amountInfo);
             return {
               amount: MyNumber.fromEther(
-                amountInfo.amount.toString(),
+                amountInfo.amount.toFixed(),
                 amountInfo.tokenInfo.decimals,
               ),
               tokenInfo: underlyingToken,

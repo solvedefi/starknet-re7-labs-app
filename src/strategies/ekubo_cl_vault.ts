@@ -246,10 +246,15 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
     if (!address || address == '0x0' || !amount2) {
       return [output];
     }
-
     console.log('Withdraw calls [1]');
-    const amt = Web3Number.fromWei(amount.toString(), amount.decimals);
-    const amt2 = Web3Number.fromWei(amount2.toString(), amount2.decimals);
+    const amt = Web3Number.fromWei(
+      amount.isZero() ? MyNumber.fromOne().toString() : amount.toString(),
+      amount.decimals,
+    );
+    const amt2 = Web3Number.fromWei(
+      amount2.isZero() ? MyNumber.fromOne().toString() : amount2.toString(),
+      amount2.decimals,
+    );
     const calls = await this.clVault.withdrawCall(
       {
         token0: {
@@ -264,7 +269,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
       ContractAddr.from(address),
       ContractAddr.from(address),
     );
-
     return [
       {
         ...output,
@@ -314,7 +318,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
             console.log('getEkuboStratBalanceAtom [1]', amountInfo);
             return {
               amount: MyNumber.fromEther(
-                amountInfo.amount.toString(),
+                amountInfo.amount.toFixed(),
                 amountInfo.tokenInfo.decimals,
               ),
               tokenInfo: underlyingToken,

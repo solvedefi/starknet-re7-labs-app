@@ -76,7 +76,7 @@ export function getConnectors(isMobile: boolean) {
   const argentXConnector = new InjectedConnector({
     options: {
       id: 'argentX',
-      name: 'Argent X',
+      name: 'Ready',
     },
   });
 
@@ -94,17 +94,27 @@ export function getConnectors(isMobile: boolean) {
     },
   });
 
-  const isInstalled = [argentXConnector, braavosConnector, keplrConnector].map(
-    (wallet) => {
-      return {
-        id: wallet.id,
-        isInstalled:
-          typeof window === 'undefined'
-            ? false
-            : window[`starknet_${wallet.id}`] !== undefined,
-      };
+  const fordefiConnector = new InjectedConnector({
+    options: {
+      id: 'fordefi',
+      name: 'FordeFi',
     },
-  );
+  });
+
+  const isInstalled = [
+    argentXConnector,
+    braavosConnector,
+    keplrConnector,
+    fordefiConnector,
+  ].map((wallet) => {
+    return {
+      id: wallet.id,
+      isInstalled:
+        typeof window === 'undefined'
+          ? false
+          : window[`starknet_${wallet.id}`] !== undefined,
+    };
+  });
 
   const webWalletConnector = new WebWalletConnector({
     url: 'https://web.argent.xyz',
@@ -122,6 +132,7 @@ export function getConnectors(isMobile: boolean) {
     argentXConnector,
     braavosConnector,
     keplrConnector,
+    fordefiConnector,
   ];
 
   // put uninstall wallets at the end

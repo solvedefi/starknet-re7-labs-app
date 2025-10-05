@@ -210,6 +210,17 @@ function InternalRedeem(props: RedeemProps) {
     return balData.data?.amount || MyNumber.fromZero();
   }, [balData]);
 
+  const balanceByToken = useMemo(() => {
+    return strategyBalances.map(
+      (balance) => balance.amount || MyNumber.fromZero(),
+    );
+  }, [strategyBalances]);
+
+  const totalBalance = balanceByToken.reduce(
+    (acc, curr) => acc.operate('plus', curr.toString()),
+    MyNumber.fromZero(),
+  );
+
   const tvlInfo = useAtomValue(props.strategy.tvlAtom);
 
   // Calculate maximum allowed amount
@@ -230,35 +241,38 @@ function InternalRedeem(props: RedeemProps) {
       reducedBalance = balance.subtract(
         MyNumber.fromEther('1.5', selectedToken.decimals),
       );
-    } else if (selectedToken.name === 'ETH') {
-      reducedBalance = balance.subtract(
-        MyNumber.fromEther('0.001', selectedToken.decimals),
-      );
     }
 
     const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
     return MyNumber.max(min, MyNumber.fromEther('0', selectedToken.decimals));
   }, [balance, selectedToken, tvlInfo]);
 
-  // Calculate actual amount from slider percentage
-  const actualAmount = useMemo(() => {
-    const percentage = sliderValue / 100;
-    return maxAmount.operate('mul', percentage);
-  }, [sliderValue, maxAmount]);
-
   // Handle slider change
   const handleSliderChange = useCallback(
     (value: number) => {
-      const intValue = Math.round(value);
       setSliderValue(value);
       setPercentageInput(value.toString());
       if (selectedToken) {
         const percentage = value / 100;
-        const newAmount = maxAmount.operate('mul', percentage);
-        onAmountChange(newAmount, value === 100, newAmount.toEtherStr());
+        let newAmount = maxAmount.operate('mul', percentage);
+        let tokenInfo = selectedToken;
+        let index = 0;
+        if (newAmount.isZero()) {
+          // use other token if first token is zero
+          newAmount = balanceByToken[1].operate('mul', percentage);
+          tokenInfo = strategyBalances[1].tokenInfo as unknown as TokenInfoV2;
+          index = 1;
+        }
+        onAmountChange(
+          newAmount,
+          value === 100,
+          newAmount.toEtherStr(),
+          tokenInfo,
+          index,
+        );
       }
     },
-    [maxAmount, selectedToken],
+    [maxAmount, selectedToken, balanceByToken, strategyBalances],
   );
 
   // Handle percentage input change
@@ -267,66 +281,91 @@ function InternalRedeem(props: RedeemProps) {
       // Allow empty string and valid numbers
       if (isNaN(valueNumber)) valueNumber = 0;
       if (isNaN(Number(valueString))) valueString = percentageInput;
-
       if (valueString === '' || (valueNumber >= 0 && valueNumber <= 100)) {
         setPercentageInput(valueString);
         setSliderValue(valueNumber);
 
         // Only update slider if we have a valid number
-
         if (selectedToken) {
           const percentage = valueNumber / 100;
-          const newAmount = maxAmount.operate('mul', percentage);
+          let newAmount = maxAmount.operate('mul', percentage);
+          let tokenInfo = selectedToken;
+          let index = 0;
+          if (newAmount.isZero()) {
+            // use other token if first token is zero
+            newAmount = balanceByToken[1].operate('mul', percentage);
+            tokenInfo = strategyBalances[1].tokenInfo as unknown as TokenInfoV2;
+            index = 1;
+          }
+
           onAmountChange(
             newAmount,
             valueNumber === 100,
             newAmount.toEtherStr(),
+            tokenInfo,
+            index,
           );
         }
       }
     },
-    [maxAmount, selectedToken, percentageInput],
+    [
+      maxAmount,
+      selectedToken,
+      percentageInput,
+      balanceByToken,
+      strategyBalances,
+    ],
   );
-
-  // Handle token selection
-  const handleTokenChange = useCallback((token: TokenInfoV2) => {
-    setSelectedToken(token);
-    // Reset slider and percentage when changing token
-    setSliderValue(0);
-    setPercentageInput('');
-    onAmountChange(MyNumber.fromZero(), false, '');
-  }, []);
 
   // Handle MAX button click
   const handleMaxClick = useCallback(() => {
     setSliderValue(100);
     setPercentageInput('100');
-    onAmountChange(maxAmount, true);
+    let tokenInfo = selectedToken;
+    let index = 0;
+    let amount = maxAmount;
+    if (amount.isZero()) {
+      // use other token if first token is zero
+      tokenInfo = strategyBalances[1].tokenInfo as unknown as TokenInfoV2;
+      index = 1;
+      amount = balanceByToken[1];
+    }
+    onAmountChange(amount, true, amount.toEtherStr(), tokenInfo, index);
     if (selectedToken) {
       mixpanel.track('Chose max amount', {
         strategyId: props.strategy.id,
         strategyName: props.strategy.name,
         buttonText: props.buttonText,
-        amount: maxAmount.toEtherStr(),
-        token: selectedToken.name,
-        maxAmount: maxAmount.toEtherStr(),
+        amount: amount.toEtherStr(),
+        token: tokenInfo?.name,
+        maxAmount: amount.toEtherStr(),
         address,
       });
     }
-  }, [maxAmount, selectedToken, props.strategy, props.buttonText, address]);
+  }, [
+    maxAmount,
+    selectedToken,
+    props.strategy,
+    props.buttonText,
+    address,
+    balanceByToken,
+    strategyBalances,
+  ]);
 
   function onAmountChange(
     _amt: MyNumber,
     isMaxClicked: boolean,
     rawAmount = _amt.toEtherStr(),
+    token = selectedToken,
+    inputIndex = 0,
   ) {
-    if (!selectedToken) return;
+    if (!token) return;
 
     setInputInfo({
-      index: 0,
+      index: inputIndex,
       info: {
-        tokenInfo: selectedToken,
-        amount: Web3Number.fromWei(_amt.toString(), selectedToken.decimals),
+        tokenInfo: token,
+        amount: Web3Number.fromWei(_amt.toString(), token.decimals),
         isMaxClicked,
         rawAmount,
       },
@@ -341,9 +380,10 @@ function InternalRedeem(props: RedeemProps) {
 
     checkAndTriggerOnAmountsChange(
       _amt,
-      selectedToken,
+      token,
       updatedInputsInfo,
       redeemInfo,
+      inputIndex,
     );
   }
 
@@ -352,6 +392,7 @@ function InternalRedeem(props: RedeemProps) {
     _token: TokenInfoV2,
     _inputsInfo: AmountInputInfo[],
     _redeemInfo: RedeemAtomType,
+    _inputIndex = 0,
   ) {
     if (!_redeemInfo.onAmountsChange) return;
 
@@ -382,11 +423,16 @@ function InternalRedeem(props: RedeemProps) {
               amount: _amtWeb3,
               tokenInfo: _token,
             },
-            index: 0,
+            index: _inputIndex,
           },
           [
             {
-              amount: _amtWeb3,
+              amount:
+                _inputsInfo[0].amount ||
+                Web3Number.fromWei(
+                  '0',
+                  _inputsInfo[0].tokenInfo?.decimals || 18,
+                ),
               tokenInfo: _inputsInfo[0].tokenInfo!,
             },
             {
@@ -573,7 +619,7 @@ function InternalRedeem(props: RedeemProps) {
               size="sm"
               width="103px"
               height={'60px'}
-              isDisabled={balance.isZero()}
+              isDisabled={totalBalance.isZero()}
               keepWithinRange={false}
               clampValueOnBlur={false}
             >
@@ -620,7 +666,7 @@ function InternalRedeem(props: RedeemProps) {
             min={0}
             max={100}
             step={1}
-            isDisabled={balance.isZero()}
+            isDisabled={totalBalance.isZero()}
           >
             <SliderTrack bg="#323232" height="10px" borderRadius="146px">
               <SliderFilledTrack bg="linear-gradient(to right, #2E45D0, #B1525C)" />
@@ -665,7 +711,7 @@ function InternalRedeem(props: RedeemProps) {
                 color: '#FFF',
               }}
               onClick={handleMaxClick}
-              isDisabled={balance.isZero()}
+              isDisabled={totalBalance.isZero()}
             >
               Max
             </Button>

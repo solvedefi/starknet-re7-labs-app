@@ -31,6 +31,10 @@ export default class MyNumber {
     return new MyNumber('0', 0);
   }
 
+  static fromOne() {
+    return new MyNumber('1', 0);
+  }
+
   toString() {
     return this.bigNumber.toFixed();
   }

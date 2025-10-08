@@ -15,7 +15,6 @@ import { useSelector } from 'react-redux';
 import { HarvestTimeAtom } from '@/store/harvest.atom';
 import { useAtomValue } from 'jotai';
 import { formatTimediff, getDisplayCurrencyAmount, timeAgo } from '@/utils';
-import STRKFarmAtoms from '@/store/strkfarm.atoms';
 import styles from '../app/border.module.css';
 import { selectStrategy } from '@/redux/features/strategySlice';
 import { RootState } from '@/redux/store';
@@ -85,8 +84,6 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
     return formatTimediff(nextHarvest);
   }, [data?.timestamp, lastHarvest, currentTime]);
 
-  const strategiesInfo = useAtomValue(STRKFarmAtoms.baseAPRs!);
-
   const strategyInfo = useSelector((state: RootState) =>
     selectStrategy(state, strategy.id),
   );
@@ -106,9 +103,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
             width={'180px'}
             label={
               <Box fontSize={'13px'}>
-                <Text>
-                  {strategy.metadata.apyMethodology || defaultAPYTooltip}
-                </Text>
+                <Text>{defaultAPYTooltip}</Text>
                 {strategyInfo && (
                   <Box
                     marginTop={'10px'}

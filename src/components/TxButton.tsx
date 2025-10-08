@@ -1,3 +1,5 @@
+import { selectStrategy } from '@/redux/features/strategySlice';
+import { RootState } from '@/redux/store';
 import { referralCodeAtom } from '@/store/referral.store';
 import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
 import { IStrategyProps, TokenInfo } from '@/strategies/IStrategy';
@@ -21,6 +23,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
+import { useSelector } from 'react-redux';
 import { TwitterShareButton } from 'react-share';
 import { Call } from 'starknet';
 
@@ -41,6 +44,11 @@ export default function TxButton(props: TxButtonProps) {
   const monitorNewTx = useSetAtom(monitorNewTxAtom);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const referralCode = useAtomValue(referralCodeAtom);
+
+  const apr = useSelector(
+    (state: RootState) =>
+      selectStrategy(state, props.txInfo.strategyId)?.calculatedApr,
+  );
 
   const disabledStyle = {
     bg: '#2F2F2F',
@@ -183,7 +191,7 @@ export default function TxButton(props: TxButtonProps) {
             >
               <TwitterShareButton
                 url={`${getReferralUrl(referralCode)}`}
-                title={`🚀I just invested my ${props.selectedMarket?.name ?? ''} in the high-yield  "${props.strategy?.name ?? ''}" strategy at @trovesfi, earning an impressive ${((props.strategy?.netYield || 0) * 100).toFixed(2)}% yield! 💸. \n\nWant in? Join me and start earning: `}
+                title={`🚀I just invested my ${props.selectedMarket?.name ?? ''} in the high-yield  "${props.strategy?.name ?? ''}" strategy at @trovesfi, earning an impressive ${((apr || props.strategy?.netYield || 0) * 100).toFixed(2)}% yield! 💸. \n\nWant in? Join me and start earning: `}
                 related={['strkfarm']}
                 style={{
                   display: 'flex',

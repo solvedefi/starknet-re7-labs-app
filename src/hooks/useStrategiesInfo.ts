@@ -20,6 +20,7 @@ export type StrategyDetails = STRKFarmStrategyAPIResult & {
   fees: LoadedNumericalValue;
   yields: LoadedNumericalValue;
   volume: LoadedNumericalValue;
+  calculatedApr: number;
 };
 
 const useStrategyFees = (contracts: string[]) => {
@@ -159,6 +160,7 @@ export const useStrategiesInfo = (
         amount: volume?.[contract] || 0,
         isLoading: volumeLoading[contract] ?? false,
       },
+      calculatedApr: ((fees?.[contract] || 0) * 365) / pool.tvlUsd,
     };
   });
 };

@@ -1,9 +1,5 @@
 import { atom } from 'jotai';
-import {
-  IStrategy,
-  IStrategyProps,
-  StrategyLiveStatus,
-} from '@/strategies/IStrategy';
+import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { convertToV2TokenInfo, getTokenInfoFromName } from '@/utils';
 import { privatePoolsAtom } from './protocols';
 import { PoolInfo } from './pools';
@@ -130,8 +126,6 @@ export function getStrategies() {
       isTransactionHistDisabled: true,
     },
   );
-
-  const strategies: IStrategy<any>[] = [re7EkuboXSTRKSTRK];
 
   return VAULTS.map((vault) => {
     const strategyMetadata: IStrategyMetadata<CLVaultStrategySettings> = {

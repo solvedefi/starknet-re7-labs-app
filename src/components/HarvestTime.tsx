@@ -131,7 +131,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                     <Box>
                       <Text>Strategy APY:</Text>
                       <Text fontSize={'12px'} opacity={0.7}>
-                        Including fees and Defi spring rewards
+                        Including fees
                       </Text>
                     </Box>
                     <Text fontWeight={'bold'}>
@@ -148,7 +148,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                     <Box>
                       <Text>Rewards APY:</Text>
                       <Text fontSize={'12px'} opacity={0.7}>
-                        Incentives by STRKFarm
+                        Incentives by TrovesFi
                       </Text>
                     </Box>
                     <Text fontWeight={'bold'}>

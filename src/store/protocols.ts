@@ -200,12 +200,12 @@ export function getPoolInfoFromStrategy(strat: StrategyDetails): PoolInfo {
       logo: strkfarmLogo.src,
     },
     tvl: strat.tvlUsd,
-    apr: strat.fees ? (strat.fees.amount * 365) / strat.tvlUsd : 0,
+    apr: strat.calculatedApr,
     aprSplits: [
       {
         apr: strat.fees ? (strat.fees.amount * 365) / strat.tvlUsd : 0,
         title: 'Strategy APY',
-        description: 'Includes fees & Defi spring rewards',
+        description: 'Includes fees',
       },
     ],
     category,

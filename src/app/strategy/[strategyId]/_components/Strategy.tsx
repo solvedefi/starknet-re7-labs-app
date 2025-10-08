@@ -51,6 +51,7 @@ const Strategy = ({ params }: StrategyParams) => {
     isPending: userStrategyWiseTVLPending,
     error: userStrategyWiseTVLError,
   } = useAtomValue(userStrategyWiseTVLAtom(params.strategyId));
+
   const strategy: StrategyInfo<any> | undefined = useMemo(() => {
     const id = params.strategyId;
     return strategies.find((s) => s.id === id);
@@ -64,6 +65,18 @@ const Strategy = ({ params }: StrategyParams) => {
     }
     return '';
   }, [strategy]);
+
+  // const feesAtom = useMemo(
+  //   () => getFeesHistoryAtom([strategyAddress]),
+  //   [strategy],
+  // );
+  // const { data: fees } = useAtomValue(feesAtom);
+  // const { data: tvl } = useAtomValue(
+  //   strategy?.tvlAtom || atom({ data: { usdValue: 0 } }),
+  // );
+
+  // const netApr = ((fees?.[strategyAddress] || 0) * 365) / (tvl?.usdValue || 1);
+  // if (strategy) strategy.netYield = netApr;
 
   const setBalQueryEnable = useSetAtom(strategy?.balEnabled || atom(false));
 

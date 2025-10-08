@@ -153,6 +153,8 @@ export default function TxButton(props: TxButtonProps) {
     );
   }
 
+  const twitterSharedYield = apr ? `${(apr * 100).toFixed(2)}% ` : '';
+
   return (
     <>
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
@@ -191,7 +193,7 @@ export default function TxButton(props: TxButtonProps) {
             >
               <TwitterShareButton
                 url={`${getReferralUrl(referralCode)}`}
-                title={`🚀I just invested my ${props.selectedMarket?.name ?? ''} in the high-yield  "${props.strategy?.name ?? ''}" strategy at @trovesfi, earning an impressive ${((apr || props.strategy?.netYield || 0) * 100).toFixed(2)}% yield! 💸. \n\nWant in? Join me and start earning: `}
+                title={`🚀I just invested my ${props.selectedMarket?.name ?? ''} in the high-yield  "${props.strategy?.name ?? ''}" strategy at @trovesfi, earning an impressive ${twitterSharedYield}yield! 💸. \n\nWant in? Join me and start earning: `}
                 related={['strkfarm']}
                 style={{
                   display: 'flex',

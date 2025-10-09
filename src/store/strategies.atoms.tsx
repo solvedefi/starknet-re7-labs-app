@@ -158,13 +158,13 @@ export function getStrategies() {
     return new EkuboClStrategy(
       vault.name,
       (
-        <div>
+        <>
           Our vault puts your tokens to work in Ekubo pools to earn fees,
           auto-claims rewards, swaps to pool tokens, redeposits, and rebalances
           - all on-chain and non-custodial. An off-chain service safely
           automates harvesting and rebalancing, without ever holding your funds.
           You stay in control and can withdraw anytime.
-        </div>
+        </>
       ),
       strategyMetadata,
       StrategyLiveStatus.HOT,

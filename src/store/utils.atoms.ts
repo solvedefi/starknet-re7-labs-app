@@ -128,7 +128,7 @@ export const userStrategyWiseTVLAtom = atomFamily((strategyId: string) => {
 
     if (!userStats || !userStats.data || !userStats.data.strategyWise) {
       return {
-        data: 0,
+        data: null,
         isPending,
         error,
       };
@@ -137,7 +137,7 @@ export const userStrategyWiseTVLAtom = atomFamily((strategyId: string) => {
       (s) => s.id === strategyId,
     );
     return {
-      data: strategy && strategy.usdValue ? strategy.usdValue : 0,
+      data: strategy && strategy.usdValue ? strategy.usdValue : null,
       isPending,
       error,
     };

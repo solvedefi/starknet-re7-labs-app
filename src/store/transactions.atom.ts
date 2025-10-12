@@ -229,7 +229,8 @@ export const UserDepsositsAtom = (
         const depositsPromises = strategyContracts.map(
           async (strategyContract, index) => {
             const transactions = userTxHistory?.[strategyContract];
-            if (!transactions || transactions.length === 0) return;
+            if (!transactions) return;
+            if (transactions.length === 0) return [strategyContract, 0];
             const token0 = tokenPrices?.find(
               (token) => token.tokenName === tokens[index][0],
             );

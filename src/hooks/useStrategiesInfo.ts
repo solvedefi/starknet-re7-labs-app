@@ -144,19 +144,19 @@ export const useStrategiesInfo = (
     return {
       ...pool,
       depositDetails: {
-        amount: deposits?.[contract] || 0,
+        amount: deposits?.[contract],
         isLoading: depositsLoading || depositsPending,
       },
       fees: {
-        amount: fees?.[contract] || 0,
+        amount: fees?.[contract],
         isLoading: feesLoading || feesPending,
       },
       yields: {
-        amount: yields[contract] || 0,
+        amount: yields[contract],
         isLoading: yieldsLoading || depositsLoading || depositsPending,
       },
       volume: {
-        amount: volume?.[contract] || 0,
+        amount: volume?.[contract],
         isLoading: volumeLoading[contract] ?? false,
       },
     };

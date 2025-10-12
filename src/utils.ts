@@ -401,3 +401,18 @@ export function formatUSD(amount: number) {
       ? amount.toFixed(0)
       : amount.toFixed(2);
 }
+
+export function formatTokenBalance(amount: MyNumber, decimals: number) {
+  if (amount.isZero()) return '0';
+  const balance = Number(amount.toEtherStr());
+  if (balance > 1_000_000_000) {
+    return `${(balance / 1_000_000_000).toFixed(decimals)}B`;
+  }
+  if (balance > 1_000_000) {
+    return `${(balance / 1_000_000).toFixed(decimals)}M`;
+  }
+
+  return Number(amount.toEtherStr()) < 10 ** -decimals
+    ? `<0.${'0'.repeat(decimals - 1)}1`
+    : amount.toEtherToFixedDecimals(decimals);
+}

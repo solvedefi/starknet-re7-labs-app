@@ -110,6 +110,7 @@ export const HowDoesItWorkModal = ({ strategy }: HowDoesItWorkModalProps) => {
               <CloseIcon h="8px" w="8px" />
             </ModalCloseButton>
             <ModalBody
+              paddingX="25px"
               pt={0}
               pb={5}
               sx={{

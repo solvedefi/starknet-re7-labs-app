@@ -26,7 +26,7 @@ import { DUMMY_BAL_ATOM, returnEmptyBal } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { strategiesAtom, StrategyInfo } from '@/store/strategies.atoms';
 import { TxHistoryAtom } from '@/store/transactions.atom';
-import { getTokenInfoFromAddr } from '@/utils';
+import { formatTokenBalance, getTokenInfoFromAddr } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
 import { StrategyParams } from '../page';
 import FlowChart from './FlowChart';
@@ -271,7 +271,8 @@ const Strategy = ({ params }: StrategyParams) => {
                             {individualBalances.map((bx, index) => {
                               return (
                                 <Text key={index}>
-                                  {bx?.amount.toEtherToFixedDecimals(
+                                  {formatTokenBalance(
+                                    bx?.amount,
                                     bx.tokenInfo?.displayDecimals || 2,
                                   )}{' '}
                                   {bx?.tokenInfo?.name}

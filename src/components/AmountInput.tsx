@@ -35,6 +35,7 @@ import MyNumber from '@/utils/MyNumber';
 import LoadingWrap from './LoadingWrap';
 import debounce from 'lodash.debounce';
 import TokenBadge from './TokenBadge';
+import { formatTokenBalance } from '@/utils';
 
 interface AmountInputProps {
   index: number;
@@ -142,10 +143,6 @@ const AmountInput = forwardRef(
         if (selectedMarket.name === 'STRK') {
           reducedBalance = balance.subtract(
             MyNumber.fromEther('1.5', selectedMarket.decimals),
-          );
-        } else if (selectedMarket.name === 'ETH') {
-          reducedBalance = balance.subtract(
-            MyNumber.fromEther('0.001', selectedMarket.decimals),
           );
         }
       }
@@ -368,7 +365,7 @@ const AmountInput = forwardRef(
                   fontWeight: '400',
                 }}
               >
-                {balance.toEtherToFixedDecimals(4)}
+                {formatTokenBalance(balance, 4)}
               </b>
             </Tooltip>
             <Button

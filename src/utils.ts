@@ -402,7 +402,10 @@ export function formatUSD(amount: number) {
       : amount.toFixed(2);
 }
 
-export function formatTokenBalance(amount: MyNumber, decimals: number) {
+export function formatTokenBalance(amount: MyNumber, decimals: number = 0) {
+  if (decimals < 0) {
+    throw new Error('formatTokenBalance: Decimals cannot be negative');
+  }
   if (amount.isZero()) return '0';
   const balance = Number(amount.toEtherStr());
   if (balance > 1_000_000_000) {

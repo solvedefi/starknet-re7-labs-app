@@ -40,14 +40,13 @@ import {
 } from '@/utils';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { addressAtom } from '@/store/claims.atoms';
-import { ReactNode } from 'react';
 
 export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
   clVault: EkuboCLVault;
   isSingleTokenDepositView: boolean = false;
   constructor(
     name: string,
-    description: string | ReactNode,
+    description: string,
     strategy: IStrategyMetadata<CLVaultStrategySettings>,
     liveStatus: StrategyLiveStatus,
     settings: IStrategySettings,

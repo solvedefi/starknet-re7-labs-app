@@ -18,13 +18,31 @@ import {
   Heading,
 } from '@chakra-ui/react';
 
+function cutLongDescription(description: string) {
+  const maxLength = 300;
+  if (description.length > maxLength) {
+    const nextSpaceIndex = description.indexOf(' ', maxLength);
+    if (nextSpaceIndex === -1) {
+      return { description, isTruncated: false };
+    }
+
+    const cutDescription = description.slice(0, nextSpaceIndex).trim();
+    const sentenceEnd = description.at(-1) === '.';
+    return {
+      description: `${cutDescription}${sentenceEnd ? '..' : '...'}`,
+      isTruncated: true,
+    };
+  }
+  return { description, isTruncated: false };
+}
+
 type HowDoesItWorkModalProps = {
   strategy: StrategyInfo<any>;
 };
 
 export const HowDoesItWorkModal = ({ strategy }: HowDoesItWorkModalProps) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
-
+  const { description, isTruncated } = cutLongDescription(strategy.description);
   return (
     <Box display={{ base: 'block', md: 'flex' }} marginTop={'20px'}>
       <Box width={{ base: '100%', md: '100%' }}>
@@ -37,7 +55,7 @@ export const HowDoesItWorkModal = ({ strategy }: HowDoesItWorkModalProps) => {
           marginBottom="5px"
           fontSize={'14px'}
         >
-          {strategy.description}
+          {description}
         </Text>
         <Wrap>
           {getUniqueById(
@@ -60,6 +78,7 @@ export const HowDoesItWorkModal = ({ strategy }: HowDoesItWorkModalProps) => {
           ))}
         </Wrap>
         <Text
+          display={isTruncated ? 'block' : 'none'}
           _hover={{ cursor: 'pointer', textDecoration: 'underline' }}
           color="#FFFFFF"
           fontWeight="bold"

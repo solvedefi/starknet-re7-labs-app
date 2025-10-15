@@ -104,7 +104,7 @@ export const HowDoesItWorkModal = ({ strategy }: HowDoesItWorkModalProps) => {
             border="1px solid #FFFFFF"
           >
             <ModalHeader paddingX={25} pt={25} pb="14px">
-              How does {strategy.name} Work?
+              How does {strategy.name} work?
             </ModalHeader>
             <ModalCloseButton w="16px" h="16px" right="17px" top="17px">
               <CloseIcon h="8px" w="8px" />

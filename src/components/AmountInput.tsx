@@ -549,7 +549,16 @@ const AmountInput = forwardRef(
           bg={'#1A1919'}
           borderRadius={'10px'}
           height={'60px'}
-          onChange={(valueStr, n) => {
+          onChange={(valueStr) => {
+            valueStr = valueStr.replace(/[-+e]/gi, '');
+            const decimalIndex = valueStr.indexOf('.');
+            if (decimalIndex !== -1) {
+              const inputWhole = valueStr.slice(0, decimalIndex);
+              let inputDecimal = valueStr.slice(decimalIndex + 1);
+              inputDecimal = inputDecimal.replace('.', '');
+              inputDecimal = inputDecimal.slice(0, props.tokenInfo.decimals);
+              valueStr = `${inputWhole}.${inputDecimal}`;
+            }
             const newAmount =
               valueStr && Number(valueStr) > 0
                 ? MyNumber.fromEther(valueStr, selectedMarket.decimals)
@@ -567,8 +576,8 @@ const AmountInput = forwardRef(
             handleDebouncedChange(newAmount, valueStr, inputsInfo, depositInfo);
           }}
           marginTop={'20px'}
-          keepWithinRange={false}
-          clampValueOnBlur={false}
+          keepWithinRange={true}
+          clampValueOnBlur={true}
           value={inputInfo.rawAmount}
           isDisabled={maxAmount.isZero()}
         >

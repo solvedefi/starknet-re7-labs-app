@@ -154,7 +154,7 @@ export class IStrategyProps<T> {
   readonly liveStatus: StrategyLiveStatus;
   readonly id: string;
   readonly name: string;
-  readonly description: string | ReactNode;
+  readonly description: string;
   readonly settings: IStrategySettings;
   readonly metadata: IStrategyMetadata<T>;
   exchanges: IDapp<any>[] = [];
@@ -226,7 +226,7 @@ export class IStrategyProps<T> {
   constructor(
     id: string,
     name: string,
-    description: string | ReactNode,
+    description: string,
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus: StrategyLiveStatus,
@@ -324,7 +324,7 @@ export class IStrategy<T> extends IStrategyProps<T> {
     id: string,
     tag: string,
     name: string,
-    description: string | ReactNode,
+    description: string,
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus = StrategyLiveStatus.ACTIVE,

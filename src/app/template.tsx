@@ -20,7 +20,7 @@ import { Toaster } from 'react-hot-toast';
 import { RpcProviderOptions, constants } from 'starknet';
 
 import { isMobile } from 'react-device-detect';
-import { ibmPlexMonoHeader, ibmPlexMonoMain } from '@/fonts';
+import { ibmPlexMonoHeader, ibmPlexMonoLight, ibmPlexMonoMain } from '@/fonts';
 
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
 
@@ -47,6 +47,7 @@ const theme = extendTheme({
     grey_text: '#B6B6B6',
     yellow: '#EFDB72',
     red: '#e18787',
+    tertiary: '#82828A',
   },
   fontSizes: {
     large: '50px',
@@ -71,6 +72,7 @@ const theme = extendTheme({
   fonts: {
     heading: ibmPlexMonoHeader.style.fontFamily,
     body: ibmPlexMonoMain.style.fontFamily,
+    light: ibmPlexMonoLight.style.fontFamily,
   },
 });
 

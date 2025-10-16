@@ -1,5 +1,9 @@
+import { saveStrategy } from '@/redux/features/strategySlice';
 import { getStrategies, strategiesAtom } from '@/store/strategies.atoms';
-import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
+import {
+  STRKFarmBaseAPYsAtom,
+  STRKFarmStrategyAPIResult,
+} from '@/store/strkfarm.atoms';
 import {
   getFeesHistoryAtom,
   UserDepsositsAtom,
@@ -9,6 +13,7 @@ import { EkuboCLVault } from '@strkfarm/sdk';
 import { useAtomValue } from 'jotai';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 type LoadedNumericalValue = {
   amount: number;
@@ -20,6 +25,7 @@ export type StrategyDetails = STRKFarmStrategyAPIResult & {
   fees: LoadedNumericalValue;
   yields: LoadedNumericalValue;
   volume: LoadedNumericalValue;
+  calculatedApr: number;
 };
 
 const useStrategyFees = (contracts: string[]) => {
@@ -108,9 +114,14 @@ const useVolume = (fees?: Record<string, number>) => {
   return { data: volume, isLoading };
 };
 
-export const useStrategiesInfo = (
-  strkFarmPools: STRKFarmStrategyAPIResult[],
-) => {
+export const useStrategiesInfo = () => {
+  const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
+  const strkFarmPools = useMemo(() => {
+    if (!strkFarmPoolsRes || !strkFarmPoolsRes.data)
+      return [] as STRKFarmStrategyAPIResult[];
+    return strkFarmPoolsRes.data.strategies;
+  }, [strkFarmPoolsRes]);
+
   // Memoize the arrays to prevent infinite re-renders
   const contracts = useMemo(
     () => strkFarmPools.map((pool) => pool.contract[0].address),
@@ -138,10 +149,10 @@ export const useStrategiesInfo = (
   const { data: yields, isLoading: yieldsLoading } = useUserYields(deposits);
 
   const { data: volume, isLoading: volumeLoading } = useVolume(fees);
-
+  const dispatch = useDispatch();
   return strkFarmPools.map((pool) => {
     const contract = pool.contract[0].address;
-    return {
+    const strat = {
       ...pool,
       depositDetails: {
         amount: deposits?.[contract],
@@ -159,6 +170,11 @@ export const useStrategiesInfo = (
         amount: volume?.[contract],
         isLoading: volumeLoading[contract] ?? false,
       },
+      calculatedApr: ((fees?.[contract] || 0) * 365) / pool.tvlUsd,
     };
+
+    dispatch(saveStrategy({ ...strat, id: strat.id }));
+
+    return strat;
   });
 };

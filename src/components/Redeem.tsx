@@ -5,7 +5,11 @@ import {
   IStrategyActionHook,
   onStratAmountsChangeFn,
 } from '@/strategies/IStrategy';
-import { convertToMyNumber, convertToV1TokenInfo } from '@/utils';
+import {
+  convertToMyNumber,
+  convertToV1TokenInfo,
+  formatTokenBalance,
+} from '@/utils';
 import MyNumber from '@/utils/MyNumber';
 import {
   Box,
@@ -738,7 +742,7 @@ function InternalRedeem(props: RedeemProps) {
                           : balance.toEtherToFixedDecimals(6)
                       }
                     >
-                      <Text>{balance.toEtherToFixedDecimals(4)}</Text>
+                      <Text>{formatTokenBalance(balance, 4)}</Text>
                     </Tooltip>
                   </VStack>
                 </Flex>

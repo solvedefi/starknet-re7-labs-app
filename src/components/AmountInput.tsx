@@ -35,6 +35,7 @@ import MyNumber from '@/utils/MyNumber';
 import LoadingWrap from './LoadingWrap';
 import debounce from 'lodash.debounce';
 import TokenBadge from './TokenBadge';
+import { formatTokenBalance } from '@/utils';
 
 interface AmountInputProps {
   index: number;
@@ -142,10 +143,6 @@ const AmountInput = forwardRef(
         if (selectedMarket.name === 'STRK') {
           reducedBalance = balance.subtract(
             MyNumber.fromEther('1.5', selectedMarket.decimals),
-          );
-        } else if (selectedMarket.name === 'ETH') {
-          reducedBalance = balance.subtract(
-            MyNumber.fromEther('0.001', selectedMarket.decimals),
           );
         }
       }
@@ -368,7 +365,7 @@ const AmountInput = forwardRef(
                   fontWeight: '400',
                 }}
               >
-                {balance.toEtherToFixedDecimals(4)}
+                {formatTokenBalance(balance, 4)}
               </b>
             </Tooltip>
             <Button
@@ -552,7 +549,16 @@ const AmountInput = forwardRef(
           bg={'#1A1919'}
           borderRadius={'10px'}
           height={'60px'}
-          onChange={(valueStr, n) => {
+          onChange={(valueStr) => {
+            valueStr = valueStr.replace(/[-+e]/gi, '');
+            const decimalIndex = valueStr.indexOf('.');
+            if (decimalIndex !== -1) {
+              const inputWhole = valueStr.slice(0, decimalIndex);
+              let inputDecimal = valueStr.slice(decimalIndex + 1);
+              inputDecimal = inputDecimal.replace('.', '');
+              inputDecimal = inputDecimal.slice(0, props.tokenInfo.decimals);
+              valueStr = `${inputWhole}.${inputDecimal}`;
+            }
             const newAmount =
               valueStr && Number(valueStr) > 0
                 ? MyNumber.fromEther(valueStr, selectedMarket.decimals)
@@ -570,8 +576,8 @@ const AmountInput = forwardRef(
             handleDebouncedChange(newAmount, valueStr, inputsInfo, depositInfo);
           }}
           marginTop={'20px'}
-          keepWithinRange={false}
-          clampValueOnBlur={false}
+          keepWithinRange={true}
+          clampValueOnBlur={true}
           value={inputInfo.rawAmount}
           isDisabled={maxAmount.isZero()}
         >

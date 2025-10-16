@@ -16,8 +16,6 @@ import {
   Text,
   Tooltip,
   VStack,
-  Wrap,
-  WrapItem,
 } from '@chakra-ui/react';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
@@ -28,7 +26,7 @@ import { DUMMY_BAL_ATOM, returnEmptyBal } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { strategiesAtom, StrategyInfo } from '@/store/strategies.atoms';
 import { TxHistoryAtom } from '@/store/transactions.atom';
-import { getTokenInfoFromAddr, getUniqueById } from '@/utils';
+import { formatTokenBalance, getTokenInfoFromAddr } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
 import { StrategyParams } from '../page';
 import FlowChart from './FlowChart';
@@ -42,6 +40,7 @@ import styles from '../../../border.module.css';
 import { userStrategyWiseTVLAtom } from '@/store/utils.atoms';
 import { ibmPlexMonoLight } from '@/fonts';
 import { NAMessage } from '@/components/NAMessage';
+import { HowDoesItWorkModal } from './HowDoesItWorkModal';
 
 function getTotalPositionValue(
   address: string | undefined,
@@ -73,6 +72,7 @@ const Strategy = ({ params }: StrategyParams) => {
     isPending: userStrategyWiseTVLPending,
     error: userStrategyWiseTVLError,
   } = useAtomValue(userStrategyWiseTVLAtom(params.strategyId));
+
   const strategy: StrategyInfo<any> | undefined = useMemo(() => {
     const id = params.strategyId;
     return strategies.find((s) => s.id === id);
@@ -274,29 +274,32 @@ const Strategy = ({ params }: StrategyParams) => {
                   )}
 
                   {/* Show individual holdings is more tokens */}
-                  {individualBalances.length > 1 &&
-                    balData.data?.amount.compare('0', 'gt') && (
-                      <Tooltip label="Detailed info of your individual token holdings in the strategy. This can vary with time depending on market conditions. The above value is the holdings in aggregated as a single token.">
-                        <HStack
-                          className="flex"
-                          gap={2}
-                          fontSize={'10px'}
-                          color="light_grey"
-                        >
-                          <p>Detailed Split:</p>
-                          {individualBalances.map((bx, index) => {
-                            return (
-                              <Text key={index}>
-                                {bx?.amount.toEtherToFixedDecimals(
-                                  bx.tokenInfo?.displayDecimals || 2,
-                                )}{' '}
-                                {bx?.tokenInfo?.name}
-                              </Text>
-                            );
-                          })}
-                        </HStack>
-                      </Tooltip>
-                    )}
+                  <Box h="15px">
+                    {individualBalances.length > 1 &&
+                      balData.data?.amount.compare('0', 'gt') && (
+                        <Tooltip label="Detailed info of your individual token holdings in the strategy. This can vary with time depending on market conditions. The above value is the holdings in aggregated as a single token.">
+                          <HStack
+                            className="flex"
+                            gap={2}
+                            fontSize={'10px'}
+                            color="light_grey"
+                          >
+                            <p>Detailed Split:</p>
+                            {individualBalances.map((bx, index) => {
+                              return (
+                                <Text key={index}>
+                                  {formatTokenBalance(
+                                    bx?.amount,
+                                    bx.tokenInfo?.displayDecimals || 2,
+                                  )}{' '}
+                                  {bx?.tokenInfo?.name}
+                                </Text>
+                              );
+                            })}
+                          </HStack>
+                        </Tooltip>
+                      )}
+                  </Box>
 
                   {address &&
                     balData.data &&
@@ -329,44 +332,7 @@ const Strategy = ({ params }: StrategyParams) => {
                       </Alert>
                     )}
                 </Box>
-                <Box display={{ base: 'block', md: 'flex' }} marginTop={'20px'}>
-                  <Box width={{ base: '100%', md: '100%' }}>
-                    <Text
-                      fontSize={'20px'}
-                      marginBottom={'0px'}
-                      fontWeight={'bold'}
-                    >
-                      How does it work?
-                    </Text>
-                    <Box
-                      color="light_grey"
-                      marginBottom="5px"
-                      fontSize={'14px'}
-                    >
-                      {strategy.description}
-                    </Box>
-                    <Wrap>
-                      {getUniqueById(
-                        strategy.actions.map((p) => ({
-                          id: p.pool.protocol.name,
-                          logo: p.pool.protocol.logo,
-                        })),
-                      ).map((p) => (
-                        <WrapItem marginRight={'10px'} key={p.id}>
-                          <Center>
-                            <Avatar
-                              size="2xs"
-                              bg={'black'}
-                              src={p.logo}
-                              marginRight={'2px'}
-                            />
-                            <Text marginTop={'2px'}>{p.id}</Text>
-                          </Center>
-                        </WrapItem>
-                      ))}
-                    </Wrap>
-                  </Box>
-                </Box>
+                <HowDoesItWorkModal strategy={strategy} />
                 {/*{strategy?.isRetired() && (*/}
                 {/*  <Alert*/}
                 {/*    fontSize={'14px'}*/}

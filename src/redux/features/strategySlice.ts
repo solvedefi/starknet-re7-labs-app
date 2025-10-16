@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-import { PoolInfo } from '@/store/pools';
+import { StrategyDetails } from '@/hooks/useStrategiesInfo';
 
-interface Strategy extends PoolInfo {
+interface Strategy extends StrategyDetails {
   id: string;
   // Add other strategy properties here
 }
@@ -35,5 +35,7 @@ export const selectStrategy = (state: RootState, id: string) =>
   state.strategy.strategies[id];
 export const selectAllStrategies = (state: RootState) =>
   state.strategy.strategies;
+export const selectAllStrategiesAsArray = (state: RootState) =>
+  Object.values(state.strategy.strategies);
 
 export default strategySlice.reducer;

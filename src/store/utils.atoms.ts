@@ -118,6 +118,7 @@ export const userStatsAtom = atomWithQuery((get) => ({
     if (data.holdingsUSD !== 0 && !data.holdingsUSD) return null;
     return data;
   },
+  refetchInterval: 5000,
 }));
 
 export const userStrategyWiseTVLAtom = atomFamily((strategyId: string) => {

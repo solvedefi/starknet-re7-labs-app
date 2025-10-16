@@ -82,7 +82,7 @@ export const getFeesHistory = async (
       `,
       variables: {
         contract: contractAddrFormatted,
-        timeframe: '24h',
+        timeframe: '7d',
       },
     });
     return data.contractFeeEarnings;

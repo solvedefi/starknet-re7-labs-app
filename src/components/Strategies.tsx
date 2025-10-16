@@ -137,7 +137,7 @@ export default function Strategies({ strategies }: StrategiesProps) {
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text>Vol(24H)</Text>
+              <Text>Vol(7D)</Text>
             </SortableTh>
             <SortableTh
               columnId="fees"
@@ -145,7 +145,7 @@ export default function Strategies({ strategies }: StrategiesProps) {
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text>Fees(24H)</Text>
+              <Text>Fees(7D)</Text>
             </SortableTh>
             <SortableTh
               columnId="apy"

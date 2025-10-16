@@ -30,6 +30,9 @@ import {
 } from '@strkfarm/sdk';
 import AmountInput, { AmountInputRef } from './AmountInput';
 import { addressAtom } from '@/store/claims.atoms';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { selectStrategy } from '@/redux/features/strategySlice';
 
 interface DepositProps {
   strategy: StrategyInfo<any>;
@@ -161,6 +164,10 @@ function InternalDeposit(props: DepositProps) {
   const inputRefs = [inputRef1, inputRef2];
   const inputErrors = [inputError1, inputError2];
   const setInputErrors = [setInputError1, setInputError2];
+
+  const strategyDetails = useSelector((state: RootState) =>
+    selectStrategy(state, props.strategy.id),
+  );
 
   // since we use a separate jotai provider,
   // need to set this again here

@@ -34,8 +34,6 @@ import { FaWallet } from 'react-icons/fa';
 import arrow from '@public/arrow_left.png';
 import NextLink from 'next/link';
 import { StrategyDetails } from '@/hooks/useStrategiesInfo';
-import { useDispatch } from 'react-redux';
-import { saveStrategy } from '../redux/features/strategySlice';
 
 export interface YieldCardProps {
   pool: PoolInfo;
@@ -584,9 +582,6 @@ export function YieldStrategyCard(props: {
   index: number;
 }) {
   const strat = getPoolInfoFromStrategy(props.strat);
-  const dispatch = useDispatch();
-
-  dispatch(saveStrategy({ ...strat, id: props.strat.id }));
 
   return <YieldCard pool={strat} index={props.index} showProtocolName={true} />;
 }

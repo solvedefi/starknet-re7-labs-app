@@ -50,6 +50,7 @@ const Strategy = ({ params }: StrategyParams) => {
     isPending: userStrategyWiseTVLPending,
     error: userStrategyWiseTVLError,
   } = useAtomValue(userStrategyWiseTVLAtom(params.strategyId));
+
   const strategy: StrategyInfo<any> | undefined = useMemo(() => {
     const id = params.strategyId;
     return strategies.find((s) => s.id === id);

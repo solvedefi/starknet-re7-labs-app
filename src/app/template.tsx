@@ -21,6 +21,7 @@ import { RpcProviderOptions, constants } from 'starknet';
 
 import { isMobile } from 'react-device-detect';
 import { ibmPlexMonoHeader, ibmPlexMonoLight, ibmPlexMonoMain } from '@/fonts';
+import { StrategyDetailsProvider } from './providers/StrategyDetailsProvider';
 
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
 
@@ -128,6 +129,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
                 {children}
                 <Toaster />
               </Container>
+              <StrategyDetailsProvider />
             </React.Suspense>
           </Flex>
         </ChakraBaseProvider>

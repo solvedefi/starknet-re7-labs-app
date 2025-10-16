@@ -19,14 +19,12 @@ import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import mixpanel from 'mixpanel-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TotalYield } from '@/components/TotalYield';
-import { StrategyDetails, useStrategiesInfo } from '@/hooks/useStrategiesInfo';
-import {
-  STRKFarmBaseAPYsAtom,
-  STRKFarmStrategyAPIResult,
-} from '@/store/strkfarm.atoms';
-import { useAtomValue } from 'jotai';
+import { StrategyDetails } from '@/hooks/useStrategiesInfo';
+import { useSelector } from 'react-redux';
+import { selectAllStrategiesAsArray } from '@/redux/features/strategySlice';
+import { RootState } from '@/redux/store';
 
 export default function Home() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -34,14 +32,9 @@ export default function Home() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
-  const strkFarmPools = useMemo(() => {
-    if (!strkFarmPoolsRes || !strkFarmPoolsRes.data)
-      return [] as STRKFarmStrategyAPIResult[];
-    return strkFarmPoolsRes.data.strategies;
-  }, [strkFarmPoolsRes]);
-
-  const strategies: StrategyDetails[] = useStrategiesInfo(strkFarmPools);
+  const strategies: StrategyDetails[] = useSelector((state: RootState) =>
+    selectAllStrategiesAsArray(state),
+  );
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {

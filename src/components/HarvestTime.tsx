@@ -15,9 +15,6 @@ import { useSelector } from 'react-redux';
 import { HarvestTimeAtom } from '@/store/harvest.atom';
 import { useAtomValue } from 'jotai';
 import { formatTimediff, getDisplayCurrencyAmount, timeAgo } from '@/utils';
-import STRKFarmAtoms, {
-  STRKFarmStrategyAPIResult,
-} from '@/store/strkfarm.atoms';
 import styles from '../app/border.module.css';
 import { selectStrategy } from '@/redux/features/strategySlice';
 import { RootState } from '@/redux/store';
@@ -87,22 +84,9 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
     return formatTimediff(nextHarvest);
   }, [data?.timestamp, lastHarvest, currentTime]);
 
-  const strategiesInfo = useAtomValue(STRKFarmAtoms.baseAPRs!);
-
-  const poolInfo = useSelector((state: RootState) =>
+  const strategyInfo = useSelector((state: RootState) =>
     selectStrategy(state, strategy.id),
   );
-
-  const strategyInfo = useMemo(() => {
-    if (!strategiesInfo || !strategiesInfo.data) return null;
-
-    const strategiesList: STRKFarmStrategyAPIResult[] =
-      strategiesInfo.data.strategies;
-    const strategyInfo = strategiesList.find(
-      (strat) => strat.id == strategy.id,
-    );
-    return strategyInfo ? strategyInfo : null;
-  }, [strategiesInfo]);
 
   const leverage = useMemo(() => {
     if (!strategyInfo) return 0;
@@ -119,9 +103,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
             width={'180px'}
             label={
               <Box fontSize={'13px'}>
-                <Text>
-                  {strategy.metadata.apyMethodology || defaultAPYTooltip}
-                </Text>
+                <Text>{defaultAPYTooltip}</Text>
                 {strategyInfo && (
                   <Box
                     marginTop={'10px'}
@@ -131,11 +113,11 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                     <Box>
                       <Text>Strategy APY:</Text>
                       <Text fontSize={'12px'} opacity={0.7}>
-                        Including fees and Defi spring rewards
+                        Including fees
                       </Text>
                     </Box>
                     <Text fontWeight={'bold'}>
-                      {((poolInfo?.apr || 0) * 100).toFixed(2)}%
+                      {((strategyInfo?.calculatedApr || 0) * 100).toFixed(2)}%
                     </Text>
                   </Box>
                 )}
@@ -148,7 +130,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                     <Box>
                       <Text>Rewards APY:</Text>
                       <Text fontSize={'12px'} opacity={0.7}>
-                        Incentives by STRKFarm
+                        Incentives by TrovesFi
                       </Text>
                     </Box>
                     <Text fontWeight={'bold'}>
@@ -174,7 +156,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                   fontSize={'27px'}
                   className="theme-gradient-starknet-text"
                 >
-                  {((poolInfo?.apr || 0) * 100).toFixed(2)}%
+                  {((strategyInfo?.calculatedApr || 0) * 100).toFixed(2)}%
                 </Text>
               </VStack>
             </Container>

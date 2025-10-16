@@ -33,9 +33,10 @@ const useStrategyFees = (contracts: string[]) => {
     return getFeesHistoryAtom(contracts);
   }, [contracts]);
 
-  const fees: AtomWithQueryResult<Record<string, number>, Error> = useAtomValue(
-    memoedFees,
-  );
+  const fees: AtomWithQueryResult<
+    Record<string, number | undefined>,
+    Error
+  > = useAtomValue(memoedFees);
   return fees;
 };
 
@@ -91,8 +92,8 @@ const useUserYields = (deposits?: Record<string, number>) => {
   return { data: userYields, isLoading };
 };
 
-const useVolume = (fees?: Record<string, number>) => {
-  const [volume, setVolume] = useState<Record<string, number>>({});
+const useVolume = (fees?: Record<string, number | undefined>) => {
+  const [volume, setVolume] = useState<Record<string, number | undefined>>({});
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
   const strategies = useMemo(getStrategies, []);
   useEffect(() => {
@@ -100,7 +101,11 @@ const useVolume = (fees?: Record<string, number>) => {
       const contract = strategy.metadata.address.toString();
       setIsLoading((prev) => ({ ...prev, [contract]: true }));
       const contractFees = fees?.[contract];
-      if (contractFees === undefined) return;
+      if (contractFees === undefined) {
+        setVolume((prev) => ({ ...prev, [contract]: undefined }));
+        setIsLoading((prev) => ({ ...prev, [contract]: false }));
+        return;
+      }
       strategy.getPoolKey().then((poolKey) => {
         const rawFeeQ128 = BigInt(poolKey.fee);
         const feePct = EkuboCLVault.div2Power128(rawFeeQ128);

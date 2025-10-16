@@ -16,7 +16,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 type LoadedNumericalValue = {
-  amount: number;
+  amount: number | undefined;
   isLoading: boolean;
 };
 
@@ -107,10 +107,14 @@ const useVolume = (fees?: Record<string, number | undefined>) => {
         return;
       }
       strategy.getPoolKey().then((poolKey) => {
-        const rawFeeQ128 = BigInt(poolKey.fee);
-        const feePct = EkuboCLVault.div2Power128(rawFeeQ128);
-        const volume = contractFees / feePct;
-        setVolume((prev) => ({ ...prev, [contract]: volume }));
+        try {
+          const rawFeeQ128 = BigInt(poolKey.fee);
+          const feePct = EkuboCLVault.div2Power128(rawFeeQ128);
+          const volume = contractFees / feePct;
+          setVolume((prev) => ({ ...prev, [contract]: volume }));
+        } catch {
+          setVolume((prev) => ({ ...prev, [contract]: undefined }));
+        }
         setIsLoading((prev) => ({ ...prev, [contract]: false }));
       });
     });

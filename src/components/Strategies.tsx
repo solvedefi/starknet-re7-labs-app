@@ -98,7 +98,7 @@ export default function Strategies({ strategies }: StrategiesProps) {
           pools to maximize yield.
         </Text>
       </Container>
-      <Table variant="simple">
+      <Table variant="simple" overflow={'hidden'}>
         <Thead display={{ base: 'none', md: 'table-header-group' }}>
           <Tr
             fontSize={'15px'}

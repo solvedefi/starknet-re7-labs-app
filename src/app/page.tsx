@@ -123,7 +123,13 @@ export default function Home() {
           borderRadius="1px"
         />
         <TabPanels>
-          <TabPanel p={0} bg="#171717" float={'left'} width={'100%'}>
+          <TabPanel
+            p={0}
+            bg="#171717"
+            float={'left'}
+            width={'100%'}
+            overflow={'scroll'}
+          >
             <Strategies strategies={strategies} />
           </TabPanel>
         </TabPanels>

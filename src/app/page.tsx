@@ -129,6 +129,13 @@ export default function Home() {
             float={'left'}
             width={'100%'}
             overflow={'scroll'}
+            sx={{
+              '&::-webkit-scrollbar': {
+                display: 'none',
+              },
+              '-ms-overflow-style': 'none',
+              'scrollbar-width': 'none',
+            }}
           >
             <Strategies strategies={strategies} />
           </TabPanel>

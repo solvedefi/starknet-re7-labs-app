@@ -72,7 +72,13 @@ export default function Home() {
 
   return (
     <Container maxWidth={'1264px'} margin={'0 auto'}>
-      <VStack justifySelf={'center'} width={'1069px'} gap="22px" pb="38px">
+      <VStack
+        justifySelf={'center'}
+        maxWidth={'1069px'}
+        width={'100%'}
+        gap="22px"
+        pb="38px"
+      >
         <TVL />
         <TotalYield strategies={strategies} />
       </VStack>
@@ -117,7 +123,20 @@ export default function Home() {
           borderRadius="1px"
         />
         <TabPanels>
-          <TabPanel p={0} bg="#171717" float={'left'} width={'100%'}>
+          <TabPanel
+            p={0}
+            bg="#171717"
+            float={'left'}
+            width={'100%'}
+            overflow={'scroll'}
+            sx={{
+              '&::-webkit-scrollbar': {
+                display: 'none',
+              },
+              '-ms-overflow-style': 'none',
+              'scrollbar-width': 'none',
+            }}
+          >
             <Strategies strategies={strategies} />
           </TabPanel>
         </TabPanels>

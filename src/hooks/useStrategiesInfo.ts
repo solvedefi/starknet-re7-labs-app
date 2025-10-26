@@ -16,7 +16,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 type LoadedNumericalValue = {
-  amount: number;
+  amount: number | undefined;
   isLoading: boolean;
 };
 
@@ -33,9 +33,10 @@ const useStrategyFees = (contracts: string[]) => {
     return getFeesHistoryAtom(contracts);
   }, [contracts]);
 
-  const fees: AtomWithQueryResult<Record<string, number>, Error> = useAtomValue(
-    memoedFees,
-  );
+  const fees: AtomWithQueryResult<
+    Record<string, number | undefined>,
+    Error
+  > = useAtomValue(memoedFees);
   return fees;
 };
 
@@ -91,8 +92,8 @@ const useUserYields = (deposits?: Record<string, number>) => {
   return { data: userYields, isLoading };
 };
 
-const useVolume = (fees?: Record<string, number>) => {
-  const [volume, setVolume] = useState<Record<string, number>>({});
+const useVolume = (fees?: Record<string, number | undefined>) => {
+  const [volume, setVolume] = useState<Record<string, number | undefined>>({});
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
   const strategies = useMemo(getStrategies, []);
   useEffect(() => {
@@ -100,12 +101,20 @@ const useVolume = (fees?: Record<string, number>) => {
       const contract = strategy.metadata.address.toString();
       setIsLoading((prev) => ({ ...prev, [contract]: true }));
       const contractFees = fees?.[contract];
-      if (contractFees === undefined) return;
+      if (contractFees === undefined) {
+        setVolume((prev) => ({ ...prev, [contract]: undefined }));
+        setIsLoading((prev) => ({ ...prev, [contract]: false }));
+        return;
+      }
       strategy.getPoolKey().then((poolKey) => {
-        const rawFeeQ128 = BigInt(poolKey.fee);
-        const feePct = EkuboCLVault.div2Power128(rawFeeQ128);
-        const volume = contractFees / feePct;
-        setVolume((prev) => ({ ...prev, [contract]: volume }));
+        try {
+          const rawFeeQ128 = BigInt(poolKey.fee);
+          const feePct = EkuboCLVault.div2Power128(rawFeeQ128);
+          const volume = contractFees / feePct;
+          setVolume((prev) => ({ ...prev, [contract]: volume }));
+        } catch {
+          setVolume((prev) => ({ ...prev, [contract]: undefined }));
+        }
         setIsLoading((prev) => ({ ...prev, [contract]: false }));
       });
     });
@@ -155,19 +164,19 @@ export const useStrategiesInfo = () => {
     const strat = {
       ...pool,
       depositDetails: {
-        amount: deposits?.[contract] || 0,
+        amount: deposits?.[contract],
         isLoading: depositsLoading || depositsPending,
       },
       fees: {
-        amount: fees?.[contract] || 0,
+        amount: fees?.[contract],
         isLoading: feesLoading || feesPending,
       },
       yields: {
-        amount: yields[contract] || 0,
+        amount: yields[contract],
         isLoading: yieldsLoading || depositsLoading || depositsPending,
       },
       volume: {
-        amount: volume?.[contract] || 0,
+        amount: volume?.[contract],
         isLoading: volumeLoading[contract] ?? false,
       },
       calculatedApr: ((fees?.[contract] || 0) * 52) / pool.tvlUsd,

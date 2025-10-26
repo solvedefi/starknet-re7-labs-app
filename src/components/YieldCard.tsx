@@ -34,6 +34,7 @@ import { FaWallet } from 'react-icons/fa';
 import arrow from '@public/arrow_left.png';
 import NextLink from 'next/link';
 import { StrategyDetails } from '@/hooks/useStrategiesInfo';
+import { NAMessage } from './NAMessage';
 
 export interface YieldCardProps {
   pool: PoolInfo;
@@ -573,7 +574,8 @@ function LoadedNumericalValue({
   isLoading?: boolean;
 }) {
   if (isLoading) return <Spinner />;
-  if (amount === 0 || amount === undefined) return <Text>-</Text>;
+  if (amount === undefined || amount === null) return <NAMessage />;
+  if (amount === 0) return <Text>-</Text>;
   return <Text>${getDisplayCurrencyAmount(amount, 2)}</Text>;
 }
 

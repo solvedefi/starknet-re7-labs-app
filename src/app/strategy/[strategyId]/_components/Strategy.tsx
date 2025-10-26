@@ -39,7 +39,29 @@ import { TokenDeposit } from './TokenDeposit';
 import styles from '../../../border.module.css';
 import { userStrategyWiseTVLAtom } from '@/store/utils.atoms';
 import { ibmPlexMonoLight } from '@/fonts';
+import { NAMessage } from '@/components/NAMessage';
 import { HowDoesItWorkModal } from './HowDoesItWorkModal';
+
+function getTotalPositionValue(
+  address: string | undefined,
+  userStrategyWiseTVL: number | null,
+  userStrategyWiseTVLPending: boolean,
+  strategy: StrategyInfo<any> | undefined,
+) {
+  if (address) {
+    if (userStrategyWiseTVLPending) {
+      return <Spinner size="sm" marginTop={'5px'} />;
+    }
+    if (userStrategyWiseTVL === null || strategy?.isRetired()) {
+      return <NAMessage />;
+    }
+    if (userStrategyWiseTVL === 0) {
+      return '-';
+    }
+    return `USD ${userStrategyWiseTVL.toFixed(2)}`;
+  }
+  return 'Connect wallet';
+}
 
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
@@ -235,17 +257,11 @@ const Strategy = ({ params }: StrategyParams) => {
                           <b>Total Position Value </b>
                         </Text>
                         <Text fontSize={'21px'}>
-                          {address ? (
-                            userStrategyWiseTVLPending ? (
-                              <Spinner size="sm" marginTop={'5px'} />
-                            ) : userStrategyWiseTVL === 0 ||
-                              strategy?.isRetired() ? (
-                              '-'
-                            ) : (
-                              `USD ${userStrategyWiseTVL.toFixed(2)}`
-                            )
-                          ) : (
-                            'Connect wallet'
+                          {getTotalPositionValue(
+                            address,
+                            userStrategyWiseTVL,
+                            userStrategyWiseTVLPending,
+                            strategy,
                           )}
                         </Text>
                       </Box>

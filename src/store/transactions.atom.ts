@@ -53,11 +53,13 @@ type EkuboVaultFlow = {
 
 type ContractFeeEarnings = {
   contract: string;
-  dailyEarnings: {
-    date: string;
-    tokenAddress: string;
-    amount: string;
-  }[];
+  dailyEarnings:
+    | {
+        date: string;
+        tokenAddress: string;
+        amount: string;
+      }[]
+    | undefined;
   totalCollections: string;
 };
 
@@ -90,8 +92,8 @@ export const getFeesHistory = async (
     console.error('GraphQL Error:', error);
     return {
       contract,
-      dailyEarnings: [],
-      totalCollections: '0',
+      dailyEarnings: undefined,
+      totalCollections: '',
     };
   }
 };
@@ -107,9 +109,10 @@ export const getFeesHistoryAtom = (contracts: string[]) =>
         JSON.stringify(contracts),
         JSON.stringify(tokenPrices),
       ],
-      queryFn: async (): Promise<Record<string, number>> => {
+      queryFn: async (): Promise<Record<string, number | undefined>> => {
         const feesCollectionPromises = contracts.map(async (contract) => {
           const feesHistory = await getFeesHistory(contract);
+          if (!feesHistory.dailyEarnings) return undefined;
           return feesHistory.dailyEarnings.reduce((acc, fee) => {
             const tokenPricePoint = tokenPrices?.find(
               (token) => token.tokenAddress === fee.tokenAddress,
@@ -128,7 +131,7 @@ export const getFeesHistoryAtom = (contracts: string[]) =>
             acc[contracts[index]] = fee;
             return acc;
           },
-          {} as Record<string, number>,
+          {} as Record<string, number | undefined>,
         );
         return feesCollectionMap;
       },
@@ -229,7 +232,8 @@ export const UserDepsositsAtom = (
         const depositsPromises = strategyContracts.map(
           async (strategyContract, index) => {
             const transactions = userTxHistory?.[strategyContract];
-            if (!transactions || transactions.length === 0) return;
+            if (!transactions) return;
+            if (transactions.length === 0) return [strategyContract, 0];
             const token0 = tokenPrices?.find(
               (token) => token.tokenName === tokens[index][0],
             );

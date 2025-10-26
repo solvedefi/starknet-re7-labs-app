@@ -8,7 +8,7 @@ type TotalYieldProps = {
 
 export const TotalYield = ({ strategies }: TotalYieldProps) => {
   const totalYield = strategies.reduce(
-    (acc, strategy) => acc + strategy.yields.amount,
+    (acc, strategy) => acc + (strategy.yields.amount || 0),
     0,
   );
 

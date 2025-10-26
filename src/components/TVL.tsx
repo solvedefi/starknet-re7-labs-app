@@ -14,6 +14,7 @@ import {
 import { useAtomValue } from 'jotai';
 import React from 'react';
 import chart from '@public/chart.png';
+import { NAMessage } from './NAMessage';
 
 const TVL: React.FC = () => {
   const { data, isPending } = useAtomValue(dAppStatsAtom);
@@ -68,7 +69,7 @@ const TVL: React.FC = () => {
               ) : data !== undefined ? (
                 formattedTvlData(Number(data.tvl?.toFixed(4) ?? 0))
               ) : (
-                '0'
+                <NAMessage />
               )}
             </StatNumber>
           </Stat>
@@ -101,13 +102,12 @@ const TVL: React.FC = () => {
               </Container>
             </StatLabel>
             <StatNumber>
-              $
               {userStatsPending ? (
                 <Spinner size="sm" color="white" marginLeft={'5px'} />
               ) : !userData ? (
-                0
+                <NAMessage />
               ) : (
-                Number(userData?.holdingsUSD.toFixed(2)).toLocaleString()
+                `$${Number(userData?.holdingsUSD.toFixed(2)).toLocaleString()}`
               )}
             </StatNumber>
           </Stat>

@@ -38,7 +38,7 @@ export interface PoolMetadata {
 
 export interface DepositDetails {
   tokens: Pick<TokenInfo, 'name' | 'address' | 'decimals'>[];
-  amount: number;
+  amount: number | undefined;
   isLoading: boolean;
 }
 export interface PoolInfo extends PoolMetadata {
@@ -50,15 +50,15 @@ export interface PoolInfo extends PoolMetadata {
   contract?: { name: string; address: string }[];
   depositDetails?: DepositDetails;
   fees?: {
-    amount: number;
+    amount: number | undefined;
     isLoading: boolean;
   };
   yields?: {
-    amount: number;
+    amount: number | undefined;
     isLoading: boolean;
   };
   volume?: {
-    amount: number;
+    amount: number | undefined;
     isLoading: boolean;
   };
   protocol: {

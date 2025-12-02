@@ -38,7 +38,11 @@ export async function getERC20Balance(
   const provider = new RpcProvider({
     nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
   });
-  const erc20Contract = new Contract(ERC20Abi, token.token, provider);
+  const erc20Contract = new Contract({
+    abi: ERC20Abi,
+    address: token.token,
+    providerOrAccount: provider,
+  });
   const balance = await erc20Contract.call('balanceOf', [address]);
   return {
     amount: new MyNumber(balance.toString(), token.decimals),
@@ -57,7 +61,11 @@ export async function getERC4626Balance(
   const provider = new RpcProvider({
     nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
   });
-  const erc4626Contract = new Contract(ERC4626Abi, token.token, provider);
+  const erc4626Contract = new Contract({
+    abi: ERC4626Abi,
+    address: token.token,
+    providerOrAccount: provider,
+  });
   const balance = await erc4626Contract.call('convert_to_assets', [
     uint256.bnToUint256(bal.amount.toString()),
   ]);
@@ -85,19 +93,19 @@ export async function getERC721PositionValue(
   });
   let result: any = null;
   try {
-    const erc721Contract = new Contract(
-      DeltaNeutralAbi,
-      token.address,
-      provider,
-    );
+    const erc721Contract = new Contract({
+      abi: DeltaNeutralAbi,
+      address: token.address,
+      providerOrAccount: provider,
+    });
     const tokenId = num.getDecimalString(address);
     result = await erc721Contract.call('describe_position', [tokenId]);
   } catch (err) {
-    const erc721Contract = new Contract(
-      DeltaNeutralAbi2,
-      token.address,
-      provider,
-    );
+    const erc721Contract = new Contract({
+      abi: DeltaNeutralAbi2,
+      address: token.address,
+      providerOrAccount: provider,
+    });
     const tokenId = num.getDecimalString(address);
     result = await erc721Contract.call('describe_position', [tokenId]);
   }

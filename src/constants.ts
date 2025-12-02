@@ -432,39 +432,39 @@ export const VAULTS: Vault[] = [
     baseToken: 'WBTC',
     quoteToken: 'STRK',
   },
-  // NEW USDC VAULTS
-  {
-    name: 'USDC/USDT',
-    address:
-      '0x5203a08b471e46bf33990ac83aff577bbe5a5d789e61de2c6531e3c4773d1c9',
-    launchBlock: 3998018,
-    baseToken: 'USDC',
-    quoteToken: 'USDT',
-  },
-  {
-    name: 'ETH/USDC',
-    address:
-      '0x4d00c7423b3c0fae3640f6099ac97acbfd8708f099e09bfe3a7a6a680399228',
-    launchBlock: 3998025,
-    baseToken: 'ETH',
-    quoteToken: 'USDC',
-  },
-  {
-    name: 'STRK/USDC',
-    address:
-      '0x4de22bd0a8eb4d0a18736e66dd36d20ba50bc106346bbfac3dbeaac1ab37ce1',
-    launchBlock: 3998030,
-    baseToken: 'STRK',
-    quoteToken: 'USDC',
-  },
-  {
-    name: 'WBTC/USDC',
-    address:
-      '0x76101c3b80af1103c9c6d541ca627f61b5ae7ae79d7fce96ccdf7bdb648450d',
-    launchBlock: 3998034,
-    baseToken: 'WBTC',
-    quoteToken: 'USDC',
-  },
+  // // NEW USDC VAULTS
+  // {
+  //   name: 'USDC/USDT',
+  //   address:
+  //     '0x5203a08b471e46bf33990ac83aff577bbe5a5d789e61de2c6531e3c4773d1c9',
+  //   launchBlock: 3998018,
+  //   baseToken: 'USDC',
+  //   quoteToken: 'USDT',
+  // },
+  // {
+  //   name: 'ETH/USDC',
+  //   address:
+  //     '0x4d00c7423b3c0fae3640f6099ac97acbfd8708f099e09bfe3a7a6a680399228',
+  //   launchBlock: 3998025,
+  //   baseToken: 'ETH',
+  //   quoteToken: 'USDC',
+  // },
+  // {
+  //   name: 'STRK/USDC',
+  //   address:
+  //     '0x4de22bd0a8eb4d0a18736e66dd36d20ba50bc106346bbfac3dbeaac1ab37ce1',
+  //   launchBlock: 3998030,
+  //   baseToken: 'STRK',
+  //   quoteToken: 'USDC',
+  // },
+  // {
+  //   name: 'WBTC/USDC',
+  //   address:
+  //     '0x76101c3b80af1103c9c6d541ca627f61b5ae7ae79d7fce96ccdf7bdb648450d',
+  //   launchBlock: 3998034,
+  //   baseToken: 'WBTC',
+  //   quoteToken: 'USDC',
+  // },
 ];
 
 export default CONSTANTS;

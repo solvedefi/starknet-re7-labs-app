@@ -17,6 +17,7 @@ import {
   Tooltip,
   VStack,
 } from '@chakra-ui/react';
+
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -41,6 +42,7 @@ import { userStrategyWiseTVLAtom } from '@/store/utils.atoms';
 import { ibmPlexMonoLight } from '@/fonts';
 import { HowDoesItWorkModal } from './HowDoesItWorkModal';
 import { WarningTwoIcon } from '@chakra-ui/icons';
+import Link from 'next/link';
 
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
@@ -233,9 +235,47 @@ const Strategy = ({ params }: StrategyParams) => {
                       gap={2}
                       justify={'center'}
                       py={2}
+                      direction="column"
                     >
-                      <WarningTwoIcon color="orange" />
-                      <Text>Vault currently under migration</Text>
+                      <HStack>
+                        <WarningTwoIcon color="orange" />
+                        <Text>Vault currently under migration</Text>
+                      </HStack>
+                      <HStack>
+                        <Text fontSize={'14px'}>
+                          You can switch your USDC.e to USDC on AVNU{' '}
+                          <Text
+                            as="span"
+                            textDecoration={'underline'}
+                            _hover={{ color: '#2E45D0' }}
+                          >
+                            <Link
+                              href="https://app.avnu.fi/en/usdc.e-usdc"
+                              target="_blank"
+                            >
+                              here
+                            </Link>
+                          </Text>
+                        </Text>
+                      </HStack>
+                      <HStack>
+                        <Text fontSize={'14px'}>
+                          See AVNU&apos;s{' '}
+                          <Text
+                            as="span"
+                            textDecoration={'underline'}
+                            _hover={{ color: '#2E45D0' }}
+                          >
+                            <Link
+                              href="https://docs.avnu.fi/updates/circle-usdc-migration"
+                              target="_blank"
+                            >
+                              docs
+                            </Link>
+                          </Text>{' '}
+                          for more information.
+                        </Text>
+                      </HStack>
                     </Flex>
                   )}
                 </VStack>

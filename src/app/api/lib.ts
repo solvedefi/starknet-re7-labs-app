@@ -89,11 +89,11 @@ export const getRewardsInfo = async (
       const priceData = await priceResponse.json();
       // consider token price of vToken
       const clsVToken = await provider.getClassAt(stratAllowed.rewardToken);
-      const tokenContractVToken = new Contract(
-        clsVToken.abi,
-        stratAllowed.rewardToken,
-        provider,
-      );
+      const tokenContractVToken = new Contract({
+        abi: clsVToken.abi,
+        address: stratAllowed.rewardToken,
+        providerOrAccount: provider,
+      });
       const shareValue = await tokenContractVToken.call('convert_to_assets', [
         uint256.bnToUint256((1e18).toString()),
       ]);
@@ -130,7 +130,11 @@ export const getRewardsInfo = async (
       // if less bal available, use the available balance
       const rewardToken = stratAllowed.rewardToken;
       const cls = await provider.getClassAt(rewardToken);
-      const tokenContract = new Contract(cls.abi, rewardToken, provider);
+      const tokenContract = new Contract({
+        abi: cls.abi,
+        address: rewardToken,
+        providerOrAccount: provider,
+      });
       const available = await tokenContract.balanceOf(funder);
       const availableBal =
         Number(

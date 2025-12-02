@@ -3,18 +3,18 @@ import { TokenInfo } from '@/strategies/IStrategy';
 import MyNumber from '@/utils/MyNumber';
 import { useAccount, useReadContract } from '@starknet-react/core';
 import { useEffect, useMemo } from 'react';
-import { BlockTag } from 'starknet';
+import { Abi, BlockTag, uint256 } from 'starknet';
 
 export function useERC20Balance(token: TokenInfo | undefined) {
   const { address } = useAccount();
 
   const { data, isError, isLoading, error } = useReadContract({
+    abi: ERC20Abi as Abi,
     functionName: 'balanceOf',
-    args: [address || '0x0'],
-    abi: ERC20Abi,
+    args: address ? [address, uint256.bnToUint256(1)] : undefined,
     address: token?.token || ('0x0' as any),
     watch: true,
-    blockIdentifier: BlockTag.PENDING,
+    blockIdentifier: BlockTag.LATEST,
   });
 
   const result = useMemo(() => {

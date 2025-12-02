@@ -8,7 +8,7 @@ import { referralCodeAtom } from '@/store/referral.store';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useReadContract, useSendTransaction } from '@starknet-react/core';
-import { Contract } from 'starknet';
+import { Contract, uint256 } from 'starknet';
 import NFTAbi from '../../abi/nft.abi.json';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { addressAtom } from '@/store/claims.atoms';
@@ -81,11 +81,11 @@ const CommunityPage = () => {
     isOGNFTEligible.isError,
   ]);
 
-  const ogNFTContract = new Contract(
-    NFTAbi,
-    process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '',
-    provider,
-  );
+  const ogNFTContract = new Contract({
+    abi: NFTAbi,
+    address: process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '',
+    providerOrAccount: provider,
+  });
 
   const {
     sendAsync: claimOGNFT,
@@ -107,10 +107,10 @@ const CommunityPage = () => {
     '0x0') as `0x${string}`;
   const { data: ogNFTBalance, status: balanceQueryStatus } = useReadContract({
     abi: NFTAbi,
-    address: ogNFTAddr,
     functionName: 'balanceOf',
-    args: [address || '0x0', 1],
-  });
+    address: ogNFTAddr,
+    args: [address || '0x0', uint256.bnToUint256(1)],
+  } as any);
 
   useEffect(() => {
     if (isOGNFTEligible.isSuccess && isOGNFTEligible.data?.totalOgNFTUsers) {
@@ -372,7 +372,7 @@ const CommunityPage = () => {
                 ) : !address ? (
                   'Connect wallet to check eligibility'
                 ) : isOGNFTEligible.isLoading ||
-                  balanceQueryStatus == 'pending' ? (
+                  balanceQueryStatus === 'pending' ? (
                   <Spinner size="sm" />
                 ) : hasNFT ? (
                   'Claimed'

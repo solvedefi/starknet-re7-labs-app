@@ -6,6 +6,7 @@ import MyNumber from './utils/MyNumber';
 const LOGOS = {
   USDT: '/zklend/icons/tokens/usdt.svg?w=20',
   USDC: '/zklend/icons/tokens/usdc.svg?w=20',
+  'USDC.e': '/zklend/icons/tokens/usdc.svg?w=20',
   WBTC: '/zklend/icons/tokens/wbtc.svg?w=20',
   tBTC: '/zklend/icons/tokens/wbtc.svg?w=20',
   ETH: '/zklend/icons/tokens/eth.svg?w=20',
@@ -18,6 +19,7 @@ const LOGOS = {
 export type TokenName =
   | 'USDT'
   | 'USDC'
+  | 'USDC.e'
   | 'ETH'
   | 'STRK'
   | 'WBTC'
@@ -196,8 +198,19 @@ export const TOKENS: TokenInfo[] = [
     isERC4626: true,
   },
   {
-    token: '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8',
+    token: '0x033068F6539f8e6e6b131e6B2B814e6c34A5224bC66947c47DaB9dFeE93b35fb',
     name: 'USDC',
+    decimals: 6,
+    displayDecimals: 2,
+    logo: CONSTANTS.LOGOS.USDC,
+    minAmount: MyNumber.fromEther('10', 6),
+    maxAmount: MyNumber.fromEther('10000', 6),
+    stepAmount: MyNumber.fromEther('10', 6),
+    isERC4626: false,
+  },
+  {
+    token: '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8',
+    name: 'USDC.e', // Legagy
     decimals: 6,
     displayDecimals: 2,
     logo: CONSTANTS.LOGOS.USDC,
@@ -357,28 +370,28 @@ interface Vault {
 
 export const VAULTS: Vault[] = [
   {
-    name: 'USDC/USDT',
+    name: 'USDC.e/USDT',
     address:
       '0x3a4f8debaf12af97bb911099bc011d63d6c208d4c5ba8e15d7f437785b0aaa2',
     launchBlock: 1501761,
-    baseToken: 'USDC',
+    baseToken: 'USDC.e',
     quoteToken: 'USDT',
   },
   {
-    name: 'ETH/USDC',
+    name: 'ETH/USDC.e',
     address:
       '0x160d8fa4569ef6a12e6bf47cb943d7b5ebba8a41a69a14c1d943050ba5ff947',
     launchBlock: 1501761,
     baseToken: 'ETH',
-    quoteToken: 'USDC',
+    quoteToken: 'USDC.e',
   },
   {
-    name: 'STRK/USDC',
+    name: 'STRK/USDC.e',
     address:
       '0x351b36d0d9d8b40010658825adeeddb1397436cd41acd0ff6c6e23aaa8b5b30',
     launchBlock: 1501762,
     baseToken: 'STRK',
-    quoteToken: 'USDC',
+    quoteToken: 'USDC.e',
   },
   {
     name: 'STRK/ETH',
@@ -389,12 +402,12 @@ export const VAULTS: Vault[] = [
     quoteToken: 'ETH',
   },
   {
-    name: 'WBTC/USDC',
+    name: 'WBTC/USDC.e',
     address:
       '0x2bcaef2eb7706875a5fdc6853dd961a0590f850bc3a031c59887189b5e84ba1',
     launchBlock: 1501764,
     baseToken: 'WBTC',
-    quoteToken: 'USDC',
+    quoteToken: 'USDC.e',
   },
   // {
   //   name: 'tBTC/USDC',
@@ -418,6 +431,39 @@ export const VAULTS: Vault[] = [
     launchBlock: 1501766,
     baseToken: 'WBTC',
     quoteToken: 'STRK',
+  },
+  // NEW USDC VAULTS
+  {
+    name: 'USDC/USDT',
+    address:
+      '0x5203a08b471e46bf33990ac83aff577bbe5a5d789e61de2c6531e3c4773d1c9',
+    launchBlock: 3998018,
+    baseToken: 'USDC',
+    quoteToken: 'USDT',
+  },
+  {
+    name: 'ETH/USDC',
+    address:
+      '0x4d00c7423b3c0fae3640f6099ac97acbfd8708f099e09bfe3a7a6a680399228',
+    launchBlock: 3998025,
+    baseToken: 'ETH',
+    quoteToken: 'USDC',
+  },
+  {
+    name: 'STRK/USDC',
+    address:
+      '0x4de22bd0a8eb4d0a18736e66dd36d20ba50bc106346bbfac3dbeaac1ab37ce1',
+    launchBlock: 3998030,
+    baseToken: 'STRK',
+    quoteToken: 'USDC',
+  },
+  {
+    name: 'WBTC/USDC',
+    address:
+      '0x76101c3b80af1103c9c6d541ca627f61b5ae7ae79d7fce96ccdf7bdb648450d',
+    launchBlock: 3998034,
+    baseToken: 'WBTC',
+    quoteToken: 'USDC',
   },
 ];
 

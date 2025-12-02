@@ -5,7 +5,11 @@ import { getPoolInfoFromStrategy, sortAtom } from '@/store/protocols';
 import { UserStats, userStatsAtom } from '@/store/utils.atoms';
 import { isLive, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { getDisplayCurrencyAmount } from '@/utils';
-import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons';
+import {
+  TriangleDownIcon,
+  TriangleUpIcon,
+  WarningTwoIcon,
+} from '@chakra-ui/icons';
 import {
   Avatar,
   AvatarGroup,
@@ -101,6 +105,11 @@ export function StrategyInfo(props: YieldCardProps) {
                     <Image src={shield.src} alt="badge" />
                   </Box>
                 </Link>
+              </Tooltip>
+            )}
+            {pool.pool.name.includes('USDC') && (
+              <Tooltip label="Vault currently under migration">
+                <WarningTwoIcon color="orange" />
               </Tooltip>
             )}
           </HStack>
@@ -486,6 +495,7 @@ export default function YieldCard(props: YieldCardProps) {
   const isRetired = useMemo(() => {
     return isPoolRetired(pool);
   }, [pool]);
+
   return (
     <>
       <Tr

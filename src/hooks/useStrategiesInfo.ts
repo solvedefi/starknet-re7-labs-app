@@ -170,7 +170,8 @@ export const useStrategiesInfo = () => {
         amount: volume?.[contract] || 0,
         isLoading: volumeLoading[contract] ?? false,
       },
-      calculatedApr: ((fees?.[contract] || 0) * 52) / pool.tvlUsd,
+      calculatedApr:
+        pool.tvlUsd > 0 ? ((fees?.[contract] || 0) * 52) / pool.tvlUsd : 0,
     };
 
     dispatch(saveStrategy({ ...strat, id: strat.id }));

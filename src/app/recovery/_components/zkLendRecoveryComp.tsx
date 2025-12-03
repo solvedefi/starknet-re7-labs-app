@@ -105,11 +105,11 @@ export default function ZklendRecoveryComp() {
 
         const contractCalls = Object.entries(ALL_STRATS).map(
           async ([key, strategyInfo]) => {
-            const contract = new Contract(
-              strategyAbi,
-              strategyInfo.address,
-              provider,
-            );
+            const contract = new Contract({
+              abi: strategyAbi,
+              address: strategyInfo.address,
+              providerOrAccount: provider,
+            });
             const res: any = await contract.call('zklend_position', [
               address,
               uint256.bnToUint256(BATCH_ID),
@@ -174,11 +174,11 @@ export default function ZklendRecoveryComp() {
 
   const calls = useMemo(() => {
     const contracts = Object.entries(ALL_STRATS).map(([key, strategyInfo]) => {
-      const contract = new Contract(
-        strategyAbi,
-        strategyInfo.address,
-        provider,
-      );
+      const contract = new Contract({
+        abi: strategyAbi,
+        address: strategyInfo.address,
+        providerOrAccount: provider,
+      });
       return contract;
     });
     const calls = contracts

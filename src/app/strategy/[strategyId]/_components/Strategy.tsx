@@ -17,6 +17,7 @@ import {
   Tooltip,
   VStack,
 } from '@chakra-ui/react';
+
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -40,6 +41,8 @@ import styles from '../../../border.module.css';
 import { userStrategyWiseTVLAtom } from '@/store/utils.atoms';
 import { ibmPlexMonoLight } from '@/fonts';
 import { HowDoesItWorkModal } from './HowDoesItWorkModal';
+import { WarningTwoIcon } from '@chakra-ui/icons';
+import Link from 'next/link';
 
 const Strategy = ({ params }: StrategyParams) => {
   const address = useAtomValue(addressAtom);
@@ -172,52 +175,110 @@ const Strategy = ({ params }: StrategyParams) => {
           <Grid width={'100%'} templateColumns="repeat(10, 1fr)" gap={'44px'}>
             <GridItem display="flex" colSpan={colSpan1}>
               <Card width="100%" color="white" bg="#171717">
-                <Flex mb={'20px'}>
-                  <AvatarGroup size={'lg'} spacing={'-25px'} mr={'5px'}>
-                    {strategy &&
-                      strategy.metadata.depositTokens.length > 0 &&
-                      strategy.metadata.depositTokens.map((token: any) => {
-                        return (
+                <VStack mb={'20px'} w="full">
+                  <Flex w="full">
+                    <AvatarGroup size={'lg'} spacing={'-25px'} mr={'5px'}>
+                      {strategy &&
+                        strategy.metadata.depositTokens.length > 0 &&
+                        strategy.metadata.depositTokens.map((token: any) => {
+                          return (
+                            <Avatar
+                              key={token.address}
+                              marginRight={'5px'}
+                              src={token.logo}
+                              width={'47px'}
+                              height={'47px'}
+                            />
+                          );
+                        })}
+                      {strategy &&
+                        strategy.metadata.depositTokens.length == 0 && (
                           <Avatar
-                            key={token.address}
                             marginRight={'5px'}
-                            src={token.logo}
-                            width={'47px'}
-                            height={'47px'}
+                            src={strategy?.holdingTokens[0].logo}
                           />
-                        );
-                      })}
-                    {strategy &&
-                      strategy.metadata.depositTokens.length == 0 && (
-                        <Avatar
-                          marginRight={'5px'}
-                          src={strategy?.holdingTokens[0].logo}
-                        />
-                      )}
-                  </AvatarGroup>
-                  <VStack alignItems={'flex-start'} gap={'0px'}>
-                    <Text
-                      // marginTop={'6px'}
-                      marginLeft={'10px'}
-                      fontSize={{ base: '18px', md: '25px' }}
-                      fontWeight={'bold'}
-                      color="white"
-                      lineHeight={'normal'}
+                        )}
+                    </AvatarGroup>
+                    <HStack spacing={2} align={'start'}>
+                      <VStack alignItems={'flex-start'} gap={'0px'}>
+                        <Text
+                          // marginTop={'6px'}
+                          marginLeft={'10px'}
+                          fontSize={{ base: '18px', md: '25px' }}
+                          fontWeight={'bold'}
+                          color="white"
+                          lineHeight={'normal'}
+                        >
+                          {strategy ? strategy.name : 'Strategy Not found'}
+                        </Text>
+                        <Text
+                          mt="-5px"
+                          fontSize={'20px'}
+                          marginLeft={'10px'}
+                          fontWeight={'300'}
+                          color={'white'}
+                          fontFamily={ibmPlexMonoLight.style.fontFamily}
+                        >
+                          By Ekubo
+                        </Text>
+                      </VStack>
+                    </HStack>
+                  </Flex>
+                  {/* Temporary warning for USDC vault */}
+                  {strategy.name.includes('USDC.e') && (
+                    <Flex
+                      w="full"
+                      borderRadius={'10px'}
+                      border={'1px solid #FCC01E'}
+                      bg={'#FCC01E1A'}
+                      alignItems={'center'}
+                      gap={2}
+                      justify={'center'}
+                      py={2}
+                      direction="column"
                     >
-                      {strategy ? strategy.name : 'Strategy Not found'}
-                    </Text>
-                    <Text
-                      mt="-5px"
-                      fontSize={'20px'}
-                      marginLeft={'10px'}
-                      fontWeight={'300'}
-                      color={'white'}
-                      fontFamily={ibmPlexMonoLight.style.fontFamily}
-                    >
-                      By Ekubo
-                    </Text>
-                  </VStack>
-                </Flex>
+                      <HStack>
+                        <WarningTwoIcon color="orange" />
+                        <Text>Vault currently under migration</Text>
+                      </HStack>
+                      <HStack>
+                        <Text fontSize={'14px'}>
+                          You can switch your USDC.e to USDC on AVNU{' '}
+                          <Text
+                            as="span"
+                            textDecoration={'underline'}
+                            _hover={{ color: '#2E45D0' }}
+                          >
+                            <Link
+                              href="https://app.avnu.fi/en/usdc.e-usdc"
+                              target="_blank"
+                            >
+                              here
+                            </Link>
+                          </Text>
+                        </Text>
+                      </HStack>
+                      <HStack>
+                        <Text fontSize={'14px'}>
+                          See AVNU&apos;s{' '}
+                          <Text
+                            as="span"
+                            textDecoration={'underline'}
+                            _hover={{ color: '#2E45D0' }}
+                          >
+                            <Link
+                              href="https://docs.avnu.fi/updates/circle-usdc-migration"
+                              target="_blank"
+                            >
+                              docs
+                            </Link>
+                          </Text>{' '}
+                          for more information.
+                        </Text>
+                      </HStack>
+                    </Flex>
+                  )}
+                </VStack>
 
                 {!strategy?.isRetired() && (
                   <HarvestTime strategy={strategy} balData={balData} />

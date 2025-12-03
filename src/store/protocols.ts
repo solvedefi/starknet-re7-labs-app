@@ -203,7 +203,12 @@ export function getPoolInfoFromStrategy(strat: StrategyDetails): PoolInfo {
     apr: strat.calculatedApr,
     aprSplits: [
       {
-        apr: strat.fees ? (strat.fees.amount * 52) / strat.tvlUsd : 0,
+        apr:
+          strat.tvlUsd > 0
+            ? strat.fees
+              ? (strat.fees.amount * 52) / strat.tvlUsd
+              : 0
+            : 0,
         title: 'Strategy APY',
         description: 'Includes fees',
       },

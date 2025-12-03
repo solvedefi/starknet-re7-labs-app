@@ -321,76 +321,6 @@ function InternalRedeem(props: RedeemProps) {
     ],
   );
 
-  // Handle MAX button click
-  const handleMaxClick = useCallback(() => {
-    setSliderValue(100);
-    setPercentageInput('100');
-    let tokenInfo = selectedToken;
-    let index = 0;
-    let amount = maxAmount;
-    if (amount.isZero()) {
-      // use other token if first token is zero
-      tokenInfo = strategyBalances[1].tokenInfo as unknown as TokenInfoV2;
-      index = 1;
-      amount = balanceByToken[1];
-    }
-    onAmountChange(amount, true, amount.toEtherStr(), tokenInfo, index);
-    if (selectedToken) {
-      mixpanel.track('Chose max amount', {
-        strategyId: props.strategy.id,
-        strategyName: props.strategy.name,
-        buttonText: props.buttonText,
-        amount: amount.toEtherStr(),
-        token: tokenInfo?.name,
-        maxAmount: amount.toEtherStr(),
-        address,
-      });
-    }
-  }, [
-    maxAmount,
-    selectedToken,
-    props.strategy,
-    props.buttonText,
-    address,
-    balanceByToken,
-    strategyBalances,
-  ]);
-
-  function onAmountChange(
-    _amt: MyNumber,
-    isMaxClicked: boolean,
-    rawAmount = _amt.toEtherStr(),
-    token = selectedToken,
-    inputIndex = 0,
-  ) {
-    if (!token) return;
-
-    setInputInfo({
-      index: inputIndex,
-      info: {
-        tokenInfo: token,
-        amount: Web3Number.fromWei(_amt.toString(), token.decimals),
-        isMaxClicked,
-        rawAmount,
-      },
-    });
-
-    const updatedInputsInfo = inputsInfo.map((item, index) => {
-      return {
-        ...item,
-        tokenInfo: props.strategy.metadata.depositTokens[index],
-      };
-    });
-
-    checkAndTriggerOnAmountsChange(
-      _amt,
-      token,
-      updatedInputsInfo,
-      redeemInfo,
-      inputIndex,
-    );
-  }
-
   const checkAndTriggerOnAmountsChange = debounce(function (
     _amt: MyNumber,
     _token: TokenInfoV2,
@@ -513,6 +443,87 @@ function InternalRedeem(props: RedeemProps) {
       console.error('onAmountsChange error', err);
     }
   }, 200);
+
+  const onAmountChange = useCallback(
+    (
+      _amt: MyNumber,
+      isMaxClicked: boolean,
+      rawAmount = _amt.toEtherStr(),
+      token = selectedToken,
+      inputIndex = 0,
+    ) => {
+      if (!token) return;
+
+      setInputInfo({
+        index: inputIndex,
+        info: {
+          tokenInfo: token,
+          amount: Web3Number.fromWei(_amt.toString(), token.decimals),
+          isMaxClicked,
+          rawAmount,
+        },
+      });
+
+      const updatedInputsInfo = inputsInfo.map((item, index) => {
+        return {
+          ...item,
+          tokenInfo: props.strategy.metadata.depositTokens[index],
+        };
+      });
+
+      checkAndTriggerOnAmountsChange(
+        _amt,
+        token,
+        updatedInputsInfo,
+        redeemInfo,
+        inputIndex,
+      );
+    },
+    [
+      inputsInfo,
+      setInputInfo,
+      redeemInfo,
+      props.strategy,
+      selectedToken,
+      checkAndTriggerOnAmountsChange,
+    ],
+  );
+
+  // Handle MAX button click
+  const handleMaxClick = useCallback(() => {
+    setSliderValue(100);
+    setPercentageInput('100');
+    let tokenInfo = selectedToken;
+    let index = 0;
+    let amount = maxAmount;
+    if (amount.isZero()) {
+      // use other token if first token is zero
+      tokenInfo = strategyBalances[1].tokenInfo as unknown as TokenInfoV2;
+      index = 1;
+      amount = balanceByToken[1];
+    }
+    onAmountChange(amount, true, amount.toEtherStr(), tokenInfo, index);
+    if (selectedToken) {
+      mixpanel.track('Chose max amount', {
+        strategyId: props.strategy.id,
+        strategyName: props.strategy.name,
+        buttonText: props.buttonText,
+        amount: amount.toEtherStr(),
+        token: tokenInfo?.name,
+        maxAmount: amount.toEtherStr(),
+        address,
+      });
+    }
+  }, [
+    maxAmount,
+    selectedToken,
+    props.strategy,
+    props.buttonText,
+    address,
+    balanceByToken,
+    strategyBalances,
+    onAmountChange,
+  ]);
 
   // Update callsInfo when selectedToken or amount changes
   useEffect(() => {

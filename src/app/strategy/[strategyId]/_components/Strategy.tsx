@@ -225,7 +225,7 @@ const Strategy = ({ params }: StrategyParams) => {
                     </HStack>
                   </Flex>
                   {/* Temporary warning for USDC vault */}
-                  {strategy.name.includes('USDC') && (
+                  {strategy.name.includes('USDC.e') && (
                     <Flex
                       w="full"
                       borderRadius={'10px'}

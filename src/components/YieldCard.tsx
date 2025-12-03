@@ -107,7 +107,7 @@ export function StrategyInfo(props: YieldCardProps) {
                 </Link>
               </Tooltip>
             )}
-            {pool.pool.name.includes('USDC') && (
+            {pool.pool.name.includes('USDC.e') && (
               <Tooltip label="Vault currently under migration">
                 <WarningTwoIcon color="orange" />
               </Tooltip>

@@ -2464,6 +2464,7 @@
   integrity sha512-ngLjOFuWOI4EFij8V+nl5tgHVACr6jqgLNUQbgD+AgnTcAN33SemBPXDIsovwK1Mz1U04Cz3qjDOnTq7067ZQw==
 
 "@starknet-io/types-js@^0.7.10", "@starknet-io/types-js@^0.7.7", "starknet-types-07@npm:@starknet-io/types-js@^0.7.10":
+  name starknet-types-07
   version "0.7.10"
   resolved "https://registry.yarnpkg.com/@starknet-io/types-js/-/types-js-0.7.10.tgz#d21dc973d0cd04d7b6293ce461f2f06a5873c760"
   integrity sha512-1VtCqX4AHWJlRRSYGSn+4X1mqolI1Tdq62IwzoU2vUuEE72S1OlEeGhpvd6XsdqXcfHmVzYfj8k1XtKBQqwo9w==
@@ -2486,10 +2487,10 @@
     viem "^2.21.1"
     zod "^3.22.4"
 
-"@strkfarm/sdk@^1.1.64":
-  version "1.1.64"
-  resolved "https://registry.yarnpkg.com/@strkfarm/sdk/-/sdk-1.1.64.tgz#24aa06b68276c14273f28d9923f90588097d993c"
-  integrity sha512-yYrTApcWP5F+1AsLyhbAyZj73KMBPFlRH+cgVbJo3xgXuNZeKy+98QucaE9exCj6AhxkRKiyENZ5gVq0ou7Zlw==
+"@strkfarm/sdk@^1.1.65":
+  version "1.1.65"
+  resolved "https://registry.yarnpkg.com/@strkfarm/sdk/-/sdk-1.1.65.tgz#ba63b05c52e1076893f9765a546dc3e5c49303b0"
+  integrity sha512-wvV+OH0oaqAfZTszHw5XfbRVf7o9rzt7OSlPlP2ue3Vs58NVdnkX212997TgrVaWx7EjRtr/spCL6mT2yqi7Mw==
   dependencies:
     "@apollo/client" "3.11.8"
     "@avnu/avnu-sdk" "3.0.2"
@@ -2497,7 +2498,6 @@
     "@noble/curves" "^1.0.0"
     "@noble/hashes" "^2.0.0"
     "@scure/starknet" "^2.0.0"
-    "@strkfarm/sdk" "link:../../../Library/Caches/Yarn/v6/npm-@strkfarm-sdk-1.1.64-24aa06b68276c14273f28d9923f90588097d993c-integrity/node_modules/@strkfarm/sdk"
     bignumber.js "4.0.4"
     browser-assert "^1.2.1"
     chalk "^4.1.2"
@@ -5241,10 +5241,23 @@ esutils@^2.0.2:
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
-ethers@^6.11.1, ethers@^6.13.5:
+ethers@^6.11.1:
   version "6.15.0"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.15.0.tgz#2980f2a3baf0509749b7e21f8692fa8a8349c0e3"
   integrity sha512-Kf/3ZW54L4UT0pZtsY/rf+EkBU7Qi5nnhonjUb8yTXcxH3cdcWrV2cRyk0Xk/4jK6OoHhxxZHriyhje20If2hQ==
+  dependencies:
+    "@adraffy/ens-normalize" "1.10.1"
+    "@noble/curves" "1.2.0"
+    "@noble/hashes" "1.3.2"
+    "@types/node" "22.7.5"
+    aes-js "4.0.0-beta.5"
+    tslib "2.7.0"
+    ws "8.17.1"
+
+ethers@^6.13.5:
+  version "6.16.0"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.16.0.tgz#fff9b4f05d7a359c774ad6e91085a800f7fccf65"
+  integrity sha512-U1wulmetNymijEhpSEQ7Ct/P/Jw9/e7R1j5XIbPRydgV2DjLVMsULDlNksq3RQnFgKoLlZf88ijYtWEXcPa07A==
   dependencies:
     "@adraffy/ens-normalize" "1.10.1"
     "@noble/curves" "1.2.0"

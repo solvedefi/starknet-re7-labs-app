@@ -332,10 +332,9 @@ export const provider = new RpcProvider({
   nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
 });
 
-// ? When updating this, ensure there is redirect available for this route
-// ? to respect version of doc in github
-export const LATEST_TNC_DOC_VERSION = 'tnc/v1';
-export const RE7_TnC_DOC_URL = `https://www.re7labs.xyz/terms`;
+// T&C version - increment when terms change to force users to re-accept
+export const LATEST_TNC_DOC_VERSION = 'tnc/v2';
+export const RE7_TnC_DOC_URL = `/terms-and-conditions`;
 export const SIGNING_DATA = {
   types: {
     StarkNetDomain: [

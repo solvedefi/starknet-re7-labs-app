@@ -1,6 +1,6 @@
 'use client';
 
-import { RE7_TnC_DOC_URL, SIGNING_DATA } from '@/constants';
+import { LATEST_TNC_DOC_VERSION, RE7_TnC_DOC_URL } from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import {
   Button,
@@ -13,18 +13,13 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import {
-  useAccount,
-  useDisconnect,
-  useSignTypedData,
-} from '@starknet-react/core';
+import { useAccount, useDisconnect } from '@starknet-react/core';
 import axios from 'axios';
 import { atomWithQuery } from 'jotai-tanstack-query';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import React, { useEffect, useState } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { referralCodeAtom } from '@/store/referral.store';
-import { useSearchParams } from 'next/navigation';
-// import { generateReferralCode } from '@/utils';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import mixpanel from 'mixpanel-browser';
 import toast from 'react-hot-toast';
@@ -33,146 +28,131 @@ import { lastWalletAtom } from '@/store/utils.atoms';
 interface TncModalProps {}
 
 export const UserTnCAtom = atomWithQuery((get) => {
+  const address = get(addressAtom);
   return {
-    // we use referral code atom as key to ensure user exisits in db by then
-    queryKey: ['tnc', get(addressAtom), get(referralCodeAtom)],
+    queryKey: ['tnc', address],
     queryFn: async (): Promise<boolean> => {
-      const tncSigned = sessionStorage.getItem('RE7_Aggregator_tncSigned');
-      return tncSigned === 'true';
+      if (!address) return false;
+
+      try {
+        const res = await axios.get(`/api/tnc/getUser/${address}`);
+        if (res.data?.success && res.data?.user) {
+          const user = res.data.user;
+          // Check BOTH signed AND correct version
+          return (
+            user.isTncSigned === true &&
+            user.tncDocVersion === LATEST_TNC_DOC_VERSION
+          );
+        }
+        return false;
+      } catch {
+        return false;
+      }
     },
-    // queryFn: async (): Promise<null | UserTncInfo> => {
-    // const address: string | undefined = get(addressAtom);
-    // console.log(`address tnc`, address);
-    // if (!address) return null;
-    // const res = await axios.get(`/api/tnc/getUser/${address}`);
-    // return res.data;
-    // },
+    // Only run query when we have a real address
+    enabled: !!address,
+    // Cache result for 30 seconds to prevent unnecessary refetches
+    staleTime: 30000,
   };
 });
 
-const TncModal: React.FC<TncModalProps> = (props) => {
+const TncModal: React.FC<TncModalProps> = () => {
   const { address, account } = useAccount();
-  const [refCode, setReferralCode] = useAtom(referralCodeAtom);
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const userTncInfoRes = useAtomValue(UserTnCAtom);
-  const userTncInfo = useMemo(
-    () => userTncInfoRes.data,
-    [userTncInfoRes, refCode],
-  );
+  const setReferralCode = useSetAtom(referralCodeAtom);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSigningPending, setIsSigningPending] = useState(false);
   const { disconnectAsync } = useDisconnect();
   const setLastWallet = useSetAtom(lastWalletAtom);
 
+  const isTncPage = pathname === '/terms-and-conditions';
+
+  // Extract specific values to avoid triggering effect on every object change
   const {
-    signTypedData,
-    error: signingError,
-    data: sigData,
-  } = useSignTypedData({
-    params: SIGNING_DATA,
-  });
+    isLoading,
+    isFetching,
+    isSuccess,
+    data: hasTncAccepted,
+  } = userTncInfoRes;
+  const isQueryReady = isSuccess && !isLoading && !isFetching;
 
   useEffect(() => {
-    if (!userTncInfo && address) {
+    // Don't show modal while pathname is not yet available (hydration)
+    if (pathname === null) {
+      return;
+    }
+
+    // Never show modal on T&C page (users need to read it)
+    if (isTncPage) {
+      onClose();
+      return;
+    }
+
+    // Wait for query to complete successfully before making modal decisions
+    if (!isQueryReady) {
+      return;
+    }
+
+    // Show modal if user is connected but hasn't accepted current T&C version
+    if (!hasTncAccepted && address) {
       onOpen();
     } else {
       onClose();
     }
-  }, [userTncInfo, address]);
-
-  // set ref code of the user if it exists
-  // useEffect(() => {
-  //   if (!userTncInfo) return;
-  //   (async () => {
-  //     if (userTncInfo.success && userTncInfo.user) {
-  //       setReferralCode(userTncInfo.user.referralCode);
-  //       console.log(`tncinfo`, userTncInfo.user);
-  //       if (
-  //         (userTncInfo.user.isTncSigned &&
-  //           userTncInfo.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
-  //         !userTncInfo.user.isTncSigned
-  //       ) {
-  //         onOpen();
-  //       } else {
-  //         onClose();
-  //       }
-  //       return;
-  //     }
-
-  //     if (!userTncInfo.success) {
-  //       try {
-  //         let referrer = searchParams.get('referrer');
-
-  //         if (address && referrer && address === referrer) {
-  //           referrer = null;
-  //         }
-
-  //         const res = await axios.post('/api/referral/createUser', {
-  //           address,
-  //           myReferralCode: generateReferralCode(),
-  //           referrerAddress: referrer,
-  //         });
-  //         if (res.data.success && res.data.user) {
-  //           setReferralCode(res.data.user.referralCode);
-  //         }
-  //       } catch (error) {
-  //         console.error('Error while creating user', error);
-  //       }
-  //     }
-  //   })();
-  // }, [userTncInfo]);
-
-  useEffect(() => {
-    console.log('signature', sigData);
-    if (signingError) {
-      toast.error(signingError.message, {
-        position: 'bottom-right',
-      });
-      setIsSigningPending(false);
-    }
-    if (!address || !account || !sigData) {
-      return;
-    }
-
-    async function processSign() {
-      try {
-        if (!sigData) {
-          return;
-        }
-
-        const signature = sigData;
-        if (signature && signature.length > 0) {
-          const res2 = await axios.post('/api/tnc/signUser', {
-            address,
-            signature: JSON.stringify(signature),
-          });
-
-          if (res2.data?.success) {
-            onClose();
-          } else {
-            toast.error(res2.data?.message || 'Error verifying T&C');
-          }
-        }
-      } catch (error) {
-        console.error('signature', error);
-        mixpanel.track('TnC signing failed', { address });
-      }
-      setIsSigningPending(false);
-    }
-    processSign();
-  }, [sigData, signingError]);
+  }, [
+    isQueryReady,
+    hasTncAccepted,
+    address,
+    isTncPage,
+    pathname,
+    onOpen,
+    onClose,
+  ]);
 
   const handleSign = async () => {
     if (!address || !account) {
       return;
     }
-    mixpanel.track('TnC agreed', { address });
 
-    sessionStorage.setItem('RE7_Aggregator_tncSigned', 'true');
-    onClose();
-    return;
-    // setIsSigningPending(true);
-    // signTypedData();
+    setIsSigningPending(true);
+    try {
+      // Get referrer from URL if present (e.g., /?referrer=0x123...)
+      const referrerAddress = searchParams.get('referrer');
+
+      const res = await axios.post('/api/tnc/accept', {
+        address,
+        referrerAddress,
+      });
+
+      if (res.data?.success) {
+        mixpanel.track('TnC agreed', {
+          address,
+          version: LATEST_TNC_DOC_VERSION,
+        });
+
+        // Update referral code from response if available
+        if (res.data.user?.referralCode) {
+          setReferralCode(res.data.user.referralCode);
+        }
+
+        // Refetch the UserTnCAtom to update state
+        await userTncInfoRes.refetch();
+      } else {
+        toast.error(res.data?.message || 'Failed to accept T&C', {
+          position: 'bottom-right',
+        });
+      }
+    } catch (error) {
+      console.error('Error accepting T&C:', error);
+      toast.error('Failed to accept T&C. Please try again.', {
+        position: 'bottom-right',
+      });
+      mixpanel.track('TnC acceptance failed', { address });
+    } finally {
+      setIsSigningPending(false);
+    }
   };
 
   return (
@@ -184,7 +164,6 @@ const TncModal: React.FC<TncModalProps> = (props) => {
     >
       <ModalOverlay />
       <ModalContent borderRadius=".5rem" maxW="32rem">
-        {/* <ModalCloseButton color="#7F49E5"/> */}
         <ModalBody
           backgroundColor="#1A1C26"
           padding="3rem"
@@ -246,6 +225,7 @@ const TncModal: React.FC<TncModalProps> = (props) => {
                 backgroundColor: '#7F49E5',
               }}
               onClick={handleSign}
+              isDisabled={isSigningPending}
             >
               Agree{' '}
               {isSigningPending && (
@@ -270,9 +250,6 @@ const TncModal: React.FC<TncModalProps> = (props) => {
               Disconnect
             </Button>
           </Center>
-          <Text textAlign={'center'} color={'light_grey'} fontSize={'12px'}>
-            Note: Only deployed accounts can sign
-          </Text>
         </ModalBody>
       </ModalContent>
     </Modal>

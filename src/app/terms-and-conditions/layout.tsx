@@ -3,7 +3,7 @@ import { Container } from '@chakra-ui/react';
 
 export default function MdxLayout({ children }: { children: ReactNode }) {
   return (
-    <Container color="white" maxW="700px" px={6}>
+    <Container color="white" maxW="700px" px={6} pb={12}>
       {children}
     </Container>
   );

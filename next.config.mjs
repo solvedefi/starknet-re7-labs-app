@@ -1,12 +1,19 @@
-/** @type {import('next').NextConfig} */
+import createMDX from '@next/mdx';
+import remarkGfm from 'remark-gfm';
+import rehypeSlug from 'rehype-slug';
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   // output: 'export',
-  compiler: process.env.NODE_ENV == 'development' ? {} : {
-    removeConsole: {
-      exclude: ['error'],
-    },
-  },
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
+  compiler:
+    process.env.NODE_ENV === 'development'
+      ? {}
+      : {
+          removeConsole: {
+            exclude: ['error'],
+          },
+        },
   async rewrites() {
     return [
       {
@@ -49,7 +56,7 @@ const nextConfig = {
       {
         source: '/api/price/:path*',
         destination: 'https://app.troves.fi/api/price/:path*',
-      }
+      },
     ];
   },
   async redirects() {
@@ -75,7 +82,6 @@ const nextConfig = {
           'https://github.com/strkfarm/static-assets/blob/177389cad715d69245c1b125df87f90318ac2d7b/tnc.pdf',
         permanent: true,
       },
-      
     ];
   },
   webpack(config, options) {
@@ -110,12 +116,22 @@ const nextConfig = {
               frame-ancestors 'none';
               base-uri 'self';
               form-action 'self'
-            `.replace(/\s{2,}/g, " ").trim(),
-          }
+            `
+              .replace(/\s{2,}/g, ' ')
+              .trim(),
+          },
         ],
       },
     ];
   },
 };
 
-export default nextConfig;
+const withMDX = createMDX({
+  // Add markdown plugins here, as desired
+  options: {
+    remarkPlugins: [remarkGfm],
+    rehypePlugins: [rehypeSlug],
+  },
+});
+
+export default withMDX(nextConfig);

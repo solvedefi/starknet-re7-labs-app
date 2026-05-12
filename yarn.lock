@@ -2540,10 +2540,10 @@
     viem "^2.21.1"
     zod "^3.22.4"
 
-"@strkfarm/sdk@^1.1.65":
-  version "1.1.65"
-  resolved "https://registry.yarnpkg.com/@strkfarm/sdk/-/sdk-1.1.65.tgz#ba63b05c52e1076893f9765a546dc3e5c49303b0"
-  integrity sha512-wvV+OH0oaqAfZTszHw5XfbRVf7o9rzt7OSlPlP2ue3Vs58NVdnkX212997TgrVaWx7EjRtr/spCL6mT2yqi7Mw==
+"@strkfarm/sdk@2.0.0-staging.68":
+  version "2.0.0-staging.68"
+  resolved "https://registry.yarnpkg.com/@strkfarm/sdk/-/sdk-2.0.0-staging.68.tgz#fca4981a99e28705d41fb6b220c41714d67fce60"
+  integrity sha512-WBox5gW4VGSGmKebrssb/Gc7kOgXvCvj7U05JmqPlZ+d599TtVHSELAxmP5CiDbxAWDsbuhJ4ca7xYLqHPoFjg==
   dependencies:
     "@apollo/client" "3.11.8"
     "@avnu/avnu-sdk" "3.0.2"

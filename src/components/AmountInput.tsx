@@ -440,6 +440,13 @@ const AmountInput = forwardRef(
       ) {
         return;
       }
+      // SDK 2.0's assertValidDepositTokens reads tokenInfo.decimals on every
+      // entry, so skip the simulation until each input has resolved its
+      // tokenInfo (otherwise we crash with "Cannot read properties of null").
+      const isAllTokenInfosDefined = inputsInfo.every((item) => item.tokenInfo);
+      if (!isAllTokenInfosDefined) {
+        return;
+      }
       // simulate deposits using a large amount
       const amt = new Web3Number(10000000, props.tokenInfo.decimals);
       depositInfo
@@ -459,7 +466,7 @@ const AmountInput = forwardRef(
               };
             }
             return {
-              amount: Web3Number.fromWei('0', item.tokenInfo?.decimals || 0),
+              amount: Web3Number.fromWei('0', item.tokenInfo!.decimals),
               tokenInfo: item.tokenInfo!,
             };
           }),

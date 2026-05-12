@@ -1,20 +1,8 @@
 import { constants, RpcProvider } from 'starknet';
+import { Global } from '@strkfarm/sdk';
 import { NFTInfo, TokenInfo } from './strategies/IStrategy';
 import { standariseAddress } from './utils';
 import MyNumber from './utils/MyNumber';
-
-const LOGOS = {
-  USDT: '/zklend/icons/tokens/usdt.svg?w=20',
-  USDC: '/zklend/icons/tokens/usdc.svg?w=20',
-  'USDC.e': '/zklend/icons/tokens/usdc.svg?w=20',
-  WBTC: '/zklend/icons/tokens/wbtc.svg?w=20',
-  tBTC: '/zklend/icons/tokens/wbtc.svg?w=20',
-  ETH: '/zklend/icons/tokens/eth.svg?w=20',
-  STRK: '/zklend/icons/tokens/strk.svg?w=20',
-  DAI: '/zklend/icons/tokens/dai.svg?w=20',
-  kSTRK: '/zklend/icons/tokens/kstrk.svg?w=20',
-  xSTRK: '/imagedelivery/c1f44170-c1b0-4531-3d3b-5f0bacfe1300/logo',
-};
 
 export type TokenName =
   | 'USDT'
@@ -26,7 +14,28 @@ export type TokenName =
   | 'tBTC'
   | 'DAI'
   | 'kSTRK'
-  | 'xSTRK';
+  | 'xSTRK'
+  | 'strkBTC';
+
+// Logos source from @strkfarm/sdk Global.getDefaultTokens() when available so
+// we don't have to keep parallel asset URLs in sync. DAI and kSTRK aren't in
+// the SDK token list, so they keep local fallbacks.
+const sdkLogo = (symbol: string) =>
+  Global.getDefaultTokens().find((t) => t.symbol === symbol)?.logo;
+
+const LOGOS: Record<TokenName, string> = {
+  USDT: sdkLogo('USDT')!,
+  USDC: sdkLogo('USDC')!,
+  'USDC.e': sdkLogo('USDC.e')!,
+  WBTC: sdkLogo('WBTC')!,
+  tBTC: sdkLogo('tBTC')!,
+  ETH: sdkLogo('ETH')!,
+  STRK: sdkLogo('STRK')!,
+  DAI: '/zklend/icons/tokens/dai.svg?w=20',
+  kSTRK: '/zklend/icons/tokens/kstrk.svg?w=20',
+  xSTRK: sdkLogo('xSTRK')!,
+  strkBTC: sdkLogo('strkBTC')!,
+};
 
 export const CONSTANTS = {
   DEX_INCENTIVE_URL:
@@ -276,6 +285,19 @@ export const TOKENS: TokenInfo[] = [
     stepAmount: MyNumber.fromEther('10', 18),
     isERC4626: false,
   },
+  {
+    token: standariseAddress(
+      '0x787150e306e6eae6e3f79dea881770e8bbff2c1b8eb490f969669ee945b3135',
+    ),
+    name: 'strkBTC',
+    decimals: 8,
+    displayDecimals: 2,
+    logo: CONSTANTS.LOGOS.strkBTC,
+    minAmount: MyNumber.fromEther('0.00001', 8),
+    maxAmount: MyNumber.fromEther('10000', 8),
+    stepAmount: MyNumber.fromEther('0.00001', 8),
+    isERC4626: false,
+  },
 ];
 
 export const NFTS: NFTInfo[] = [
@@ -463,6 +485,38 @@ export const VAULTS: Vault[] = [
     launchBlock: 3998034,
     baseToken: 'USDC',
     quoteToken: 'WBTC',
+  },
+  {
+    name: 'strkBTC/USDC',
+    address:
+      '0x02dfe5af1665a7adf549008161c818eb18dcf89fc9518ab812294f2b691b2845',
+    launchBlock: 9650986,
+    baseToken: 'strkBTC',
+    quoteToken: 'USDC',
+  },
+  {
+    name: 'strkBTC/STRK',
+    address:
+      '0x04784e62a4847484528ba65f500b37a9347e88632e90d866e213f2c2651be828',
+    launchBlock: 9650592,
+    baseToken: 'strkBTC',
+    quoteToken: 'STRK',
+  },
+  {
+    name: 'strkBTC/ETH',
+    address:
+      '0x07118ecd7dece83462b0ac8302c682fb17c7e18b0be13d81867c5bf3f80933ef',
+    launchBlock: 9650986,
+    baseToken: 'strkBTC',
+    quoteToken: 'ETH',
+  },
+  {
+    name: 'WBTC/strkBTC',
+    address:
+      '0x07e927222730899442b2438bfd6218ff8ac44bd7a3420646fca359b8392e42c1',
+    launchBlock: 9650986,
+    baseToken: 'WBTC',
+    quoteToken: 'strkBTC',
   },
 ];
 

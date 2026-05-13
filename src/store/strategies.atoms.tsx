@@ -3,7 +3,6 @@ import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { convertToV2TokenInfo, getTokenInfoFromName } from '@/utils';
 import { privatePoolsAtom } from './protocols';
 import { PoolInfo } from './pools';
-import { Box, Link } from '@chakra-ui/react';
 import { ContractAddr, EkuboCLVaultStrategies, Global } from '@strkfarm/sdk';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { EkuboClStrategy } from '@/strategies/ekubo_cl_vault';
@@ -15,134 +14,33 @@ export interface StrategyInfo<T> extends IStrategyProps<T> {
 }
 
 export function getStrategies() {
-  const alerts2: any[] = [
-    {
-      type: 'warning',
-      text: (
-        <Box>
-          Deposits are expected to fail for this strategy due to an ongoing
-          zkLend security incident until further notice.{' '}
-          <Link
-            href="https://x.com/strkfarm/status/1889526043733794979"
-            color="white"
-            fontWeight={'bold'}
-          >
-            Learn more
-          </Link>
-        </Box>
-      ),
-      tab: 'deposit',
-    },
-    {
-      type: 'warning',
-      text: (
-        <Box>
-          You will receive withdrawals as zTokens, redeemable on zkLend.
-          However, redemptions may be affected due to an ongoing security
-          incident.{' '}
-          <Link
-            href="https://x.com/strkfarm/status/1889526043733794979"
-            color="white"
-            fontWeight={'bold'}
-          >
-            Learn more
-          </Link>
-        </Box>
-      ),
-      tab: 'withdraw',
-    },
-  ];
-
-  const alerts: any[] = [
-    {
-      type: 'warning',
-      text: (
-        <Box>
-          Deposits and Withdraws are paused for this strategy due to zkLend
-          security incident until further notice.{' '}
-          <Link
-            href="https://x.com/strkfarm/status/1889526043733794979"
-            color="white"
-            fontWeight={'bold'}
-          >
-            Learn more
-          </Link>
-        </Box>
-      ),
-      tab: 'all',
-    },
-  ];
-
-  const strategyMetadata: IStrategyMetadata<CLVaultStrategySettings> = {
-    ...EkuboCLVaultStrategies[0],
-    name: 'Re7 Ekubo xSTRK/STRK',
-    description: `
-      Our vault puts your tokens to work in Ekubo pools to earn fees, auto-claims rewards, 
-      swaps to pool tokens, redeposits, and rebalances - all on-chain and non-custodial. 
-      An off-chain service safely automates harvesting and rebalancing, without ever holding your funds. 
-      You stay in control and can withdraw anytime.
-    `,
-    address: ContractAddr.from(
-      '0x0684f7fc8ebd6dae56bbae2ea21bc81b2c9c29d014c564a8ae90507ea6d2c4cc',
-    ),
-    launchBlock: 1446217,
-    depositTokens: [
-      // We support most blue chip tokens in this list, so, for any vault, u just need
-      // to specify the name
-      // ? The order of tokens is import. First is Ekubo poolKey token0, second is token1
-      // If token doesn't exist in our list, u can manually populate here as well
-      Global.getDefaultTokens().find((t) => t.symbol === 'xSTRK')!,
-      Global.getDefaultTokens().find((t) => t.symbol === 'STRK')!,
-    ],
-  };
-  const re7EkuboXSTRKSTRK = new EkuboClStrategy(
-    `Re7 Ekubo xSTRK/STRK`,
-    `Our vault puts your tokens to work in Ekubo pools to earn fees,
-        auto-claims rewards, swaps to pool tokens, redeposits, and rebalances -
-        all on-chain and non-custodial. An off-chain service safely automates
-        harvesting and rebalancing, without ever holding your funds. You stay in
-        control and can withdraw anytime.`,
-    strategyMetadata,
-    StrategyLiveStatus.HOT,
-    {
-      maxTVL: 0,
-      isAudited: EkuboCLVaultStrategies[0].auditUrl ? true : false,
-      auditUrl: EkuboCLVaultStrategies[0].auditUrl,
-      isPaused: false,
-      alerts: [
-        {
-          type: 'info',
-          text: 'Depending on the current position range and price, your input amounts are automatially adjusted to nearest required amounts',
-          tab: 'all',
-        },
-      ],
-      quoteToken: convertToV2TokenInfo(
-        getTokenInfoFromName('STRK'), // quote token for this strategy, used to denominate user holdings of the pool in this asset as a summary
-      ),
-      isTransactionHistDisabled: true,
-    },
-  );
-
   return VAULTS.map((vault) => {
+    // SDK 2.0 asserts depositTokens[0]/[1] match the on-chain Ekubo poolKey
+    // token0/token1, which Ekubo orders by ascending address. Sort here so
+    // VAULTS entries don't need to know about Ekubo's ordering convention.
+    const baseTokenInfo = Global.getDefaultTokens().find(
+      (t) => t.symbol === vault.baseToken,
+    )!;
+    const quoteTokenInfo = Global.getDefaultTokens().find(
+      (t) => t.symbol === vault.quoteToken,
+    )!;
+    const depositTokens =
+      baseTokenInfo.address.toBigInt() < quoteTokenInfo.address.toBigInt()
+        ? [baseTokenInfo, quoteTokenInfo]
+        : [quoteTokenInfo, baseTokenInfo];
+
     const strategyMetadata: IStrategyMetadata<CLVaultStrategySettings> = {
       ...EkuboCLVaultStrategies[0],
       name: vault.name,
       description: `
-        Our vault puts your tokens to work in Ekubo pools to earn fees, auto-claims rewards, 
-        swaps to pool tokens, redeposits, and rebalances - all on-chain and non-custodial. 
-        An off-chain service safely automates harvesting and rebalancing, without ever holding your funds. 
+        Our vault puts your tokens to work in Ekubo pools to earn fees, auto-claims rewards,
+        swaps to pool tokens, redeposits, and rebalances - all on-chain and non-custodial.
+        An off-chain service safely automates harvesting and rebalancing, without ever holding your funds.
         You stay in control and can withdraw anytime.
       `,
       address: ContractAddr.from(vault.address),
       launchBlock: vault.launchBlock,
-      depositTokens: [
-        // We support most blue chip tokens in this list, so, for any vault, u just need
-        // to specify the name
-        // ? The order of tokens is import. First is Ekubo poolKey token0, second is token1
-        // If token doesn't exist in our list, u can manually populate here as well
-        Global.getDefaultTokens().find((t) => t.symbol === vault.baseToken)!,
-        Global.getDefaultTokens().find((t) => t.symbol === vault.quoteToken)!,
-      ],
+      depositTokens,
     };
 
     return new EkuboClStrategy(

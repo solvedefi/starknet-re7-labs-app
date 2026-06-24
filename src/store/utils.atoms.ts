@@ -1,4 +1,4 @@
-import CONSTANTS, { TOKENS } from '@/constants';
+import { TOKENS } from '@/constants';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 import { addressAtom } from './claims.atoms';
@@ -7,67 +7,6 @@ import { SingleTokenInfo } from '@strkfarm/sdk';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import { getPrice, standariseAddress } from '@/utils';
-
-interface BlockInfo {
-  data: {
-    blocks: {
-      id: string;
-      number: number;
-      timestamp: string; // "2024-03-15T08:54:05",
-      __typename: 'Block';
-    }[];
-  };
-}
-
-async function getBlock(tSeconds: number, retry = 0): Promise<BlockInfo> {
-  try {
-    const data = JSON.stringify({
-      query: `query blocks {
-            blocks(first: 1, orderBy: "timestamp", orderByDirection: "asc", where: {timestampGt: ${tSeconds}}) {
-                id
-                number
-                timestamp
-                __typename
-            }
-            }`,
-      variables: {},
-    });
-    console.log('jedi base', 'data', data);
-    const res = await fetchWithRetry(
-      CONSTANTS.JEDI.BASE_API,
-      {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: data,
-      },
-      `Error fetching block info`,
-    );
-    const blockInfo = await res?.json();
-    console.log('jedi base data', blockInfo, tSeconds);
-    return blockInfo;
-  } catch (err) {
-    console.log('err', err);
-    if (retry < 3) {
-      await new Promise((res) => setTimeout(res, 2000));
-      return await getBlock(tSeconds, retry + 1);
-    }
-    throw err;
-  }
-}
-
-const blockInfoNowAtom = atomWithQuery((get) => ({
-  queryKey: ['block_now'],
-  queryFn: async (): Promise<BlockInfo> => {
-    console.log('jedi base', 'block now');
-    const nowSeconds = Math.round(new Date().getTime() / 1000);
-    const res = await getBlock(nowSeconds);
-    console.log('jedi base', 'data2', res);
-    return res;
-  },
-}));
 
 interface DAppStats {
   tvl: number;
@@ -185,43 +124,6 @@ export const tokenPricesAtom = atomWithQuery(() => ({
 //     }, 0)
 //     return tvl;
 // })
-
-const blockInfoMinus1DAtom = atomWithQuery((get) => ({
-  queryKey: ['block_minus_1d'],
-  queryFn: async ({ queryKey }) => {
-    console.log('jedi base', 'block_minus_1d');
-    const nowSeconds = Math.round(new Date().getTime() / 1000);
-    const NowMinus1DSeconds = nowSeconds - 86400;
-    const data = JSON.stringify({
-      query: `query blocks {
-            blocks(first: 1, orderBy: "timestamp", orderByDirection: "asc", where: {timestampGt: ${NowMinus1DSeconds}}) {
-                id
-                number
-                timestamp
-                __typename
-            }
-            }`,
-      variables: {},
-    });
-    console.log('jedi base', 'data', data);
-
-    const res = await fetchWithRetry(
-      CONSTANTS.JEDI.BASE_API,
-      {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: data,
-      },
-      'Error fetching block minus 1d',
-    );
-    if (!res) return { data: { blocks: [] } };
-    console.log('jedi base', 'data2', res.json());
-    return await res.json();
-  },
-}));
 
 const ISSERVER = typeof window === 'undefined';
 declare let localStorage: any;

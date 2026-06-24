@@ -13,12 +13,8 @@ export enum Category {
 }
 
 export enum PoolType {
-  DEXV2 = 'V2 LP DEX',
-  DEXV3 = 'Concentrated LP DEX',
-  Lending = 'Lending',
   Derivatives = 'Derivatives',
-  Staking = 'Staking',
-}
+  }
 
 export interface APRSplit {
   apr: number | 'Err';
@@ -152,7 +148,7 @@ export interface ProtocolAtoms {
   baseAPRs?: Atom<AtomWithQueryResult<any, Error>>;
 }
 
-export interface ProtocolAtoms2 {
+interface ProtocolAtoms2 {
   pools: Atom<PoolInfo[]>;
   baseAPRs?: Atom<CustomAtomWithQueryResult<any, Error>>;
 }

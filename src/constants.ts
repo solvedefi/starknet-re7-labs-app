@@ -357,30 +357,6 @@ export const provider = new RpcProvider({
 // T&C version - increment when terms change to force users to re-accept
 export const LATEST_TNC_DOC_VERSION = 'tnc/v2';
 export const RE7_TnC_DOC_URL = `/terms-and-conditions`;
-const SIGNING_DATA = {
-  types: {
-    StarkNetDomain: [
-      { name: 'name', type: 'felt' },
-      { name: 'version', type: 'felt' },
-      { name: 'chainId', type: 'felt' },
-    ],
-    Tnc: [
-      { name: 'message', type: 'felt' },
-      { name: 'document', type: 'felt' },
-    ],
-  },
-  primaryType: 'Tnc',
-  domain: {
-    name: 'Re7 Labs',
-    version: '1',
-    chainId: getNetwork(),
-  },
-  message: {
-    message: 'Read and Agree T&C',
-    document: `${RE7_TnC_DOC_URL.replace('https://', '').replace('http://', '').slice(0, 25)}`,
-  },
-};
-
 interface Vault {
   name: string;
   address: string;

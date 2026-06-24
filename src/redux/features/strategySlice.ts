@@ -33,7 +33,6 @@ export const { saveStrategy } = strategySlice.actions;
 // Selectors
 export const selectStrategy = (state: RootState, id: string) =>
   state.strategy.strategies[id];
-const selectAllStrategies = (state: RootState) => state.strategy.strategies;
 export const selectAllStrategiesAsArray = (state: RootState) =>
   Object.values(state.strategy.strategies);
 

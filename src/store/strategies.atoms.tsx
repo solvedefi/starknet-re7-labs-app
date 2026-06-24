@@ -74,15 +74,6 @@ export function getStrategies() {
   });
 }
 
-const STRATEGIES_INFO = getStrategies();
-
-const getPrivatePools = (get: any) => {
-  // A placeholder to fetch any external pools/rewards info
-  // that is not necessarily available in the allPools (i.e. not public)
-
-  return [];
-};
-
 const strategiesAtomAsync = atomWithQuery((get) => {
   return {
     queryKey: ['strategies'],

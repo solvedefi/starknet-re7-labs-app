@@ -4,9 +4,7 @@ import {
   getBalanceAtom,
   returnEmptyBal,
 } from '@/store/balance.atoms';
-import { IndexedPoolData } from '@/store/endur.store';
-import { LendingSpace } from '@/store/lending.base';
-import { Category, PoolInfo } from '@/store/pools';
+import { PoolInfo } from '@/store/pools';
 import {
   convertToV2TokenInfo,
   convertToV2Web3Number,
@@ -344,87 +342,6 @@ export class IStrategy<T> extends IStrategyProps<T> {
       balanceAtom,
     );
     this.tag = tag;
-  }
-
-  filterStablesOnly(
-    pools: PoolInfo[],
-    amount: string,
-    prevActions: StrategyAction[],
-  ) {
-    const eligiblePools = pools.filter((p) =>
-      p.category.includes(Category.Stable),
-    );
-    if (!eligiblePools) throw new Error(`${this.tag}: [F1] no eligible pools`);
-    return eligiblePools;
-  }
-
-  filterSameProtocolNotSameDepositPool(
-    pools: PoolInfo[],
-    amount: string,
-    prevActions: StrategyAction[],
-  ) {
-    if (prevActions.length == 0)
-      throw new Error(
-        `${this.tag}: filterSameProtocolNotSameDepositPool - Prev actions zero`,
-      );
-    const lastAction = prevActions[prevActions.length - 1];
-    const eligiblePools = pools
-      .filter((p) => p.protocol.name == lastAction.pool.protocol.name)
-      .filter((p) => {
-        return p.pool.name != lastAction.pool.pool.name;
-      });
-
-    if (!eligiblePools) throw new Error(`${this.tag}: [F2] no eligible pools`);
-    return eligiblePools;
-  }
-
-  filterNotSameProtocolSameDepositPool(
-    pools: PoolInfo[],
-    amount: string,
-    prevActions: StrategyAction[],
-  ) {
-    if (prevActions.length == 0)
-      throw new Error(
-        `${this.tag}: filterNotSameProtocolSameDepositPool - Prev actions zero`,
-      );
-    const lastAction = prevActions[prevActions.length - 1];
-    const eligiblePools = pools
-      .filter((p) => p.protocol.name != lastAction.pool.protocol.name)
-      .filter((p) => {
-        return p.pool.name == lastAction.pool.pool.name;
-      });
-
-    if (!eligiblePools) throw new Error(`${this.tag}: [F3] no eligible pools`);
-    return eligiblePools;
-  }
-
-  filterTokenByProtocol(
-    tokenName: string,
-    protocol: IDapp<LendingSpace.MyBaseAprDoc[]> | IDapp<IndexedPoolData>,
-  ) {
-    return (
-      pools: PoolInfo[],
-      amount: string,
-      prevActions: StrategyAction[],
-    ) => {
-      return pools.filter(
-        (p) => p.pool.name == tokenName && p.protocol.name == protocol.name,
-      );
-    };
-  }
-
-  optimizerDeposit(
-    eligiblePools: PoolInfo[],
-    amount: string,
-    actions: StrategyAction[],
-  ) {
-    let bestPool: PoolInfo = eligiblePools[0];
-    eligiblePools.forEach((p) => {
-      if (p.apr > bestPool.apr) {
-        bestPool = p;
-      }
-    });
-    return [...actions, { pool: bestPool, amount, isDeposit: true }];
   }
 
   async solve(pools: PoolInfo[], amount: string) {

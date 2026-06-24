@@ -1,13 +1,11 @@
-import shield from '@/assets/shield.svg';
+import shield from '@public/shield.svg';
 import { addressAtom } from '@/store/claims.atoms';
 import { isPoolRetired, PoolInfo } from '@/store/pools';
 import { getPoolInfoFromStrategy } from '@/store/protocols';
 import { UserStats, userStatsAtom } from '@/store/utils.atoms';
 import { isLive, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { getDisplayCurrencyAmount } from '@/utils';
-import {
-  WarningTwoIcon,
-} from '@chakra-ui/icons';
+import { WarningTwoIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   AvatarGroup,

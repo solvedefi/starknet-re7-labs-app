@@ -1,5 +1,5 @@
 import { ArrowUpIcon } from '@chakra-ui/icons';
-import arrowsUpDownIcon from '@/assets/arrows-up-down.svg';
+import arrowsUpDownIcon from '@public/arrows-up-down.svg';
 import { Box, Image } from '@chakra-ui/react';
 
 export type SortColumn =

@@ -1,1 +1,10 @@
-yarn run lint:fix && yarn run format:fix
+#Typecheck
+
+# Prettier
+yarn run format:fix
+
+# Lint 
+yarn run lint:fix 
+
+# Knip
+yarn knip

@@ -4,7 +4,7 @@ import { NFTInfo, TokenInfo } from './strategies/IStrategy';
 import { standariseAddress } from './utils';
 import MyNumber from './utils/MyNumber';
 
-export type TokenName =
+type TokenName =
   | 'USDT'
   | 'USDC'
   | 'USDC.e'

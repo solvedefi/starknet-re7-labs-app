@@ -1,8 +1,5 @@
-import CONSTANTS from '@/constants';
 import { StrategyLiveStatus, TokenInfo } from '@/strategies/IStrategy';
-import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
-import { CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
-import { Atom, atom } from 'jotai';
+import { Atom } from 'jotai';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 
 export enum Category {
@@ -82,93 +79,10 @@ export function isPoolRetired(pool: PoolInfo) {
   return pool.additional.tags.includes(StrategyLiveStatus.RETIRED);
 }
 
-function getDefaultPoolInfo(): PoolInfo {
-  return {
-    pool: {
-      id: '',
-      name: '',
-      logos: [],
-    },
-    depositDetails: {
-      tokens: [],
-      amount: 0,
-      isLoading: false,
-    },
-    fees: {
-      amount: 0,
-      isLoading: false,
-    },
-    contract: [],
-    protocol: {
-      name: '',
-      link: '',
-      logo: '',
-    },
-    apr: 0,
-    tvl: 0,
-    aprSplits: [],
-    category: [Category.Others],
-    type: PoolType.Derivatives,
-    additional: {
-      riskFactor: 0,
-      tags: [],
-      isAudited: false,
-    },
-    borrow: {
-      apr: 0,
-      borrowFactor: 0,
-    },
-    lending: {
-      collateralFactor: 0,
-    },
-  };
-}
-
-type NostraPoolData = {
-  id?: string;
-  address?: string;
-  isDegen?: boolean;
-  tokenA?: string;
-  tokenAAddress?: string;
-  tokenB?: string;
-  tokenBAddress?: string;
-  volume?: string;
-  fee?: string;
-  swap?: number;
-  tvl?: string;
-  baseApr?: string;
-  rewardApr?: string;
-  rewardAllocation?: string;
-};
-
-type NostraPools = Record<string, NostraPoolData>;
-
 export interface ProtocolAtoms {
   pools: Atom<PoolInfo[]>;
   baseAPRs?: Atom<AtomWithQueryResult<any, Error>>;
 }
-
-interface ProtocolAtoms2 {
-  pools: Atom<PoolInfo[]>;
-  baseAPRs?: Atom<CustomAtomWithQueryResult<any, Error>>;
-}
-
-const StrkIncentivesQueryKeyAtom = atom(['strk_incentives', 'isNostraDegen']);
-
-const _StrkLendingIncentivesAtom = customAtomWithFetch({
-  queryKey: 'strk_lending_incentives',
-  url: CONSTANTS.LENDING_INCENTIVES_URL,
-});
-
-const StrkLendingIncentivesAtom = atom((get) => {
-  const _data = get(_StrkLendingIncentivesAtom);
-  if (_data.data) {
-    let data = JSON.stringify(_data.data);
-    data = data.replaceAll('NaN', '0');
-    _data.data = JSON.parse(data);
-  }
-  return _data;
-});
 
 /**
   Given pool name, returns appropriate category

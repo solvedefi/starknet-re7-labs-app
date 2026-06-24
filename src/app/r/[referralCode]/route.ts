@@ -2,7 +2,7 @@ import { db } from '@/db';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request, context: any) {
-  const { params } = context;
+  const params = await context.params;
 
   const user = await db.user.findFirst({
     where: {

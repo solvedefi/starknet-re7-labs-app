@@ -4,7 +4,7 @@ import { db } from '@/db';
 import { standariseAddress } from '@/utils';
 
 export async function GET(req: Request, context: any) {
-  const { params } = context;
+  const params = await context.params;
   const address = params.address;
 
   const { searchParams } = new URL(req.url);

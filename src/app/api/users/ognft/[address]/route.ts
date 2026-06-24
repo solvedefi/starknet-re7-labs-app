@@ -7,7 +7,7 @@ export const revalidate = 3600;
 
 export async function GET(req: Request, context: any) {
   try {
-    const { params } = context;
+    const params = await context.params;
     const addr = params.address;
 
     // standardised address

@@ -7,7 +7,7 @@ import { AmountsInfo } from '@/strategies/IStrategy';
 export const revalidate = 0;
 
 export async function GET(_req: Request, context: any) {
-  const { params } = context;
+  const params = await context.params;
   const addr = params.address;
 
   // standardised address

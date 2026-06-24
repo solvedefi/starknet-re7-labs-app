@@ -8,9 +8,14 @@ export type StrategyParams = {
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-export async function generateMetadata({ params }: StrategyParams) {
+type StrategyPageProps = {
+  params: Promise<{ strategyId: string }>;
+};
+
+export async function generateMetadata({ params }: StrategyPageProps) {
+  const { strategyId } = await params;
   const strategies = getStrategies();
-  const strategy = strategies.find((s) => s.id === params?.strategyId);
+  const strategy = strategies.find((s) => s.id === strategyId);
   if (strategy) {
     return {
       title: `${strategy.name} | Re7 Labs`,
@@ -25,10 +30,11 @@ export async function generateMetadata({ params }: StrategyParams) {
   };
 }
 
-export default function StrategyPage({ params }: StrategyParams) {
+export default async function StrategyPage({ params }: StrategyPageProps) {
+  const { strategyId } = await params;
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'} padding="30px 10px">
-      <Strategy params={params} />
+      <Strategy params={{ strategyId }} />
     </Container>
   );
 }

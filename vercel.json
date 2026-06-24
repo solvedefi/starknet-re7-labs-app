@@ -1,10 +1,6 @@
 {
   "crons": [
     {
-      "path": "/api/raffle/luckyWinner?winnersCount=3",
-      "schedule": "0 8 * * *"
-    },
-    {
       "path": "/api/strategies?no_cache=true",
       "schedule": "*/9 * * * *"
     },

@@ -14,7 +14,7 @@ export enum Category {
 
 export enum PoolType {
   Derivatives = 'Derivatives',
-  }
+}
 
 export interface APRSplit {
   apr: number | 'Err';

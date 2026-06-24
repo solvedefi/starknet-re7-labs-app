@@ -37,7 +37,7 @@ const LOGOS: Record<TokenName, string> = {
   strkBTC: sdkLogo('strkBTC')!,
 };
 
-export const CONSTANTS = {
+const CONSTANTS = {
   DEX_INCENTIVE_URL:
     'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/fetchFile?file=strk_grant.json',
   CARMINE_INCENTIVES_URL: '/carmine/api/v1/mainnet/defispring',
@@ -357,7 +357,7 @@ export const provider = new RpcProvider({
 // T&C version - increment when terms change to force users to re-accept
 export const LATEST_TNC_DOC_VERSION = 'tnc/v2';
 export const RE7_TnC_DOC_URL = `/terms-and-conditions`;
-export const SIGNING_DATA = {
+const SIGNING_DATA = {
   types: {
     StarkNetDomain: [
       { name: 'name', type: 'felt' },

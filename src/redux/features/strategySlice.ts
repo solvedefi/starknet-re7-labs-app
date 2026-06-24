@@ -15,7 +15,7 @@ const initialState: StrategyState = {
   strategies: {},
 };
 
-export const strategySlice = createSlice({
+const strategySlice = createSlice({
   name: 'strategy',
   initialState,
   reducers: {
@@ -28,13 +28,12 @@ export const strategySlice = createSlice({
   },
 });
 
-export const { saveStrategy, removeStrategy } = strategySlice.actions;
+export const { saveStrategy } = strategySlice.actions;
 
 // Selectors
 export const selectStrategy = (state: RootState, id: string) =>
   state.strategy.strategies[id];
-export const selectAllStrategies = (state: RootState) =>
-  state.strategy.strategies;
+const selectAllStrategies = (state: RootState) => state.strategy.strategies;
 export const selectAllStrategiesAsArray = (state: RootState) =>
   Object.values(state.strategy.strategies);
 

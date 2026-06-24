@@ -36,7 +36,7 @@ export interface PoolMetadata {
   };
 }
 
-export interface DepositDetails {
+interface DepositDetails {
   tokens: Pick<TokenInfo, 'name' | 'address' | 'decimals'>[];
   amount: number;
   isLoading: boolean;
@@ -86,7 +86,7 @@ export function isPoolRetired(pool: PoolInfo) {
   return pool.additional.tags.includes(StrategyLiveStatus.RETIRED);
 }
 
-export function getDefaultPoolInfo(): PoolInfo {
+function getDefaultPoolInfo(): PoolInfo {
   return {
     pool: {
       id: '',
@@ -157,17 +157,14 @@ export interface ProtocolAtoms2 {
   baseAPRs?: Atom<CustomAtomWithQueryResult<any, Error>>;
 }
 
-export const StrkIncentivesQueryKeyAtom = atom([
-  'strk_incentives',
-  'isNostraDegen',
-]);
+const StrkIncentivesQueryKeyAtom = atom(['strk_incentives', 'isNostraDegen']);
 
 const _StrkLendingIncentivesAtom = customAtomWithFetch({
   queryKey: 'strk_lending_incentives',
   url: CONSTANTS.LENDING_INCENTIVES_URL,
 });
 
-export const StrkLendingIncentivesAtom = atom((get) => {
+const StrkLendingIncentivesAtom = atom((get) => {
   const _data = get(_StrkLendingIncentivesAtom);
   if (_data.data) {
     let data = JSON.stringify(_data.data);

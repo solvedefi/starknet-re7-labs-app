@@ -121,7 +121,7 @@ export interface IStrategySettings {
   isTransactionHistDisabled?: boolean;
 }
 
-export interface AmountInfo {
+interface AmountInfo {
   amount: Web3Number;
   usdValue: number;
   tokenInfo: TokenInfoV2;

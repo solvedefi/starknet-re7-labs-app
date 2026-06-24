@@ -39,14 +39,14 @@ import arrow from '@public/arrow_left.png';
 import NextLink from 'next/link';
 import { StrategyDetails } from '@/hooks/useStrategiesInfo';
 
-export interface YieldCardProps {
+interface YieldCardProps {
   pool: PoolInfo;
   index: number;
   showProtocolName?: boolean;
   onClick?: (strategyId: string) => void;
 }
 
-export function getStratCardBg(status: StrategyLiveStatus, index: number) {
+function getStratCardBg(status: StrategyLiveStatus, index: number) {
   if (status == StrategyLiveStatus.HOT) {
     return '#414173';
   }
@@ -70,7 +70,7 @@ function getStratCardBadgeBg(status: StrategyLiveStatus) {
   return 'bg';
 }
 
-export function StrategyInfo(props: YieldCardProps) {
+function StrategyInfo(props: YieldCardProps) {
   const { pool } = props;
 
   return (
@@ -223,7 +223,7 @@ function StrategyAPY(props: YieldCardProps) {
   );
 }
 
-export function getStrategyWiseHoldingsInfo(
+function getStrategyWiseHoldingsInfo(
   userData: UserStats | null | undefined,
   id: string,
 ) {
@@ -252,7 +252,7 @@ export function getStrategyWiseHoldingsInfo(
   };
 }
 
-export function StrategyTVL(props: YieldCardProps) {
+function StrategyTVL(props: YieldCardProps) {
   const { pool } = props;
   const address = useAtomValue(addressAtom);
   const { data: userData } = useAtomValue(userStatsAtom);
@@ -475,7 +475,7 @@ function StrategyMobileCard(props: YieldCardProps) {
   );
 }
 
-export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
+function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
   return {
     onClick: () => {
       mixpanel.track('Pool clicked', {
@@ -489,7 +489,7 @@ export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
     },
   };
 }
-export default function YieldCard(props: YieldCardProps) {
+function YieldCard(props: YieldCardProps) {
   const { pool, index } = props;
 
   const isRetired = useMemo(() => {
@@ -596,7 +596,7 @@ export function YieldStrategyCard(props: {
   return <YieldCard pool={strat} index={props.index} showProtocolName={true} />;
 }
 
-export function HeaderSorter(props: {
+function HeaderSorter(props: {
   heading: string;
   mainColor: string;
   inActiveColor: string;

@@ -12,7 +12,7 @@ import { getLiveStatusEnum } from '@/strategies/IStrategy';
 import { IDapp } from './IDapp.store';
 import { StrategyDetails } from '@/hooks/useStrategiesInfo';
 
-export const getProtocols: () => {
+const getProtocols: () => {
   name: string;
   class: IDapp<any>;
   atoms: ProtocolAtoms2;
@@ -99,7 +99,7 @@ export const getProtocols: () => {
   // },
 ];
 
-export const ALL_FILTER = 'All';
+const ALL_FILTER = 'All';
 
 const allProtocols = () => {
   return getProtocols().map((p) => ({
@@ -108,7 +108,7 @@ const allProtocols = () => {
   }));
 };
 
-export const filters = {
+const filters = {
   categories: [...Object.values(Category)],
   types: [...Object.values(PoolType)],
   protocols: allProtocols().filter(
@@ -117,14 +117,14 @@ export const filters = {
   ),
 };
 
-export const filterAtoms = {
+const filterAtoms = {
   categoriesAtom: atom([ALL_FILTER]),
   typesAtom: atom([ALL_FILTER]),
   protocolsAtom: atom([ALL_FILTER]),
   riskAtom: atom([ALL_FILTER]),
 };
 
-export const updateFiltersAtom = atom(
+const updateFiltersAtom = atom(
   null,
   (
     get,
@@ -166,7 +166,7 @@ export const privatePoolsAtom = atom((get) => {
   return [] as PoolInfo[];
 });
 
-export const allPoolsAtomUnSorted = atom((get) => {
+const allPoolsAtomUnSorted = atom((get) => {
   const pools: PoolInfo[] = [];
   return getProtocols().reduce(
     (_pools, p) => _pools.concat(get(p.atoms.pools)),
@@ -242,7 +242,7 @@ export function getPoolInfoFromStrategy(strat: StrategyDetails): PoolInfo {
   return item;
 }
 
-export const allPoolsAtomWithStrategiesUnSorted = atom((get) => {
+const allPoolsAtomWithStrategiesUnSorted = atom((get) => {
   const pools: PoolInfo[] = get(allPoolsAtomUnSorted);
   // const strategies = get(strategiesAtom);
   // const strategyPools: PoolInfo[] = strategies.map((strategy) => {
@@ -274,7 +274,7 @@ export const sortAtom = atom<Array<{ field: string; order: 'asc' | 'desc' }>>(
   [],
 );
 // sort pool results function
-export const sortPoolsAtom = atom((get) => {
+const sortPoolsAtom = atom((get) => {
   // get current sort atom
   const sort = get(sortAtom);
   // get default sort atom
@@ -307,7 +307,7 @@ export const sortPoolsAtom = atom((get) => {
   return sortedPools;
 });
 
-export const filteredPools = atom((get) => {
+const filteredPools = atom((get) => {
   console.log(`sorting`, 'filter pools');
   const pools = get(sortPoolsAtom);
   console.log(`sorting`, 'filter pools [2]');

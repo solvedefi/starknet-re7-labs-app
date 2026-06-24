@@ -50,7 +50,7 @@ export async function getERC20Balance(
   };
 }
 
-export async function getERC4626Balance(
+async function getERC4626Balance(
   token: TokenInfo | undefined,
   address: string | undefined,
 ) {
@@ -81,7 +81,7 @@ export async function getERC4626Balance(
   };
 }
 
-export async function getERC721PositionValue(
+async function getERC721PositionValue(
   token: NFTInfo | undefined,
   address: string | undefined,
 ) {
@@ -119,7 +119,7 @@ export async function getERC721PositionValue(
   };
 }
 
-export function getERC20BalanceAtom(token: TokenInfo | undefined) {
+function getERC20BalanceAtom(token: TokenInfo | undefined) {
   return atomWithQuery((get) => {
     return {
       queryKey: ['getERC20Balance', token?.token, get(addressAtom)],
@@ -159,7 +159,7 @@ function getERC721PositionValueAtom(token: NFTInfo | undefined) {
   });
 }
 
-export async function getBalance(
+async function getBalance(
   token: TokenInfo | NFTInfo | undefined,
   address: string,
 ) {

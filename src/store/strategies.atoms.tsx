@@ -74,9 +74,9 @@ export function getStrategies() {
   });
 }
 
-export const STRATEGIES_INFO = getStrategies();
+const STRATEGIES_INFO = getStrategies();
 
-export const getPrivatePools = (get: any) => {
+const getPrivatePools = (get: any) => {
   // A placeholder to fetch any external pools/rewards info
   // that is not necessarily available in the allPools (i.e. not public)
 

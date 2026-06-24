@@ -49,7 +49,7 @@ interface RedeemProps {
 /**
  * Information about a token amount input field
  */
-export interface AmountInputInfo {
+interface AmountInputInfo {
   /** Whether the max button was clicked */
   isMaxClicked: boolean;
   /** Raw string value entered in input field (e.g. '', '0.1') */
@@ -63,7 +63,7 @@ export interface AmountInputInfo {
 /**
  * State shape for redeem form
  */
-export type RedeemAtomType = {
+type RedeemAtomType = {
   /** Array of atoms containing input info for each token */
   inputsInfo: PrimitiveAtom<AmountInputInfo>[];
   // deposit/withdrawMethods can return multiple options (which are actions)
@@ -87,17 +87,17 @@ function getInputInfoAtoms() {
 /**
  * Derived atom of input infos
  */
-export const inputsInfoAtoms = getInputInfoAtoms();
+const inputsInfoAtoms = getInputInfoAtoms();
 
 /**
  * Derived atom of input infos
  */
-export const inputsInfoAtom = atom((get) => {
+const inputsInfoAtom = atom((get) => {
   return inputsInfoAtoms.map((i) => get(i));
 });
 
 // Create redeem atom with 2 token inputs (current max supported)
-export const redeemAtom = atom<RedeemAtomType>({
+const redeemAtom = atom<RedeemAtomType>({
   inputsInfo: inputsInfoAtoms,
   actionIndex: 0,
   loading: false,
@@ -112,7 +112,7 @@ const isMaxClickedAtom = atom((get) => {
   return inputInfos.some((a) => a.isMaxClicked);
 });
 
-export const updateInputInfoAtom = atom(
+const updateInputInfoAtom = atom(
   null,
   (
     get,
@@ -126,7 +126,7 @@ export const updateInputInfoAtom = atom(
   },
 );
 
-export const resetRedeemFormAtom = atom(null, (get, set) => {
+const resetRedeemFormAtom = atom(null, (get, set) => {
   const inputInfos = get(inputsInfoAtom);
   set(redeemAtom, {
     inputsInfo: getInputInfoAtoms(),

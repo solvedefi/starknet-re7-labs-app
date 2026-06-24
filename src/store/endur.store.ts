@@ -20,7 +20,7 @@ export interface IndexedPoolData {
   [key: string]: PoolData[];
 }
 
-export class Endur extends IDapp<IndexedPoolData> {
+class Endur extends IDapp<IndexedPoolData> {
   name = 'Endur';
   link = 'https://endur.fi/r/strkfarm';
   logo = 'https://endur.fi/favicon.ico';

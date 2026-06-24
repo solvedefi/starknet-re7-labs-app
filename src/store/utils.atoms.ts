@@ -8,7 +8,7 @@ import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import { getPrice, standariseAddress } from '@/utils';
 
-export interface BlockInfo {
+interface BlockInfo {
   data: {
     blocks: {
       id: string;
@@ -19,10 +19,7 @@ export interface BlockInfo {
   };
 }
 
-export async function getBlock(
-  tSeconds: number,
-  retry = 0,
-): Promise<BlockInfo> {
+async function getBlock(tSeconds: number, retry = 0): Promise<BlockInfo> {
   try {
     const data = JSON.stringify({
       query: `query blocks {
@@ -61,7 +58,7 @@ export async function getBlock(
   }
 }
 
-export const blockInfoNowAtom = atomWithQuery((get) => ({
+const blockInfoNowAtom = atomWithQuery((get) => ({
   queryKey: ['block_now'],
   queryFn: async (): Promise<BlockInfo> => {
     console.log('jedi base', 'block now');
@@ -189,7 +186,7 @@ export const tokenPricesAtom = atomWithQuery(() => ({
 //     return tvl;
 // })
 
-export const blockInfoMinus1DAtom = atomWithQuery((get) => ({
+const blockInfoMinus1DAtom = atomWithQuery((get) => ({
   queryKey: ['block_minus_1d'],
   queryFn: async ({ queryKey }) => {
     console.log('jedi base', 'block_minus_1d');

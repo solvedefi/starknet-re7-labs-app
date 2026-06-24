@@ -23,7 +23,7 @@ import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import assert from 'assert';
 import MyNumber from './utils/MyNumber';
 
-export function getUniqueStrings(arr: Array<string>) {
+function getUniqueStrings(arr: Array<string>) {
   const _arr: string[] = [];
   arr.forEach((item) => {
     if (!_arr.includes(item)) _arr.push(item);
@@ -31,7 +31,7 @@ export function getUniqueStrings(arr: Array<string>) {
   return _arr;
 }
 
-export function getUnique<T>(arr: Array<T>, uniqueField: string) {
+function getUnique<T>(arr: Array<T>, uniqueField: string) {
   const _arr: T[] = [];
   const map: { [key: string]: boolean } = {};
   arr.forEach((item: any) => {
@@ -165,7 +165,7 @@ export function formatTimediff(endTime: Date) {
   };
 }
 
-export function copyReferralLink(refCode: string) {
+function copyReferralLink(refCode: string) {
   navigator.clipboard.writeText(getReferralUrl(refCode));
 
   toast.success('Referral link copied to clipboard', {
@@ -225,7 +225,7 @@ export function getHosturl() {
   }
 }
 
-export async function getPriceFromMyAPI(tokenInfo: MyMultiTokenInfo) {
+async function getPriceFromMyAPI(tokenInfo: MyMultiTokenInfo) {
   console.log('getPrice from redis', tokenInfo.name);
 
   const endpoint = getEndpoint();
@@ -330,7 +330,7 @@ export function convertToMyNumber(amount: MyWeb3Number): MyNumber {
   return new MyNumber(amount.toWei(), amount.decimals);
 }
 
-export function ZeroAmountsInfo(tokens: MyMultiTokenInfo[]): AmountsInfo {
+function ZeroAmountsInfo(tokens: MyMultiTokenInfo[]): AmountsInfo {
   const res: AmountsInfo = {
     usdValue: 0,
     amounts: [],
@@ -349,7 +349,7 @@ export function ZeroAmountsInfo(tokens: MyMultiTokenInfo[]): AmountsInfo {
   return res;
 }
 
-export function DummyStrategyActionHook(
+function DummyStrategyActionHook(
   tokens: MyMultiTokenInfo[],
 ): IStrategyActionHook {
   return buildStrategyActionHook([], tokens, null, true);
@@ -394,7 +394,7 @@ export function buildStrategyActionHook(
   };
 }
 
-export function formatUSD(amount: number) {
+function formatUSD(amount: number) {
   return amount > 1000000
     ? `${(amount / 1000000).toFixed(2)}M`
     : amount > 1000

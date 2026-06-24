@@ -29,7 +29,7 @@ export interface TransactionInfo {
   createdAt: Date;
 }
 
-export type UserTxHistory = Array<{
+type UserTxHistory = Array<{
   type: 'deposit' | 'withdraw';
   amount0: string;
   amount1: string;
@@ -61,7 +61,7 @@ type ContractFeeEarnings = {
   totalCollections: string;
 };
 
-export const getFeesHistory = async (
+const getFeesHistory = async (
   contract: string,
 ): Promise<ContractFeeEarnings> => {
   const contractAddrFormatted = standariseAddress(contract);
@@ -135,7 +135,7 @@ export const getFeesHistoryAtom = (contracts: string[]) =>
     };
   });
 
-export const getUserTxHistory = async (
+const getUserTxHistory = async (
   strategyContract: string,
   owner: string,
 ): Promise<UserTxHistory> => {
@@ -179,7 +179,7 @@ export const getUserTxHistory = async (
   }
 };
 
-export const UserTxHistoryAtom = (strategyContracts: string[], owner: string) =>
+const UserTxHistoryAtom = (strategyContracts: string[], owner: string) =>
   atomWithQuery(() => {
     return {
       enabled: !!owner,
@@ -321,7 +321,7 @@ async function getTxHistory(
   }
 }
 
-export const newTxsAtom = atom<TransactionInfo[]>([]);
+const newTxsAtom = atom<TransactionInfo[]>([]);
 
 export const TxHistoryAtom = (contract: string, owner: string) =>
   atomWithQuery((get) => ({
@@ -392,7 +392,7 @@ async function deserialiseTxInfo(key: string, initialValue: TransactionInfo[]) {
 }
 
 // Atom to store tx history in local storage
-export const transactionsAtom = createAtomWithStorage<TransactionInfo[]>(
+const transactionsAtom = createAtomWithStorage<TransactionInfo[]>(
   'transactions',
   [],
   deserialiseTxInfo,
@@ -509,7 +509,7 @@ function StrategyTxPropsToMessage(tx: StrategyTxProps, get: Getter) {
   return StrategyTxPropsToMessageWithStrategies(tx, strategies);
 }
 
-export function StrategyTxPropsToMessageWithStrategies(
+function StrategyTxPropsToMessageWithStrategies(
   tx: StrategyTxProps,
   strategies: StrategyInfo<any>[],
 ) {

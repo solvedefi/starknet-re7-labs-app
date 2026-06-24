@@ -27,7 +27,7 @@ import { lastWalletAtom } from '@/store/utils.atoms';
 
 interface TncModalProps {}
 
-export const UserTnCAtom = atomWithQuery((get) => {
+const UserTnCAtom = atomWithQuery((get) => {
   const address = get(addressAtom);
   return {
     queryKey: ['tnc', address],

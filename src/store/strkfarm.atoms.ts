@@ -57,7 +57,7 @@ export interface STRKFarmStrategyAPIResult {
   investmentFlows: IInvestmentFlow[];
 }
 
-export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
+class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
   name = 'Re7 Labs';
   logo = strkfarmLogo.src;
   incentiveDataKey = '';
@@ -166,7 +166,7 @@ export const STRKFarmBaseAPYsAtom = atomWithQuery((get) => ({
   },
 }));
 
-export const strkfarm = new STRKFarm();
+const strkfarm = new STRKFarm();
 const STRKFarmAtoms: ProtocolAtoms = {
   baseAPRs: STRKFarmBaseAPYsAtom,
   pools: atom((get) => {

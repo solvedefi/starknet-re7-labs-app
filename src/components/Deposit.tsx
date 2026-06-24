@@ -82,7 +82,7 @@ function getInputInfoAtoms() {
 /**
  * Derived atom of input infos
  */
-export const inputsInfoAtoms = getInputInfoAtoms();
+const inputsInfoAtoms = getInputInfoAtoms();
 
 /**
  * Derived atom of input infos
@@ -121,7 +121,7 @@ export const updateInputInfoAtom = atom(
   },
 );
 
-export const resetDepositFormAtom = atom(null, (get, set) => {
+const resetDepositFormAtom = atom(null, (get, set) => {
   const inputInfos = get(inputsInfoAtom);
   set(depositAtom, {
     inputsInfo: getInputInfoAtoms(),

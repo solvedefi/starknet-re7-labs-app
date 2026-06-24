@@ -15,8 +15,6 @@ import {
   Tabs,
   VStack,
 } from '@chakra-ui/react';
-import Autoplay from 'embla-carousel-autoplay';
-import useEmblaCarousel from 'embla-carousel-react';
 import mixpanel from 'mixpanel-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -34,13 +32,6 @@ export default function Home() {
 
   const strategies: StrategyDetails[] = useSelector((state: RootState) =>
     selectAllStrategiesAsArray(state),
-  );
-
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      loop: true,
-    },
-    [Autoplay({ playOnInit: true, delay: 8000 })],
   );
 
   function setRoute(value: string) {

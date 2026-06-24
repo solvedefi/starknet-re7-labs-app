@@ -4,7 +4,7 @@ import { TokenName } from '@/constants';
 import { StrategyAction } from '@/strategies/IStrategy';
 import { CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
 
-export interface APRInfo {
+interface APRInfo {
   asset: TokenName;
   apr: number;
 }
@@ -82,6 +82,6 @@ export class IDapp<BaseAPYT> {
   }
 }
 
-export function getPoolId(protocol: string, poolName: string) {
+function getPoolId(protocol: string, poolName: string) {
   return `${protocol.toLowerCase().replaceAll(' ', '_')}__${poolName.toLowerCase().replaceAll(' ', '_')}`;
 }

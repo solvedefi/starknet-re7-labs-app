@@ -1,15 +1,11 @@
-import shield from '@/assets/shield.svg';
+import shield from '@public/shield.svg';
 import { addressAtom } from '@/store/claims.atoms';
 import { isPoolRetired, PoolInfo } from '@/store/pools';
-import { getPoolInfoFromStrategy, sortAtom } from '@/store/protocols';
+import { getPoolInfoFromStrategy } from '@/store/protocols';
 import { UserStats, userStatsAtom } from '@/store/utils.atoms';
 import { isLive, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { getDisplayCurrencyAmount } from '@/utils';
-import {
-  TriangleDownIcon,
-  TriangleUpIcon,
-  WarningTwoIcon,
-} from '@chakra-ui/icons';
+import { WarningTwoIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   AvatarGroup,
@@ -28,7 +24,6 @@ import {
   Text,
   Tooltip,
   Tr,
-  VStack,
 } from '@chakra-ui/react';
 import { ContractAddr } from '@strkfarm/sdk';
 import { useAtomValue } from 'jotai';
@@ -39,14 +34,14 @@ import arrow from '@public/arrow_left.png';
 import NextLink from 'next/link';
 import { StrategyDetails } from '@/hooks/useStrategiesInfo';
 
-export interface YieldCardProps {
+interface YieldCardProps {
   pool: PoolInfo;
   index: number;
   showProtocolName?: boolean;
   onClick?: (strategyId: string) => void;
 }
 
-export function getStratCardBg(status: StrategyLiveStatus, index: number) {
+function getStratCardBg(status: StrategyLiveStatus, index: number) {
   if (status == StrategyLiveStatus.HOT) {
     return '#414173';
   }
@@ -70,7 +65,7 @@ function getStratCardBadgeBg(status: StrategyLiveStatus) {
   return 'bg';
 }
 
-export function StrategyInfo(props: YieldCardProps) {
+function StrategyInfo(props: YieldCardProps) {
   const { pool } = props;
 
   return (
@@ -223,7 +218,7 @@ function StrategyAPY(props: YieldCardProps) {
   );
 }
 
-export function getStrategyWiseHoldingsInfo(
+function getStrategyWiseHoldingsInfo(
   userData: UserStats | null | undefined,
   id: string,
 ) {
@@ -252,7 +247,7 @@ export function getStrategyWiseHoldingsInfo(
   };
 }
 
-export function StrategyTVL(props: YieldCardProps) {
+function StrategyTVL(props: YieldCardProps) {
   const { pool } = props;
   const address = useAtomValue(addressAtom);
   const { data: userData } = useAtomValue(userStatsAtom);
@@ -330,13 +325,6 @@ export function StrategyTVL(props: YieldCardProps) {
       )}
     </Box>
   );
-}
-// return sort heading text to match with sort options heading text
-function sortHeading(field: string) {
-  if (field == 'APY') {
-    return 'APR';
-  }
-  return field.toUpperCase();
 }
 function GetRiskLevel(riskFactor: number) {
   let color = '';
@@ -475,7 +463,7 @@ function StrategyMobileCard(props: YieldCardProps) {
   );
 }
 
-export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
+function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
   return {
     onClick: () => {
       mixpanel.track('Pool clicked', {
@@ -489,7 +477,7 @@ export function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
     },
   };
 }
-export default function YieldCard(props: YieldCardProps) {
+function YieldCard(props: YieldCardProps) {
   const { pool, index } = props;
 
   const isRetired = useMemo(() => {
@@ -594,50 +582,4 @@ export function YieldStrategyCard(props: {
   const strat = getPoolInfoFromStrategy(props.strat);
 
   return <YieldCard pool={strat} index={props.index} showProtocolName={true} />;
-}
-
-export function HeaderSorter(props: {
-  heading: string;
-  mainColor: string;
-  inActiveColor: string;
-  onClick: (order: 'asc' | 'desc') => void;
-  // added active? boolean to handle sort status...
-  active?: boolean;
-}) {
-  // get the current sort atom
-  const sort = useAtomValue(sortAtom);
-  // get corrent index for a particular sort option from the current sort atom
-  const currentFieldIndex = sort.findIndex(
-    (s) => s.field === sortHeading(props.heading),
-  );
-  // get the order of the clicked sort option
-  const order: 'asc' | 'desc' =
-    currentFieldIndex >= 0 ? sort[currentFieldIndex].order : 'desc';
-  return (
-    <HStack
-      as="button"
-      onClick={() => {
-        props.onClick(order);
-      }}
-      float={'right'}
-    >
-      <Text color={props.mainColor}>{props.heading.toUpperCase()}</Text>
-      <VStack gap={0} spacing={0}>
-        <TriangleUpIcon
-          color={
-            order == 'asc' && props.active
-              ? props.mainColor
-              : props.inActiveColor
-          }
-        />
-        <TriangleDownIcon
-          color={
-            order == 'desc' && props.active
-              ? props.mainColor
-              : props.inActiveColor
-          }
-        />
-      </VStack>
-    </HStack>
-  );
 }

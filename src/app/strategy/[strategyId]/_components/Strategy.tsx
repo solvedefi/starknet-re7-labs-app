@@ -173,7 +173,9 @@ const Strategy = ({ params }: StrategyParams) => {
                       {strategy &&
                         strategy.metadata.depositTokens.length == 0 && (
                           <Avatar className="mr-[5px] h-12 w-12">
-                            <AvatarImage src={strategy?.holdingTokens[0].logo} />
+                            <AvatarImage
+                              src={strategy?.holdingTokens[0].logo}
+                            />
                             <AvatarFallback />
                           </Avatar>
                         )}
@@ -339,7 +341,9 @@ const Strategy = ({ params }: StrategyParams) => {
                 <div>
                   <div className="text-cell hidden w-full text-white md:flex">
                     <p className="w-1/2 px-2.5 py-[5px]">Action</p>
-                    <p className="w-[30%] px-2.5 py-[5px] text-left">Protocol</p>
+                    <p className="w-[30%] px-2.5 py-[5px] text-left">
+                      Protocol
+                    </p>
                     <p className="w-[10%] px-2.5 py-[5px] text-right">Amount</p>
                     <p className="w-[10%] px-2.5 py-[5px] text-right">Yield</p>
                   </div>

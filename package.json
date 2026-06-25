@@ -26,10 +26,7 @@
   ],
   "dependencies": {
     "@apollo/client": "^3.11.8",
-    "@chakra-ui/react": "2.8.2",
     "@dagrejs/dagre": "^1.1.4",
-    "@emotion/react": "11.11.3",
-    "@emotion/styled": "11.11.0",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^15",
@@ -56,7 +53,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "ethers": "^6.11.1",
-    "framer-motion": "11.0.5",
     "get-starknet-core": "3.3.3",
     "graphql": "16.9.0",
     "jotai": "2.6.4",

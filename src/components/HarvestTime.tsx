@@ -111,7 +111,9 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                   <div className="mt-2.5 flex justify-between">
                     <div>
                       <p>Rewards APY:</p>
-                      <p className="text-xs opacity-70">Incentives by TrovesFi</p>
+                      <p className="text-xs opacity-70">
+                        Incentives by TrovesFi
+                      </p>
                     </div>
                     <p className="font-bold">
                       {(strategyInfo.apySplit.rewardsApy * 100).toFixed(2)}%

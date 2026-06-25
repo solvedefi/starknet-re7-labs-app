@@ -5,5 +5,13 @@
     "generateChangelog.js"
   ],
   "project": ["src/**/*.{ts,tsx}", "*.{js,mjs}"],
-  "ignoreDependencies": ["sharp"]
+  "ignore": ["src/components/ui/**", "src/lib/utils.ts"],
+  "ignoreDependencies": [
+    "sharp",
+    "class-variance-authority",
+    "clsx",
+    "tailwind-merge",
+    "lucide-react",
+    "@radix-ui/*"
+  ]
 }

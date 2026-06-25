@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ShadCN semantic tokens (dark theme), mapped to the app palette.
+   Scoped to :root only — no global element resets — so it coexists with
+   Chakra during the migration without altering existing styles. */
+:root {
+  --background: 0 0% 9%; /* #171717 */
+  --foreground: 0 0% 100%;
+  --card: 0 0% 7%; /* #131313 */
+  --card-foreground: 0 0% 100%;
+  --popover: 240 21% 13%; /* #1a1a27 highlight */
+  --popover-foreground: 0 0% 100%;
+  --primary: 251 65% 60%; /* #6e53dc purple */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 18% 8%; /* #111119 bg */
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 20%;
+  --muted-foreground: 194 8% 64%; /* #9ca9ad light_grey */
+  --accent: 157 92% 74%; /* #7DFACB cyan */
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 62% 70%; /* #e18787 red */
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+  --ring: 251 65% 60%;
+  --radius: 0.5rem;
+}
+
 :root {
   --foreground-rgb: #212121;
 }

@@ -1,6 +1,5 @@
-import { ArrowUpIcon } from '@chakra-ui/icons';
 import arrowsUpDownIcon from '@public/arrows-up-down.svg';
-import { Box, Image } from '@chakra-ui/react';
+import { ArrowUp } from 'lucide-react';
 
 export type SortColumn =
   | 'name'
@@ -26,34 +25,35 @@ export function SortIndicator({
   sortDirection,
   isHovered = false,
 }: SortIndicatorProps) {
-  const arrowOpacity = sortColumn !== column ? 0 : 1;
-  const transition = arrowOpacity ? 'transform 0.2s ease' : undefined;
+  const isActive = sortColumn === column;
 
   return (
-    <Box ml="8px" display="flex" w="12px" h="12px" alignItems="center">
-      {isHovered && !arrowOpacity ? (
-        <Image
+    <div className="ml-2 flex h-3 w-3 items-center">
+      {isHovered && !isActive ? (
+        <img
           src={arrowsUpDownIcon.src}
           alt="arrows-up-down"
-          width="12px"
-          height="12px"
-          display="inline"
-          filter="invert(62%) sepia(6%) saturate(1012%) hue-rotate(130deg) brightness(92%) contrast(88%)"
+          width={12}
+          height={12}
+          className="inline"
+          style={{
+            filter:
+              'invert(62%) sepia(6%) saturate(1012%) hue-rotate(130deg) brightness(92%) contrast(88%)',
+          }}
         />
       ) : (
-        <ArrowUpIcon
-          width="12px"
-          height="12px"
-          display="inline"
-          transform={
-            sortDirection === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)'
-          }
-          transition={transition}
-          color="#8A9B9B"
-          opacity={arrowOpacity}
-          p={0}
+        <ArrowUp
+          width={12}
+          height={12}
+          className="inline transition-transform"
+          style={{
+            transform:
+              sortDirection === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)',
+            color: '#8A9B9B',
+            opacity: isActive ? 1 : 0,
+          }}
         />
       )}
-    </Box>
+    </div>
   );
 }

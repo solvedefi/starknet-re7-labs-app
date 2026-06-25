@@ -1,27 +1,32 @@
-import {
-  Container,
-  Skeleton,
-  Stack,
-  Table,
-  Tbody,
-  Text,
-  Th,
-  Thead,
-  Tr,
-} from '@chakra-ui/react';
 import React, { useMemo, useState } from 'react';
 
 import { YieldStrategyCard } from './YieldCard';
 import { SortColumn, SortDirection } from './SortIndicator';
 import { SortableTh } from './SortableTh';
+import { Skeleton } from './ui/skeleton';
+import { cn } from '@/lib/utils';
 import { StrategyDetails } from '@/hooks/useStrategiesInfo';
+import { getLiveStatusEnum, StrategyLiveStatus } from '@/strategies/IStrategy';
 
 type StrategiesProps = {
   strategies: StrategyDetails[];
 };
 
+type StrategyView = 'live' | 'migrated';
+
+// A strategy is "migrated" when it has been retired or is one of the vaults
+// currently under migration (today only the USDC.e vaults). Everything else
+// is considered live.
+function isMigrated(strat: StrategyDetails) {
+  return (
+    getLiveStatusEnum(strat.status.number) === StrategyLiveStatus.RETIRED ||
+    strat.name.includes('USDC.e')
+  );
+}
+
 export default function Strategies({ strategies }: StrategiesProps) {
-  const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
+  const [view, setView] = useState<StrategyView>('live');
+  const [sortColumn, setSortColumn] = useState<SortColumn | null>('tvl');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
   const handleSort = (column: SortColumn) => {
@@ -33,11 +38,22 @@ export default function Strategies({ strategies }: StrategiesProps) {
     }
   };
 
-  // Apply sorting to the data
-  const sortedStrategies = useMemo(() => {
-    if (!sortColumn) return strategies;
+  // Split strategies by the selected Live / Migrated view.
+  const liveStrategies = useMemo(
+    () => strategies.filter((strat) => !isMigrated(strat)),
+    [strategies],
+  );
+  const migratedStrategies = useMemo(
+    () => strategies.filter(isMigrated),
+    [strategies],
+  );
+  const viewStrategies = view === 'live' ? liveStrategies : migratedStrategies;
 
-    return strategies.sort((a, b) => {
+  // Apply sorting to the data (copy first — never mutate the source array).
+  const sortedStrategies = useMemo(() => {
+    if (!sortColumn) return viewStrategies;
+
+    return [...viewStrategies].sort((a, b) => {
       let aValue: any;
       let bValue: any;
 
@@ -80,40 +96,58 @@ export default function Strategies({ strategies }: StrategiesProps) {
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [sortColumn, sortDirection, strategies]);
+  }, [sortColumn, sortDirection, viewStrategies]);
+
+  const views: { id: StrategyView; label: string; count: number }[] = [
+    { id: 'live', label: 'Live', count: liveStrategies.length },
+    { id: 'migrated', label: 'Migrated', count: migratedStrategies.length },
+  ];
 
   return (
-    <Container width="100%" float={'left'} padding={'0px'}>
-      <Container width="100%" float={'left'} padding={'24px 30px 12px 32px'}>
-        <Text color="#FFF" fontSize={'18px'} padding={'5px 0px'}>
+    <div className="float-left w-full">
+      <div className="float-left w-full px-8 pb-3 pt-6">
+        <p className="py-1 text-lg text-white">
           <b>What are strategies?</b>
-        </Text>
-        <Text
-          color="#FFF"
-          fontSize={'15px'}
-          marginBottom={'15px'}
-          padding={'2px 0px'}
-        >
+        </p>
+        <p className="mb-4 py-0.5 text-[15px] text-white">
           Strategies are a combination of investment steps that combine various
           pools to maximize yield.
-        </Text>
-      </Container>
-      <Table variant="simple" overflow={'hidden'}>
-        <Thead display={{ base: 'none', md: 'table-header-group' }}>
-          <Tr
-            fontSize={'15px'}
-            color={'#8A9B9B'}
-            bg="#131313"
-            borderRadius="15px"
-            borderBottom={'10px solid #131313 !important'}
-          >
+        </p>
+      </div>
+
+      <div className="float-left w-full px-8 pb-4">
+        <div className="flex gap-2">
+          {views.map(({ id, label, count }) => {
+            const isSelected = view === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setView(id)}
+                className={cn(
+                  'rounded-lg px-4 py-1.5 text-sm transition-colors hover:text-white',
+                  isSelected
+                    ? 'bg-[#2E2E2E] font-bold text-white'
+                    : 'text-light_grey',
+                )}
+              >
+                {label} ({count})
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <table className="w-full overflow-hidden">
+        <thead className="hidden md:table-header-group">
+          <tr className="bg-[#131313] text-[15px] text-[#8A9B9B]">
             <SortableTh
               columnId="name"
               selectedColumn={sortColumn}
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text>Position Name</Text>
+              <span>Position Name</span>
             </SortableTh>
             <SortableTh
               columnId="deposit"
@@ -121,7 +155,7 @@ export default function Strategies({ strategies }: StrategiesProps) {
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text>Deposit</Text>
+              <span>Deposit</span>
             </SortableTh>
             <SortableTh
               columnId="yield"
@@ -129,7 +163,7 @@ export default function Strategies({ strategies }: StrategiesProps) {
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text whiteSpace="nowrap">Current Yield</Text>
+              <span className="whitespace-nowrap">Current Yield</span>
             </SortableTh>
             <SortableTh
               columnId="volume"
@@ -137,7 +171,7 @@ export default function Strategies({ strategies }: StrategiesProps) {
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text>Vol(7D)</Text>
+              <span>Vol(7D)</span>
             </SortableTh>
             <SortableTh
               columnId="fees"
@@ -145,7 +179,7 @@ export default function Strategies({ strategies }: StrategiesProps) {
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text>Fees(7D)</Text>
+              <span>Fees(7D)</span>
             </SortableTh>
             <SortableTh
               columnId="apy"
@@ -153,7 +187,7 @@ export default function Strategies({ strategies }: StrategiesProps) {
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text>APY</Text>
+              <span>APY</span>
             </SortableTh>
             <SortableTh
               columnId="tvl"
@@ -161,47 +195,37 @@ export default function Strategies({ strategies }: StrategiesProps) {
               sortDirection={sortDirection}
               handleSort={handleSort}
             >
-              <Text>TVL</Text>
+              <span>TVL</span>
             </SortableTh>
-            <Th borderRight={'10px solid #131313 !important'}></Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {sortedStrategies.length > 0 && (
-            <>
-              {sortedStrategies.map((strat, index) => {
-                return (
-                  <YieldStrategyCard
-                    key={strat.id}
-                    strat={strat}
-                    index={index}
-                  />
-                );
-              })}
-            </>
-          )}
-        </Tbody>
-      </Table>
-      {sortedStrategies.length === 0 && (
-        <Stack>
-          <Skeleton height="70px" />
-          <Skeleton height="70px" />
-          <Skeleton height="70px" />
-          <Skeleton height="70px" />
-        </Stack>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedStrategies.map((strat, index) => (
+            <YieldStrategyCard key={strat.id} strat={strat} index={index} />
+          ))}
+        </tbody>
+      </table>
+
+      {strategies.length === 0 && (
+        <div className="flex flex-col gap-2 p-2">
+          <Skeleton className="h-[70px] w-full" />
+          <Skeleton className="h-[70px] w-full" />
+          <Skeleton className="h-[70px] w-full" />
+          <Skeleton className="h-[70px] w-full" />
+        </div>
       )}
-      <Container width="100%" float={'left'} padding={'16px 27px'}>
-        <Text
-          color="#FFF"
-          textAlign={'center'}
-          width={'100%'}
-          margin="15px 0"
-          padding="2px 0px"
-          fontSize="13px"
-        >
+      {strategies.length > 0 && sortedStrategies.length === 0 && (
+        <p className="my-8 w-full text-center text-sm text-light_grey">
+          No {view} strategies.
+        </p>
+      )}
+
+      <div className="float-left w-full px-7 py-4">
+        <p className="m-0 w-full py-0.5 text-center text-[13px] text-white">
           More strategies coming soon.
-        </Text>
-      </Container>
-    </Container>
+        </p>
+      </div>
+    </div>
   );
 }

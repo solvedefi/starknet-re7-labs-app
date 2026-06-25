@@ -1,18 +1,4 @@
-import { ChevronDownIcon } from '@chakra-ui/icons';
-import {
-  Box,
-  Button,
-  Center,
-  Container,
-  Flex,
-  Image,
-  Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Text,
-} from '@chakra-ui/react';
+import { ChevronDown } from 'lucide-react';
 import NextLink from 'next/link';
 import { useAtom, useSetAtom } from 'jotai';
 import {
@@ -21,14 +7,19 @@ import {
   StarknetkitConnector,
 } from 'starknetkit';
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import { getERC20Balance } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import {
   getEndpoint,
   getTokenInfoFromName,
-  MyMenuItemProps,
-  MyMenuListProps,
   shortAddress,
   standariseAddress,
   truncate,
@@ -264,175 +255,113 @@ export default function Navbar(props: NavbarProps) {
         : `data:image/svg+xml;utf8,${encodeURIComponent(iconString)}`;
       return {
         icon: iconSrc,
-        rounded: undefined,
+        rounded: false,
       };
     }
     return {
       icon: active.src,
-      rounded: 'full',
+      rounded: true,
     };
   }, [connector]);
 
+  const buttonClasses = cn(
+    'flex items-center rounded-[146px] border border-[#2F2F2F] px-2 py-2.5 text-[0.8rem] text-white hover:border-white sm:px-5 sm:py-5 sm:text-[15px]',
+  );
+  const buttonStyle = {
+    background: isWalletConnected
+      ? 'linear-gradient(to right, #2E45D0, #B1525C)'
+      : '#2F2F2F',
+  };
+
   return (
-    <Container
-      width={'100%'}
-      padding={'0'}
-      position={'fixed'}
-      bg="#0C0C0C"
-      zIndex={999}
-      top="0"
-    >
+    <div className="fixed top-0 z-[999] w-full bg-[#0C0C0C]">
       <TncModal />
-      <Box
-        width={'100%'}
-        maxWidth="1400px"
-        margin={'0px auto'}
-        padding={'20px 20px 10px'}
-      >
-        <Flex width={'100%'}>
-          <Link
-            as={NextLink}
-            href="/"
-            margin="auto auto auto 0"
-            textAlign={'left'}
-          >
-            <Image
+      <div className="mx-auto w-full max-w-[1400px] px-5 pb-2.5 pt-5">
+        <div className="flex w-full">
+          <NextLink href="/" className="my-auto mr-auto text-left">
+            <img
               src={fulllogo.src}
               alt="logo"
-              height={{ base: '40px', md: '50px' }}
+              className="h-10 md:h-[50px]"
             />
-          </Link>
-          {true && (
-            <Menu>
-              <MenuButton
-                as={Button}
-                rightIcon={address ? <ChevronDownIcon /> : <></>}
-                iconSpacing={{ base: '1px', sm: '5px' }}
-                sx={{
-                  background: isWalletConnected
-                    ? 'linear-gradient(to right, #2E45D0, #B1525C)'
-                    : '#2F2F2F',
-                }}
-                color="white"
-                borderColor="#2F2F2F"
-                borderRadius="146px"
-                borderWidth="1px"
-                _hover={{
-                  bg: isWalletConnected
-                    ? 'linear-gradient(to right, #2E45D0, #B1525C)'
-                    : '#2F2F2F',
-                  borderColor: '#FFF',
-                }}
-                _active={{
-                  bg: isWalletConnected
-                    ? 'linear-gradient(to right, #2E45D0, #B1525C)'
-                    : '#2F2F2F',
-                }}
-                display={{ base: 'flex' }}
-                my={{ base: 'auto', sm: 'initial' }}
-                paddingX={{ base: '0.5rem', sm: '20px' }}
-                paddingY={{ base: '10px', sm: '20px' }}
-                fontSize={{ base: '0.8rem', sm: '15px' }}
-                onClick={
-                  address
-                    ? undefined
-                    : () => {
-                        connectWallet();
-                      }
-                }
-                size="xs"
-              >
-                <Center>
-                  {address ? (
-                    <Flex alignItems="center" gap=".5rem">
-                      <Image
-                        src={connectorDisplayDetails.icon}
-                        alt="pfp"
-                        width={'15px'}
-                        height={'15px'}
-                        rounded={connectorDisplayDetails.rounded}
-                      />{' '}
-                      <Text as="h3" marginTop={'3px !important'}>
-                        {starkProfile && starkProfile.name
-                          ? truncate(starkProfile.name, 6, isMobile ? 0 : 6)
-                          : shortAddress(address, 4, isMobile ? 0 : 4)}
-                      </Text>
-                    </Flex>
-                  ) : (
-                    <Flex
-                      alignItems="center"
-                      gap={{ base: '10px', sm: '20px' }}
-                      p={2}
-                    >
-                      <Text as="h3" marginTop={'3px !important'}>
-                        CONNECT
-                      </Text>
-                      <Image
-                        src={connectImg.src}
-                        alt="pfp"
-                        width={{ base: '12px', sm: '18px' }}
-                        height={{ base: '12px', sm: '18px' }}
-                        marginRight={{ base: '-5px', sm: '-10px' }}
-                        rounded="full"
-                      />
-                    </Flex>
-                  )}
-                </Center>
-              </MenuButton>
-              <MenuList
-                {...MyMenuListProps}
-                borderRadius={'9px'}
-                width={'180px'}
-              >
-                {address && (
-                  <>
-                    <MenuItem
-                      as={Button}
-                      {...MyMenuItemProps}
-                      width="100%"
-                      height={'52px'}
-                      onClick={() => {
-                        disconnectAsync().then(() => {
-                          console.log('wallet disconnected');
-                          setLastWallet(null);
-                          setIsWalletConnected(false);
-                        });
-                      }}
-                    >
-                      DISCONNECT
-                      <Image
-                        src={close.src}
-                        width={'12px'}
-                        height={'12px'}
-                        alt="pfp"
-                        marginLeft={'auto'}
-                      />
-                    </MenuItem>
-                    <MenuItem
-                      as={Button}
-                      {...MyMenuItemProps}
-                      width="100%"
-                      height={'52px'}
-                      onClick={() => {
-                        connectWallet();
-                      }}
-                    >
-                      SWITCH
-                      <Image
-                        src={connectImg.src}
-                        width={'14px'}
-                        height={'14px'}
-                        alt="pfp"
-                        marginLeft={'auto'}
-                      />
-                    </MenuItem>
-                  </>
-                )}
-              </MenuList>
-            </Menu>
+          </NextLink>
+
+          {!address ? (
+            <button
+              type="button"
+              className={buttonClasses}
+              style={buttonStyle}
+              onClick={() => connectWallet()}
+            >
+              <span className="flex items-center gap-2.5 p-2 sm:gap-5">
+                <h3 className="mt-[3px]">CONNECT</h3>
+                <img
+                  src={connectImg.src}
+                  alt="pfp"
+                  className="-mr-[5px] h-3 w-3 rounded-full sm:-mr-2.5 sm:h-[18px] sm:w-[18px]"
+                />
+              </span>
+            </button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className={buttonClasses}
+                  style={buttonStyle}
+                >
+                  <span className="flex items-center gap-2">
+                    <img
+                      src={connectorDisplayDetails.icon}
+                      alt="pfp"
+                      className={cn(
+                        'h-[15px] w-[15px]',
+                        connectorDisplayDetails.rounded && 'rounded-full',
+                      )}
+                    />
+                    <h3 className="mt-[3px]">
+                      {starkProfile && starkProfile.name
+                        ? truncate(starkProfile.name, 6, isMobile ? 0 : 6)
+                        : shortAddress(address, 4, isMobile ? 0 : 4)}
+                    </h3>
+                    <ChevronDown className="h-4 w-4" />
+                  </span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[180px] rounded-[9px] bg-highlight text-white">
+                <DropdownMenuItem
+                  className="h-[52px] cursor-pointer focus:bg-white/10"
+                  onClick={() => {
+                    disconnectAsync().then(() => {
+                      console.log('wallet disconnected');
+                      setLastWallet(null);
+                      setIsWalletConnected(false);
+                    });
+                  }}
+                >
+                  DISCONNECT
+                  <img
+                    src={close.src}
+                    alt="pfp"
+                    className="ml-auto h-3 w-3"
+                  />
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="h-[52px] cursor-pointer focus:bg-white/10"
+                  onClick={() => connectWallet()}
+                >
+                  SWITCH
+                  <img
+                    src={connectImg.src}
+                    alt="pfp"
+                    className="ml-auto h-3.5 w-3.5"
+                  />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
-        </Flex>
-      </Box>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }

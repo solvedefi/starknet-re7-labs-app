@@ -4,20 +4,8 @@ import Strategies from '@/components/Strategies';
 import TVL from '@/components/TVL';
 import arrow from '@public/arrow_left.png';
 
-import {
-  Container,
-  Image,
-  Tab,
-  TabIndicator,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  VStack,
-} from '@chakra-ui/react';
 import mixpanel from 'mixpanel-browser';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { TotalYield } from '@/components/TotalYield';
 import { StrategyDetails } from '@/hooks/useStrategiesInfo';
 import { useSelector } from 'react-redux';
@@ -25,114 +13,47 @@ import { selectAllStrategiesAsArray } from '@/redux/features/strategySlice';
 import { RootState } from '@/redux/store';
 
 export default function Home() {
-  const [tabIndex, setTabIndex] = useState(0);
-
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
   const strategies: StrategyDetails[] = useSelector((state: RootState) =>
     selectAllStrategiesAsArray(state),
   );
-
-  function setRoute(value: string) {
-    router.push(`?tab=${value}`);
-  }
-
-  function handleTabsChange(index: number) {
-    if (index === 0) {
-      setRoute('strategies');
-    } else {
-      setRoute('pools');
-    }
-  }
 
   useEffect(() => {
     mixpanel.track('Page open');
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      const tab = searchParams!.get('tab') ?? 'strategies';
-      if (tab === 'pools') {
-        setTabIndex(1);
-      } else {
-        setTabIndex(0);
-      }
-    })();
-  }, [searchParams]);
-
   return (
-    <Container maxWidth={'1264px'} margin={'0 auto'}>
-      <VStack
-        justifySelf={'center'}
-        maxWidth={'1069px'}
-        width={'100%'}
-        gap="22px"
-        pb="38px"
-      >
+    <div className="mx-auto max-w-[1264px]">
+      <div className="mx-auto flex w-full max-w-[1069px] flex-col gap-[22px] pb-[38px]">
         <TVL />
         <TotalYield strategies={strategies} />
-      </VStack>
+      </div>
 
-      <Tabs
-        position="relative"
-        variant="unstyled"
-        width={'100%'}
-        index={tabIndex}
-        onChange={handleTabsChange}
-        marginTop={'10px'}
-      >
-        <TabList>
-          <Tab
-            color="light_grey"
-            _selected={{ color: '#FFF' }}
-            onClick={() => {
-              mixpanel.track('Strategies opened');
-            }}
+      <div className="relative mt-[10px] w-full">
+        <div className="inline-block">
+          <button
+            type="button"
+            className="flex w-full items-center px-7 py-2 text-white"
+            onClick={() => mixpanel.track('Strategies opened')}
           >
-            <Container
-              width="100%"
-              display={'flex'}
-              alignItems={'center'}
-              padding={'8px 28px'}
-            >
-              <p>STRATEGIES</p>
-              <Image
-                src={arrow.src}
-                alt="logo"
-                height="13px"
-                marginLeft={'30px'}
-                marginBottom={'2px'}
-              />
-            </Container>
-          </Tab>
-        </TabList>
-        <TabIndicator
-          // mt="-1.5px"
-          height="3px"
-          bg="linear-gradient(to right, #2E45D0, #B1525C)"
-          borderRadius="1px"
-        />
-        <TabPanels>
-          <TabPanel
-            p={0}
-            bg="#171717"
-            float={'left'}
-            width={'100%'}
-            overflow={'scroll'}
-            sx={{
-              '&::-webkit-scrollbar': {
-                display: 'none',
-              },
-              '-ms-overflow-style': 'none',
-              'scrollbar-width': 'none',
+            <p>STRATEGIES</p>
+            <img
+              src={arrow.src}
+              alt="logo"
+              className="mb-0.5 ml-[30px] h-[13px]"
+            />
+          </button>
+          <div
+            className="h-[3px] w-full rounded-[1px]"
+            style={{
+              background: 'linear-gradient(to right, #2E45D0, #B1525C)',
             }}
-          >
-            <Strategies strategies={strategies} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-      {/* <hr style={{width: '100%', borderColor: '#5f5f5f', float: 'left', margin: '20px 0'}}/> */}
-    </Container>
+          />
+        </div>
+
+        <div className="float-left w-full overflow-x-auto bg-[#171717] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Strategies strategies={strategies} />
+        </div>
+      </div>
+    </div>
   );
 }

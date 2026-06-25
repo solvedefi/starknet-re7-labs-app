@@ -15,7 +15,7 @@ import STRKFarmAtoms, {
 import '@xyflow/react/dist/style.css';
 import { IInvestmentFlow } from '@strkfarm/sdk';
 import { useAtomValue } from 'jotai';
-import { Spinner } from '@chakra-ui/react';
+import { Loader2 } from 'lucide-react';
 import { StructuredFlowNode } from './StructuredFlowNode';
 // import ELK from 'elkjs/lib/elk.bundled.js';
 
@@ -251,7 +251,7 @@ function InternalFlowChart(props: FlowChartProps) {
 
   return (
     <div>
-      <Spinner size={'sm'} />
+      <Loader2 className="h-4 w-4 animate-spin" />
     </div>
   );
 }

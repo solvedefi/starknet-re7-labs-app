@@ -117,10 +117,7 @@ function getAPRWithToolTip(pool: PoolInfo) {
     <div className="w-[300px]">
       {pool.aprSplits.map((split) => {
         return (
-          <div
-            className="my-1 flex justify-between"
-            key={split.title}
-          >
+          <div className="my-1 flex justify-between" key={split.title}>
             <div>
               <p>{split.title}:</p>
               <p className="text-xs opacity-70">{split.description}</p>

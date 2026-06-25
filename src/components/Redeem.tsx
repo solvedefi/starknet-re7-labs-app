@@ -11,21 +11,7 @@ import {
   formatTokenBalance,
 } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
-import {
-  Box,
-  Center,
-  Flex,
-  Text,
-  VStack,
-  NumberInput,
-  NumberInputField,
-  Button,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  Tooltip,
-} from '@chakra-ui/react';
+import { SimpleTooltip } from './ui/simple-tooltip';
 import { useAccount } from '@starknet-react/core';
 import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
@@ -607,190 +593,114 @@ function InternalRedeem(props: RedeemProps) {
   }, [redeemInfo, loadingInvestmentSummary, investedSummary, inputsInfo]);
 
   return (
-    <Box>
-      <VStack width={'100%'} gap={'24px'}>
-        <Flex
-          gap={'15px'}
-          width="100%"
-          align="center"
-          paddingBottom={'24px'}
-          borderBottom="1px solid #2F2F2F"
-        >
-          <Box
-            position="relative"
-            borderRadius="6px"
-            background="linear-gradient(#1A1919, #1A1919) padding-box, linear-gradient(to right, #2E45D0, #B1525C) border-box"
-            border="2px solid transparent"
-            minHeight={'42px'}
-            p="0"
+    <div>
+      <div className="flex w-full flex-col gap-[24px]">
+        <div className="flex w-full items-center gap-[15px] border-b border-[#2F2F2F] pb-[24px]">
+          <div
+            className="relative min-h-[42px] rounded-[6px] border-2 border-transparent p-0"
+            style={{
+              background:
+                'linear-gradient(#1A1919, #1A1919) padding-box, linear-gradient(to right, #2E45D0, #B1525C) border-box',
+            }}
           >
-            <NumberInput
+            <input
+              type="number"
               value={percentageInput}
-              onChange={handlePercentageInputChange}
+              onChange={(e) =>
+                handlePercentageInputChange(
+                  e.target.value,
+                  Number(e.target.value),
+                )
+              }
               min={0}
               max={100}
-              precision={0}
               step={1}
-              size="sm"
-              width="103px"
-              height={'60px'}
-              isDisabled={totalBalance.isZero()}
-              keepWithinRange={false}
-              clampValueOnBlur={false}
-            >
-              <NumberInputField
-                display={'flex'}
-                alignItems={'center'}
-                justifyContent={'center'}
-                bg="transparent"
-                color="white"
-                border="none"
-                _hover={{ borderColor: '#1A1919' }}
-                _focus={{ borderColor: '#1A1919' }}
-                fontSize={'16px'}
-                textAlign="center"
-                paddingRight="30px"
-                height={'100%'}
-                borderRadius={'6px'}
-                onKeyDown={(e) => {
-                  if (['End', 'Home'].includes(e.key)) {
-                    e.preventDefault();
-                  }
-                }}
-              />
-            </NumberInput>
-            <Text
-              position="absolute"
-              right="16px"
-              top="50%"
-              transform="translateY(-50%)"
-              fontSize={'16px'}
-              color="#FFF"
-              pointerEvents="none"
-              fontWeight="bold"
-            >
+              disabled={totalBalance.isZero()}
+              onKeyDown={(e) => {
+                if (['End', 'Home'].includes(e.key)) {
+                  e.preventDefault();
+                }
+              }}
+              className="h-[60px] w-[103px] rounded-[6px] border-none bg-transparent pr-[30px] text-center text-[16px] text-white focus:outline-none disabled:opacity-50"
+            />
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[16px] font-bold text-white">
               %
-            </Text>
-          </Box>
+            </span>
+          </div>
 
-          <Slider
+          <input
+            type="range"
             aria-label="amount-slider"
             value={sliderValue}
-            onChange={handleSliderChange}
-            focusThumbOnChange={false}
+            onChange={(e) => handleSliderChange(Number(e.target.value))}
             min={0}
             max={100}
             step={1}
-            isDisabled={totalBalance.isZero()}
-          >
-            <SliderTrack bg="#323232" height="10px" borderRadius="146px">
-              <SliderFilledTrack bg="linear-gradient(to right, #2E45D0, #B1525C)" />
-            </SliderTrack>
-            <SliderThumb
-              height={'22px'}
-              width={'22px'}
-              bg="#B1525C"
-              margin={'0px 16px 0px 8px'}
-            />
-          </Slider>
+            disabled={totalBalance.isZero()}
+            className="h-[10px] flex-1 cursor-pointer appearance-none rounded-[146px] bg-[#323232] accent-[#B1525C] disabled:opacity-50"
+          />
           <LoadingWrap
             isLoading={balData.isLoading || balData.isPending}
             isError={balData.isError}
             skeletonProps={{
               height: '10px',
               width: '50px',
-              float: 'right',
-              marginTop: '8px',
-              marginLeft: '5px',
-            }}
-            iconProps={{
-              marginLeft: '5px',
-              boxSize: '15px',
             }}
           >
-            <Button
-              borderRadius={'146px'}
-              size={'sm'}
-              color="#FFF"
-              bg="#323232"
-              padding="3px 12px"
-              maxHeight={'21px'}
-              fontSize={'12px'}
-              fontWeight={'400'}
-              _active={{
-                bg: '#323232',
-                color: '#FFF',
-              }}
-              _hover={{
-                bg: '#323232',
-                color: '#FFF',
-              }}
+            <button
+              type="button"
               onClick={handleMaxClick}
-              isDisabled={totalBalance.isZero()}
+              disabled={totalBalance.isZero()}
+              className="max-h-[21px] rounded-[146px] bg-[#323232] px-3 py-[3px] text-[12px] font-normal text-white disabled:opacity-50"
             >
               Max
-            </Button>
+            </button>
           </LoadingWrap>
-        </Flex>
-        <VStack width={'100%'} gap="24px">
+        </div>
+        <div className="flex w-full flex-col gap-[24px]">
           {availableTokens.map((token, index) => {
             const balance = strategyBalances[index].amount;
             const calculatedAmount = balance.operate('mul', sliderValue / 100);
             return (
-              <Box key={token.symbol} width="100%">
-                <Flex justifyContent={'space-between'}>
+              <div key={token.symbol} className="w-full">
+                <div className="flex justify-between">
                   <TokenBadge
                     symbol={token.symbol || ''}
                     iconSrc={token.logo || ''}
                   />
 
-                  <VStack alignItems={'flex-end'} gap={'6px'} fontSize={'12px'}>
-                    <Text>Available balance</Text>
-                    <Tooltip
+                  <div className="flex flex-col items-end gap-[6px] text-[12px]">
+                    <p>Available balance</p>
+                    <SimpleTooltip
                       label={
                         Number(balance.toEtherStr()) < 0.000001
                           ? balance.toEtherStr()
                           : balance.toEtherToFixedDecimals(6)
                       }
                     >
-                      <Text>{formatTokenBalance(balance, 4)}</Text>
-                    </Tooltip>
-                  </VStack>
-                </Flex>
+                      <p>{formatTokenBalance(balance, 4)}</p>
+                    </SimpleTooltip>
+                  </div>
+                </div>
 
-                <Box marginTop={'12px'} width="100%">
-                  <Flex align="center" marginBottom={'10px'}>
-                    <Box
-                      padding={'0px 12px'}
-                      bg={'#1A1919'}
-                      height={'60px'}
-                      width={'100%'}
-                      alignItems={'center'}
-                    >
-                      <Text
-                        display="flex"
-                        alignItems="center"
-                        height="60px"
-                        fontSize={'15px'}
-                        color="#595959"
-                        fontWeight={'bold'}
-                        width={'100%'}
-                        paddingLeft={'12px'}
-                      >
+                <div className="mt-[12px] w-full">
+                  <div className="mb-[10px] flex items-center">
+                    <div className="h-[60px] w-full items-center bg-[#1A1919] px-3">
+                      <p className="flex h-[60px] w-full items-center pl-3 text-[15px] font-bold text-[#595959]">
                         {token.symbol || ''}{' '}
                         {Number(calculatedAmount.toEtherStr()) < 0.0001
                           ? calculatedAmount.toEtherStr()
                           : calculatedAmount.toEtherToFixedDecimals(4)}
-                      </Text>
-                    </Box>
-                  </Flex>
-                </Box>
-              </Box>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             );
           })}
-        </VStack>
+        </div>
 
-        <Center width="100%">
+        <div className="flex w-full items-center justify-center">
           <TxButton
             txInfo={txInfo}
             buttonText={props.buttonText}
@@ -813,9 +723,9 @@ function InternalRedeem(props: RedeemProps) {
               setPercentageInput('');
             }}
           />
-        </Center>
-      </VStack>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
 

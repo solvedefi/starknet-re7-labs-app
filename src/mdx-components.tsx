@@ -1,45 +1,31 @@
 import type { MDXComponents } from 'mdx/types';
-import {
-  Heading,
-  Text,
-  Link,
-  UnorderedList,
-  OrderedList,
-  ListItem,
-  Code,
-  Divider,
-  Box,
-} from '@chakra-ui/react';
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     h1: (props) => (
-      <Heading as="h1" size="2xl" my={6} scrollMarginTop="80px" {...props} />
+      <h1 className="my-6 scroll-mt-20 text-4xl font-bold" {...props} />
     ),
     h2: (props) => (
-      <Heading as="h2" size="xl" my={5} scrollMarginTop="80px" {...props} />
+      <h2 className="my-5 scroll-mt-20 text-3xl font-bold" {...props} />
     ),
     h3: (props) => (
-      <Heading as="h3" size="lg" my={4} scrollMarginTop="80px" {...props} />
+      <h3 className="my-4 scroll-mt-20 text-2xl font-bold" {...props} />
     ),
     h4: (props) => (
-      <Heading as="h4" size="md" my={3} scrollMarginTop="80px" {...props} />
+      <h4 className="my-3 scroll-mt-20 text-xl font-bold" {...props} />
     ),
-    p: (props) => <Text my={4} lineHeight="tall" {...props} />,
-    a: (props) => <Link color="purple" {...props} />,
-    ul: (props) => <UnorderedList my={4} pl={4} {...props} />,
-    ol: (props) => <OrderedList my={4} pl={4} {...props} />,
-    li: (props) => <ListItem my={1} {...props} />,
-    code: (props) => <Code px={2} py={1} rounded="md" {...props} />,
-    hr: () => <Divider my={6} />,
+    p: (props) => <p className="my-4 leading-relaxed" {...props} />,
+    a: (props) => <a className="text-purple" {...props} />,
+    ul: (props) => <ul className="my-4 list-disc pl-4" {...props} />,
+    ol: (props) => <ol className="my-4 list-decimal pl-4" {...props} />,
+    li: (props) => <li className="my-1" {...props} />,
+    code: (props) => (
+      <code className="rounded-md bg-white/10 px-2 py-1" {...props} />
+    ),
+    hr: () => <hr className="my-6 border-white/20" />,
     blockquote: (props) => (
-      <Box
-        as="blockquote"
-        borderLeftWidth={4}
-        borderLeftColor="gray.500"
-        pl={4}
-        my={4}
-        fontStyle="italic"
+      <blockquote
+        className="my-4 border-l-4 border-gray-500 pl-4 italic"
         {...props}
       />
     ),

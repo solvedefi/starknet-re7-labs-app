@@ -279,11 +279,7 @@ export default function Navbar(props: NavbarProps) {
       <div className="mx-auto w-full max-w-[1400px] px-5 pb-2.5 pt-5">
         <div className="flex w-full">
           <NextLink href="/" className="my-auto mr-auto text-left">
-            <img
-              src={fulllogo.src}
-              alt="logo"
-              className="h-10 md:h-[50px]"
-            />
+            <img src={fulllogo.src} alt="logo" className="h-10 md:h-[50px]" />
           </NextLink>
 
           {!address ? (
@@ -340,11 +336,7 @@ export default function Navbar(props: NavbarProps) {
                   }}
                 >
                   DISCONNECT
-                  <img
-                    src={close.src}
-                    alt="pfp"
-                    className="ml-auto h-3 w-3"
-                  />
+                  <img src={close.src} alt="pfp" className="ml-auto h-3 w-3" />
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="h-[52px] cursor-pointer focus:bg-white/10"

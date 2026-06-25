@@ -7,17 +7,7 @@ import {
 } from '@/strategies/IStrategy';
 import { convertToMyNumber, convertToV1TokenInfo } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
-import {
-  Alert,
-  AlertIcon,
-  Box,
-  Center,
-  Flex,
-  Progress,
-  Spinner,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
+import { Loader2, TriangleAlert } from 'lucide-react';
 import { useAccount } from '@starknet-react/core';
 import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -325,8 +315,8 @@ function InternalDeposit(props: DepositProps) {
   ]);
 
   return (
-    <Box>
-      <VStack width={'100%'} gap={'16px'} paddingTop={'16px'}>
+    <div>
+      <div className="flex w-full flex-col gap-4 pt-4">
         {/* // todo wont work with multiple token options for now */}
         {callsInfo.length &&
           callsInfo[0].amounts.map((inputAmtInfo, index) => {
@@ -349,9 +339,9 @@ function InternalDeposit(props: DepositProps) {
               />
             );
           })}
-      </VStack>
+      </div>
 
-      <Center paddingY={'32px'}>
+      <div className="flex items-center justify-center py-8">
         <TxButton
           txInfo={txInfo}
           buttonText={props.buttonText}
@@ -377,17 +367,15 @@ function InternalDeposit(props: DepositProps) {
             });
           }}
         />
-      </Center>
+      </div>
 
       {!props.strategy.isRetired() && props.strategy.settings.maxTVL != 0 && (
-        <Box width="100%" marginTop={'15px'}>
-          <Flex justifyContent="space-between">
-            <Text fontSize={'12px'} color="color2" fontWeight={'bold'}>
-              Current TVL Limit:
-            </Text>
-            <Text fontSize={'12px'} color="color2">
+        <div className="mt-[15px] w-full">
+          <div className="flex justify-between">
+            <p className="text-xs font-bold text-color2">Current TVL Limit:</p>
+            <p className="flex items-center text-xs text-color2">
               {!tvlInfo || !tvlInfo?.data ? (
-                <Spinner size="2xs" />
+                <Loader2 className="h-3 w-3 animate-spin" />
               ) : (
                 Number(
                   tvlInfo.data?.amounts[0].amount.toFixed(2),
@@ -396,37 +384,39 @@ function InternalDeposit(props: DepositProps) {
               {' / '}
               {props.strategy.settings.maxTVL.toLocaleString()}{' '}
               {inputsInfo[0].tokenInfo?.symbol}
-            </Text>
-          </Flex>
-          <Progress
-            colorScheme="grey"
-            bg="linear-gradient(to right, #2E45D0, #B1525C)"
-            borderRadius={'5px'}
-            marginTop={'5px'}
-            value={
-              (100 *
-                (Number(tvlInfo.data?.amounts[0].amount.toFixed(2)) ||
-                  props.strategy.settings.maxTVL)) /
-              props.strategy.settings.maxTVL
-            }
-            isIndeterminate={!tvlInfo || !tvlInfo?.data}
-          />
+            </p>
+          </div>
+          <div
+            className="mt-[5px] h-2 w-full overflow-hidden rounded-[5px]"
+            style={{
+              background: 'linear-gradient(to right, #2E45D0, #B1525C)',
+            }}
+          >
+            <div
+              className="h-full bg-disabled_bg"
+              style={{
+                width: `${
+                  !tvlInfo || !tvlInfo?.data
+                    ? 100
+                    : (100 *
+                        (Number(tvlInfo.data?.amounts[0].amount.toFixed(2)) ||
+                          props.strategy.settings.maxTVL)) /
+                      props.strategy.settings.maxTVL
+                }%`,
+              }}
+            />
+          </div>
           {isTVLFull && isDeposit && (
-            <Alert
-              status="warning"
-              bg="bg"
-              marginTop={'20px'}
-              borderRadius={'10px'}
-            >
-              <AlertIcon />
-              <Text fontSize={'12px'} color={'color2'}>
+            <div className="mt-5 flex items-center rounded-[10px] bg-bg p-2.5">
+              <TriangleAlert className="mr-2.5 h-4 w-4 shrink-0 text-yellow" />
+              <p className="text-xs text-color2">
                 TVL limit reached. Please wait for increase in limits.
-              </Text>
-            </Alert>
+              </p>
+            </div>
           )}
           {/* {tvlInfo.isError ? 1 : 0}{tvlInfo.isLoading ? 1 : 0} {JSON.stringify(tvlInfo.error)} */}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }

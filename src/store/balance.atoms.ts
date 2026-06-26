@@ -125,7 +125,10 @@ function getERC20BalanceAtom(token: TokenInfo | undefined) {
       queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
         return getERC20Balance(token, get(addressAtom));
       },
-      refetchInterval: 5000,
+      // No polling: balances refetch on mount (e.g. opening the deposit form),
+      // on account change (address is in the key) and on tx confirmation
+      // (queryClient.invalidateQueries in transactions.atom.ts).
+      staleTime: 0,
     };
   });
 }
@@ -133,11 +136,11 @@ function getERC20BalanceAtom(token: TokenInfo | undefined) {
 function getERC4626BalanceAtom(token: TokenInfo | undefined) {
   return atomWithQuery((get) => {
     return {
-      queryKey: ['getERC4626Balance', token?.token],
+      queryKey: ['getERC4626Balance', token?.token, get(addressAtom)],
       queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
         return getERC4626Balance(token, get(addressAtom));
       },
-      refetchInterval: 5000,
+      staleTime: 0,
     };
   });
 }
@@ -145,7 +148,7 @@ function getERC4626BalanceAtom(token: TokenInfo | undefined) {
 function getERC721PositionValueAtom(token: NFTInfo | undefined) {
   return atomWithQuery((get) => {
     return {
-      queryKey: ['getERC721PositionValue', token?.address],
+      queryKey: ['getERC721PositionValue', token?.address, get(addressAtom)],
       queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
         try {
           return await getERC721PositionValue(token, get(addressAtom));
@@ -153,7 +156,7 @@ function getERC721PositionValueAtom(token: NFTInfo | undefined) {
           return returnEmptyBal();
         }
       },
-      refetchInterval: 5000,
+      staleTime: 0,
     };
   });
 }

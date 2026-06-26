@@ -13,6 +13,7 @@ import { atomWithQuery } from 'jotai-tanstack-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/utils/apolloClient';
 import { logErrorOnce } from '@/utils/errorLog';
+import { queryClient } from '@/utils/queryClient';
 import { Web3Number } from '@strkfarm/sdk';
 
 export interface StrategyTxProps {
@@ -413,6 +414,10 @@ async function waitForTransaction(
     nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
   });
   await isTxAccepted(tx.txHash);
+  // Tx confirmed on-chain → balances, positions, user stats and TVL have all
+  // changed. Refetch them now (event-driven) rather than relying on a polling
+  // timer to eventually pick the change up.
+  queryClient.invalidateQueries();
   const txs = await get(transactionsAtom);
   tx.status = 'success';
   txs.push(tx);

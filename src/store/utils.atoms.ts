@@ -53,7 +53,6 @@ export const userStatsAtom = atomWithQuery((get) => ({
     if (data.holdingsUSD !== 0 && !data.holdingsUSD) return null;
     return data;
   },
-  refetchInterval: 5000,
 }));
 
 export const userStrategyWiseTVLAtom = atomFamily((strategyId: string) => {
@@ -110,6 +109,10 @@ export const tokenPricesAtom = atomWithQuery(() => ({
     });
     return await Promise.all(tokenPrices);
   },
+  // Prices move slowly; a long staleTime stops them refetching constantly. This
+  // also breaks the fees cascade: getFeesHistoryAtom keys on the prices object,
+  // so a fresh prices fetch used to re-run 15 GraphQL + 15 RPC calls.
+  staleTime: 300_000,
 }));
 
 // export const strategyTVLAtom = atom((get) => {

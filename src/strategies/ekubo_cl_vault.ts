@@ -294,7 +294,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
             return returnEmptyBal();
           }
         },
-        refetchInterval: 10000,
+        refetchInterval: 60000,
       };
     });
   };
@@ -338,7 +338,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
             tokenInfo: convertToV1TokenInfo(this.settings.quoteToken),
           };
         },
-        refetchInterval: 10000,
+        refetchInterval: 60000,
       };
     });
   };

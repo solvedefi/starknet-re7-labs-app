@@ -6,6 +6,12 @@ import rehypeSlug from 'rehype-slug';
 const nextConfig = {
   // output: 'export',
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
+  // @strkfarm/sdk ships its dist with verbose console.log calls (APY/price/TVL
+  // math). node_modules aren't run through SWC by default, so `removeConsole`
+  // below never touches them and they flood the production browser console.
+  // Transpiling the package routes it through the compiler so those logs get
+  // stripped in production builds.
+  transpilePackages: ['@strkfarm/sdk'],
   compiler:
     process.env.NODE_ENV === 'development'
       ? {}

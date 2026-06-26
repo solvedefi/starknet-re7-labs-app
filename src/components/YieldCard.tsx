@@ -5,34 +5,18 @@ import { getPoolInfoFromStrategy } from '@/store/protocols';
 import { UserStats, userStatsAtom } from '@/store/utils.atoms';
 import { isLive, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { getDisplayCurrencyAmount } from '@/utils';
-import { WarningTwoIcon } from '@chakra-ui/icons';
-import {
-  Avatar,
-  AvatarGroup,
-  Box,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  HStack,
-  Icon,
-  Image,
-  Link,
-  Spinner,
-  Stack,
-  Td,
-  Text,
-  Tooltip,
-  Tr,
-} from '@chakra-ui/react';
 import { ContractAddr } from '@strkfarm/sdk';
 import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useMemo } from 'react';
 import { FaWallet } from 'react-icons/fa';
+import { Loader2, TriangleAlert } from 'lucide-react';
 import arrow from '@public/arrow_left.png';
-import NextLink from 'next/link';
+import { useRouter } from 'next/navigation';
 import { StrategyDetails } from '@/hooks/useStrategiesInfo';
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
+import { SimpleTooltip } from './ui/simple-tooltip';
+import { cn } from '@/lib/utils';
 
 interface YieldCardProps {
   pool: PoolInfo;
@@ -41,134 +25,122 @@ interface YieldCardProps {
   onClick?: (strategyId: string) => void;
 }
 
-function getStratCardBg(status: StrategyLiveStatus, index: number) {
-  if (status == StrategyLiveStatus.HOT) {
-    return '#414173';
-  }
-  if (isLive(status)) {
-    return index % 2 === 0 ? 'color1_50p' : 'color2_50p';
-  }
-  if (status == StrategyLiveStatus.RETIRED) {
-    return 'black';
-  }
-  return 'bg';
+function Spinner() {
+  return <Loader2 className="h-4 w-4 animate-spin" />;
 }
 
-function getStratCardBadgeBg(status: StrategyLiveStatus) {
-  if (isLive(status)) {
-    return 'cyan';
-  } else if (status === StrategyLiveStatus.COMING_SOON) {
-    return 'yellow';
-  } else if (status == StrategyLiveStatus.RETIRED) {
-    return 'grey';
+function getStratCardBg(status: StrategyLiveStatus, index: number) {
+  if (status == StrategyLiveStatus.HOT) {
+    return 'bg-[#414173]';
   }
-  return 'bg';
+  if (isLive(status)) {
+    return index % 2 === 0 ? 'bg-color1_50p' : 'bg-color2_50p';
+  }
+  if (status == StrategyLiveStatus.RETIRED) {
+    return 'bg-black';
+  }
+  return 'bg-bg';
+}
+
+function AvatarGroup({ logos, size }: { logos: string[]; size: number }) {
+  return (
+    <div className="flex -space-x-2">
+      {logos.slice(0, 3).map((logo, index) => (
+        <Avatar
+          key={index}
+          className="border-2 border-[#212121]"
+          style={{ width: size, height: size }}
+        >
+          <AvatarImage src={logo} />
+          <AvatarFallback />
+        </Avatar>
+      ))}
+    </div>
+  );
 }
 
 function StrategyInfo(props: YieldCardProps) {
   const { pool } = props;
 
   return (
-    <Box>
-      <HStack spacing={2}>
-        <AvatarGroup size="xs" max={3} marginRight={'10px'}>
-          {pool.pool.logos.map((logo, index) => (
-            <Avatar key={index} src={logo} />
-          ))}
-        </AvatarGroup>
-        <Box>
-          <HStack spacing={2}>
-            <Heading size="sm" marginTop={'2px'}>
+    <div>
+      <div className="flex items-center gap-2">
+        <div className="mr-2.5">
+          <AvatarGroup logos={pool.pool.logos} size={24} />
+        </div>
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="mt-0.5 font-heading text-sm font-bold">
               {pool.pool.name}
-            </Heading>
+            </h3>
             {pool.additional && pool.additional.auditUrl && (
-              <Tooltip label="Audited smart contract. Click to view the audit report.">
-                <Link
+              <SimpleTooltip label="Audited smart contract. Click to view the audit report.">
+                <a
                   href={pool.additional.auditUrl}
                   target="_blank"
+                  rel="noreferrer"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Box
-                    width={'24px'}
-                    height={'24px'}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    backgroundColor={'rgba(0, 0, 0, 0.2)'}
-                    borderRadius={'50%'}
-                  >
-                    <Image src={shield.src} alt="badge" />
-                  </Box>
-                </Link>
-              </Tooltip>
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-black/20">
+                    <img src={shield.src} alt="badge" />
+                  </span>
+                </a>
+              </SimpleTooltip>
             )}
             {pool.pool.name.includes('USDC.e') && (
-              <Tooltip label="Vault currently under migration">
-                <WarningTwoIcon color="orange" />
-              </Tooltip>
+              <SimpleTooltip label="Vault currently under migration">
+                <span>
+                  <TriangleAlert className="h-4 w-4 text-orange-400" />
+                </span>
+              </SimpleTooltip>
             )}
-          </HStack>
+          </div>
           {props.showProtocolName && (
-            <HStack marginTop={'5px'} spacing={1}>
-              <Avatar size={'2xs'} src={pool.protocol.logo} />
-              <Heading size="xs" marginTop={'2px'} color={'light_grey'}>
+            <div className="mt-1 flex items-center gap-1">
+              <Avatar className="h-4 w-4">
+                <AvatarImage src={pool.protocol.logo} />
+                <AvatarFallback />
+              </Avatar>
+              <h4 className="mt-0.5 font-heading text-xs text-light_grey">
                 {pool.protocol.name}
-              </Heading>
-            </HStack>
+              </h4>
+            </div>
           )}
-        </Box>
-      </HStack>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function getAPRWithToolTip(pool: PoolInfo) {
   const tip = (
-    <Box width={'300px'}>
+    <div className="w-[300px]">
       {pool.aprSplits.map((split) => {
         return (
-          <Flex
-            margin="5px 0"
-            justifyContent={'space-between'}
-            key={split.title}
-          >
-            <Box>
-              <Text>{split.title}:</Text>
-              <Text fontSize={'12px'} opacity={0.7}>
-                {split.description}
-              </Text>
-            </Box>
-            <Text fontWeight={'bold'}>
+          <div className="my-1 flex justify-between" key={split.title}>
+            <div>
+              <p>{split.title}:</p>
+              <p className="text-xs opacity-70">{split.description}</p>
+            </div>
+            <p className="font-bold">
               {split.apr === 'Err' ? split.apr : (split.apr * 100).toFixed(2)}%
-            </Text>
-          </Flex>
+            </p>
+          </div>
         );
       })}
-    </Box>
+    </div>
   );
   return (
-    <Tooltip hasArrow label={tip} bg="gray.300" color="black">
-      <Box
-        width={''}
-        padding={'auto'}
-        display={'flex'}
-        justifyContent={'flex-start'}
-      >
+    <SimpleTooltip label={tip} className="bg-gray-300 text-black">
+      <div className="flex justify-start">
         {pool.isLoading && <Spinner />}
         {!pool.isLoading && (
-          <>
-            <Text
-              textAlign={'right'}
-              color="white"
-              fontSize={'16px'}
-              fontWeight={'bolder'}
-            >
-              {(pool.apr * 100).toFixed(2)}%
-            </Text>
-          </>
+          <p className="text-right text-base font-extrabold text-white">
+            {(pool.apr * 100).toFixed(2)}%
+          </p>
         )}
-      </Box>
-    </Tooltip>
+      </div>
+    </SimpleTooltip>
   );
 }
 
@@ -179,42 +151,32 @@ function StrategyAPY(props: YieldCardProps) {
   }, [pool]);
 
   return (
-    <Box width={'100%'} marginBottom={'5px'} alignItems={'center'}>
+    <div className="mb-1 w-full items-center">
       {isRetired ? (
-        <Text ml="auto" w="fit-content" mr="6">
-          -
-        </Text>
+        <p className="ml-auto mr-6 w-fit">-</p>
       ) : (
-        <Box justifyContent={'flex-start'}>
+        <div className="justify-start">
           {getAPRWithToolTip(pool)}
 
           {pool.aprSplits.length &&
             pool.aprSplits.some((a) => a.title == 'Rewards APY') && (
-              <Tooltip
+              <SimpleTooltip
                 label="Boosted rewards from STRKFarm"
-                bg="gray.300"
-                color="black"
+                className="bg-gray-300 text-black"
               >
-                <Box width={'100%'}>
-                  <Box float={'right'} display={'flex'} fontSize={'13px'}>
-                    <Text color="#FCC01E" textAlign={'right'}>
-                      ⚡
-                    </Text>
-                    <Text
-                      width="100%"
-                      color="cyan"
-                      textAlign={'right'}
-                      fontWeight={600}
-                    >
+                <div className="w-full">
+                  <div className="float-right flex text-[13px]">
+                    <p className="text-right text-[#FCC01E]">⚡</p>
+                    <p className="w-full text-right font-semibold text-cyan">
                       Boosted
-                    </Text>
-                  </Box>
-                </Box>
-              </Tooltip>
+                    </p>
+                  </div>
+                </div>
+              </SimpleTooltip>
             )}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }
 
@@ -260,206 +222,91 @@ function StrategyTVL(props: YieldCardProps) {
     isLive(pool.additional.tags[0]);
 
   return (
-    <Box
-      width={'100%'}
-      textAlign={'right'}
-      fontWeight={600}
-      display={'flex'}
-      flexDirection={'column'}
-      justifyContent={'center'}
-      alignItems={'flex-start'}
-    >
+    <div className="flex w-full flex-col items-start justify-center text-right font-semibold">
       {isPoolLive && (
-        <Text fontSize={'16px'}>
+        <p className="text-base">
           ${getDisplayCurrencyAmount(pool.tvl || 0, 0)}
-        </Text>
+        </p>
       )}
-      {!isPoolLive && <Text>-</Text>}
+      {!isPoolLive && <p>-</p>}
       {address && isPoolLive && pool.protocol.name == 'STRKFarm' && (
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          borderRadius={'20px'}
-          color="grey_text"
-          fontSize={'12px'}
-          width={'100%'}
-          mt="5px"
-        >
-          <Tooltip label="Your deposits in this STRKFarm strategy">
-            <Box width={'100%'} fontWeight={600}>
-              <Flex>
-                <Text width={'100%'} justifyContent={'flex-end'}>
+        <div className="mt-[5px] flex w-full items-center justify-center rounded-[20px] text-xs text-grey_text">
+          <SimpleTooltip label="Your deposits in this STRKFarm strategy">
+            <div className="w-full font-semibold">
+              <div className="flex">
+                <p className="w-full justify-end">
                   ${getDisplayCurrencyAmount(holdingsInfo.usdValue, 0)}
-                </Text>
-                <Box>
-                  <Icon as={FaWallet} marginLeft={'3px'} mt={'-3px'} />
-                </Box>
-              </Flex>
+                </p>
+                <div>
+                  <FaWallet className="-mt-0.5 ml-[3px]" />
+                </div>
+              </div>
               {holdingsInfo.amount != 0 && (
-                <Flex
-                  justifyContent={'flex-end'}
-                  marginTop={'-5px'}
-                  width={'100%'}
-                  opacity={0.5}
-                >
-                  {/* <Avatar size={'2xs'} src={holdingsInfo.tokenInfo.logo} mr={'2px'}/> */}
-                  <Text textAlign={'right'} fontSize={'11px'}>
+                <div className="-mt-[5px] flex w-full justify-end opacity-50">
+                  <p className="text-right text-[11px]">
                     {getDisplayCurrencyAmount(
                       holdingsInfo.amount,
                       holdingsInfo.tokenInfo.displayDecimals,
                     ).toLocaleString()}
-                  </Text>
-                  <Image
-                    width={'10px'}
+                  </p>
+                  <img
+                    className="ml-1 mr-px w-2.5 grayscale"
                     src={holdingsInfo.tokenInfo.logo}
-                    ml={'4px'}
-                    mr={'1px'}
-                    filter={'grayscale(1)'}
+                    alt=""
                   />
-                </Flex>
+                </div>
               )}
-            </Box>
-          </Tooltip>
-        </Box>
+            </div>
+          </SimpleTooltip>
+        </div>
       )}
-    </Box>
-  );
-}
-function GetRiskLevel(riskFactor: number) {
-  let color = '';
-  let bgColor = '';
-  let count = 0;
-  let tooltipLabel = '';
-
-  if (riskFactor <= 2) {
-    color = 'rgba(131, 241, 77, 1)';
-    bgColor = 'rgba(131, 241, 77, 0.3)';
-    count = 1;
-    tooltipLabel = 'Low risk';
-  } else if (riskFactor < 4) {
-    color = 'rgba(255, 146, 0, 1)';
-    bgColor = 'rgba(255, 146, 0, 0.3)';
-    count = 3;
-    tooltipLabel = 'Medium risk';
-  } else {
-    color = 'rgba(255, 32, 32, 1)';
-    bgColor = 'rgba(255, 32, 32, 0.3)';
-    count = 5;
-    tooltipLabel = 'High risk';
-  }
-
-  return (
-    <Box
-      width="100%"
-      display="flex"
-      justifyContent={'flex-end'}
-      alignContent={'flex-end'}
-    >
-      <Tooltip
-        hasArrow
-        label={`${tooltipLabel}. We currently assess only impermanent loss risk: stable pairs/pools are low risk, volatile multi-token pools are medium risk. More factors will be added soon.`}
-        bg="gray.300"
-        color="black"
-      >
-        <Box
-          position={'relative'}
-          display={'flex'}
-          flexDirection={'column'}
-          alignSelf={{ base: 'left', md: 'center' }}
-          justifyContent={'flex-start'}
-        >
-          <Box
-            width={'100%'}
-            display="flex"
-            alignItems="center"
-            justifyContent={{ base: 'flex-start', md: 'center' }}
-            padding={'4px 0px'}
-            height={'100%'}
-            position={'relative'}
-          >
-            <Stack direction="row" spacing={1}>
-              {[...Array(5)].map((_, index) => (
-                <Box
-                  key={index}
-                  width="4px"
-                  height="18px"
-                  borderRadius="md"
-                  bg={
-                    index < count ? color : 'var(--chakra-colors-opacity_50p)'
-                  }
-                />
-              ))}
-            </Stack>
-          </Box>
-          <Box
-            position={'absolute'}
-            backgroundColor={bgColor}
-            opacity={0.3}
-            filter={'blur(30.549999237060547px)'}
-            right={{ base: '-50', md: '-37px' }}
-            bottom={'-80px'}
-            width={'94px'}
-            height={'94px'}
-            zIndex={0}
-          />
-        </Box>
-      </Tooltip>
-    </Box>
+    </div>
   );
 }
 
 function StrategyMobileCard(props: YieldCardProps) {
   const { pool, index } = props;
+  const router = useRouter();
   return (
-    <Grid
-      color={'white'}
-      bg={getStratCardBg(
-        pool.additional?.tags[0] || StrategyLiveStatus.ACTIVE,
-        index,
-      )}
-      templateColumns={'repeat(3, 1fr)'}
-      templateRows={
-        props.showProtocolName ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)'
-      }
-      display={{ base: 'grid', md: 'none' }}
-      padding={'20px'}
-      gap={2}
-      borderBottom={'1px solid var(--chakra-colors-bg)'}
-      as={NextLink}
-      href={`/strategy/${pool.pool.id}`}
-      {...getLinkProps(pool, props.showProtocolName)}
-    >
-      <GridItem colSpan={3} rowSpan={props.showProtocolName ? 2 : 1}>
-        <StrategyInfo
-          pool={pool}
-          index={index}
-          showProtocolName={props.showProtocolName}
-        />
-      </GridItem>
-      <GridItem colSpan={1} rowSpan={2}>
-        <Text
-          textAlign={'left'}
-          color={'color2'}
-          fontWeight={'bold'}
-          fontSize={'13px'}
+    <tr className="md:hidden">
+      <td colSpan={8} className="p-0">
+        <div
+          role="link"
+          onClick={() => {
+            getLinkProps(pool, props.showProtocolName).onClick();
+            router.push(`/strategy/${pool.pool.id}`);
+          }}
+          className={cn(
+            'grid cursor-pointer grid-cols-3 gap-2 border-b border-bg p-5 text-white',
+            getStratCardBg(
+              pool.additional?.tags[0] || StrategyLiveStatus.ACTIVE,
+              index,
+            ),
+          )}
+          style={{
+            gridTemplateRows: props.showProtocolName
+              ? 'repeat(4, 1fr)'
+              : 'repeat(3, 1fr)',
+          }}
         >
-          APY
-        </Text>
-        <StrategyAPY pool={pool} index={index} />
-      </GridItem>
-      <GridItem colSpan={1} rowSpan={2}>
-        <Text
-          textAlign={'left'}
-          color={'color2'}
-          fontWeight={'bold'}
-          fontSize={'13px'}
-        >
-          TVL
-        </Text>
-        <StrategyTVL pool={pool} index={index} />
-      </GridItem>
-    </Grid>
+          <div className="col-span-3" style={{ gridRow: 'span 2' }}>
+            <StrategyInfo
+              pool={pool}
+              index={index}
+              showProtocolName={props.showProtocolName}
+            />
+          </div>
+          <div className="col-span-1" style={{ gridRow: 'span 2' }}>
+            <p className="text-left text-[13px] font-bold text-color2">APY</p>
+            <StrategyAPY pool={pool} index={index} />
+          </div>
+          <div className="col-span-1" style={{ gridRow: 'span 2' }}>
+            <p className="text-left text-[13px] font-bold text-color2">TVL</p>
+            <StrategyTVL pool={pool} index={index} />
+          </div>
+        </div>
+      </td>
+    </tr>
   );
 }
 
@@ -477,8 +324,10 @@ function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
     },
   };
 }
+
 function YieldCard(props: YieldCardProps) {
   const { pool, index } = props;
+  const router = useRouter();
 
   const isRetired = useMemo(() => {
     return isPoolRetired(pool);
@@ -486,74 +335,46 @@ function YieldCard(props: YieldCardProps) {
 
   return (
     <>
-      <Tr
-        color={'white'}
-        bg="#212121"
-        borderBottom={'10px solid #131313 !important'}
-        padding={'5px 10px'}
-        borderRadius="9px"
-        backgroundClip="padding-box"
-        display={{ base: 'none', md: 'table-row' }}
-        as={NextLink}
-        href={`/strategy/${pool.pool.id}`}
-        {...getLinkProps(pool, props.showProtocolName)}
+      <tr
+        onClick={() => {
+          getLinkProps(pool, props.showProtocolName).onClick();
+          router.push(`/strategy/${pool.pool.id}`);
+        }}
+        className="hidden cursor-pointer bg-[#212121] text-white [border-bottom:10px_solid_#131313] md:table-row"
       >
-        <Td borderLeft={'10px solid #131313 !important'}>
+        <td className="align-middle [border-left:10px_solid_#131313]">
           <StrategyInfo
             pool={pool}
             index={index}
             showProtocolName={props.showProtocolName}
           />
-        </Td>
-        <Td alignContent={'center'}>
+        </td>
+        <td className="align-middle">
           <LoadedNumericalValue {...pool.depositDetails} />
-        </Td>
-        <Td alignContent={'center'}>
+        </td>
+        <td className="align-middle">
           <LoadedNumericalValue {...pool.yields} />
-        </Td>
-        <Td alignContent={'center'}>
+        </td>
+        <td className="align-middle">
           <LoadedNumericalValue {...pool.volume} />
-        </Td>
-        <Td alignContent={'center'}>
+        </td>
+        <td className="align-middle">
           <LoadedNumericalValue {...pool.fees} />
-        </Td>
-        <Td alignContent={'center'} justifyContent={'flex-start'}>
+        </td>
+        <td className="align-middle">
           <StrategyAPY pool={pool} index={index} />
-        </Td>
-        {/* <Td>
+        </td>
+        <td className="align-middle">
           {isRetired ? (
-            <Text ml="auto" w="fit-content" mr="2">
-              -
-            </Text>
-          ) : pool.additional?.riskFactor ? (
-            GetRiskLevel(pool.additional?.riskFactor)
-          ) : (
-            '-'
-          )}
-        </Td> */}
-        <Td alignContent={'center'}>
-          {isRetired ? (
-            <Text ml="auto" w="fit-content" mr="2">
-              -
-            </Text>
+            <p className="ml-auto mr-2 w-fit">-</p>
           ) : (
             <StrategyTVL pool={pool} index={index} />
           )}
-        </Td>
-        <Td
-          alignContent={'center'}
-          width={'70px'}
-          borderRight={'10px solid #131313 !important'}
-        >
-          <Image
-            src={arrow.src}
-            alt="logo"
-            height="13px"
-            width="9px"
-            marginBottom={'2px'}
-          />
-        </Td>
-      </Tr>
+        </td>
+        <td className="w-[70px] align-middle [border-right:10px_solid_#131313]">
+          <img src={arrow.src} alt="logo" className="mb-0.5 h-[13px] w-[9px]" />
+        </td>
+      </tr>
       <StrategyMobileCard
         pool={pool}
         index={index}
@@ -571,8 +392,8 @@ function LoadedNumericalValue({
   isLoading?: boolean;
 }) {
   if (isLoading) return <Spinner />;
-  if (amount === 0 || amount === undefined) return <Text>-</Text>;
-  return <Text>${getDisplayCurrencyAmount(amount, 2)}</Text>;
+  if (amount === 0 || amount === undefined) return <p>-</p>;
+  return <p>${getDisplayCurrencyAmount(amount, 2)}</p>;
 }
 
 export function YieldStrategyCard(props: {

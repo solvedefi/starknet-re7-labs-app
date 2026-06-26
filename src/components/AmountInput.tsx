@@ -6,17 +6,6 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from 'react';
-import {
-  Box,
-  Text,
-  GridItem,
-  NumberInput,
-  NumberInputField,
-  Button,
-  Tooltip,
-  Grid,
-  Link,
-} from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { useAtom, useAtomValue, Atom, useSetAtom } from 'jotai';
 import { TokenInfo as TokenInfoV2, Web3Number } from '@strkfarm/sdk';
@@ -36,6 +25,7 @@ import LoadingWrap from './LoadingWrap';
 import debounce from 'lodash.debounce';
 import TokenBadge from './TokenBadge';
 import { formatTokenBalance } from '@/utils';
+import { SimpleTooltip } from './ui/simple-tooltip';
 
 interface AmountInputProps {
   index: number;
@@ -340,24 +330,18 @@ const AmountInput = forwardRef(
       const isLoading = balData.isLoading || balData.isPending;
 
       return (
-        <Box color={'light_grey'} textAlign={'right'}>
-          <Text fontSize={'12px'}>Available balance </Text>
+        <div className="text-right text-light_grey">
+          <p className="text-[12px]">Available balance </p>
           <LoadingWrap
             isLoading={isLoading}
             isError={balData.isError}
             skeletonProps={{
               height: '10px',
               width: '50px',
-              float: 'right',
-              marginTop: '8px',
-              marginLeft: '5px',
-            }}
-            iconProps={{
-              marginLeft: '5px',
-              boxSize: '15px',
+              className: 'float-right ml-[5px] mt-[8px]',
             }}
           >
-            <Tooltip label={balance.toEtherStr()}>
+            <SimpleTooltip label={balance.toEtherStr()}>
               <b
                 style={{
                   marginLeft: '5px',
@@ -367,32 +351,18 @@ const AmountInput = forwardRef(
               >
                 {formatTokenBalance(balance, 4)}
               </b>
-            </Tooltip>
-            <Button
-              size={'sm'}
-              marginLeft={'15px'}
-              color="#FFF"
-              bg="#323232"
-              padding="3px 12px"
-              maxHeight={'21px'}
-              fontSize={'12px'}
-              fontWeight={'400'}
-              _hover={{
-                bg: '#323232',
-                color: '#FFF',
-              }}
-              _active={{
-                bg: '#323232',
-                color: '#FFF',
-              }}
+            </SimpleTooltip>
+            <button
+              type="button"
+              className="ml-[15px] max-h-[21px] rounded bg-[#323232] px-3 py-[3px] text-[12px] font-normal text-white hover:bg-[#323232] disabled:opacity-50"
               onClick={handleMaxClick}
-              isDisabled={isLoading || balData.isError || balance.isZero()}
+              disabled={isLoading || balData.isError || balance.isZero()}
               aria-label="Set maximum amount"
             >
               Max
-            </Button>
+            </button>
           </LoadingWrap>
-        </Box>
+        </div>
       );
     }
 
@@ -530,33 +500,40 @@ const AmountInput = forwardRef(
     ); // ms delay
 
     return (
-      <Box width={'100%'}>
+      <div className="w-full">
         {/* Token selection and balance display */}
-        <Grid templateColumns="repeat(5, 1fr)" gap={'16px'}>
-          <GridItem colSpan={2}>
+        <div className="grid grid-cols-5 gap-[16px]">
+          <div className="col-span-2">
             <TokenBadge
               symbol={props.tokenInfo.symbol}
               iconSrc={props.tokenInfo.logo}
             />
-          </GridItem>
-          <GridItem colSpan={3}>
+          </div>
+          <div className="col-span-3">
             <BalanceComponent
               token={selectedMarket}
               strategy={props.strategy}
               buttonText={props.buttonText}
             />
-          </GridItem>
-        </Grid>
+          </div>
+        </div>
 
         {/* Amount input with validation */}
-        <NumberInput
+        <input
+          type="number"
           min={0}
           max={parseFloat(maxAmount.toEtherStr())}
-          color={'#FFF'}
-          bg={'#1A1919'}
-          borderRadius={'10px'}
-          height={'60px'}
-          onChange={(valueStr) => {
+          placeholder="Amount"
+          className="mt-5 h-[60px] w-full rounded-[10px] border-0 bg-[#1A1919] px-4 text-white placeholder:text-gray-500 focus:outline-none disabled:opacity-50"
+          value={inputInfo.rawAmount}
+          disabled={maxAmount.isZero()}
+          onKeyDown={(e) => {
+            if (['ArrowUp', 'ArrowDown', 'End', 'Home'].includes(e.key)) {
+              e.preventDefault();
+            }
+          }}
+          onChange={(e) => {
+            let valueStr = e.target.value;
             valueStr = valueStr.replace(/[-+e]/gi, '');
             const decimalIndex = valueStr.indexOf('.');
             if (decimalIndex !== -1) {
@@ -582,30 +559,13 @@ const AmountInput = forwardRef(
             });
             handleDebouncedChange(newAmount, valueStr, inputsInfo, depositInfo);
           }}
-          marginTop={'20px'}
-          keepWithinRange={true}
-          clampValueOnBlur={true}
-          value={inputInfo.rawAmount}
-          isDisabled={maxAmount.isZero()}
-        >
-          <NumberInputField
-            border={'0px'}
-            height={'60px'}
-            borderRadius={'10px'}
-            placeholder="Amount"
-            onKeyDown={(e) => {
-              if (['ArrowUp', 'ArrowDown', 'End', 'Home'].includes(e.key)) {
-                e.preventDefault();
-              }
-            }}
-          />
-        </NumberInput>
+        />
 
         {/* Validation error messages */}
         {simulatedMaxAmount.amount == 0 && (
-          <Tooltip
+          <SimpleTooltip
             label={
-              <Text>
+              <span>
                 The liquidity at the current market price, is only in{' '}
                 {
                   inputsInfo.find((_, index) => index != props.index)?.tokenInfo
@@ -613,42 +573,30 @@ const AmountInput = forwardRef(
                 }
                 . It may be in {props.tokenInfo.symbol}, when the market price
                 re-aligns.
-              </Text>
+              </span>
             }
           >
-            <Text
-              marginTop="2px"
-              marginLeft={'7px'}
-              color="light_grey"
-              fontSize={'12px'}
-            >
+            <p className="ml-[7px] mt-[2px] text-[12px] text-light_grey">
               The liquidity at the current market price, is only in{' '}
               {
                 inputsInfo.find((_, index) => index != props.index)?.tokenInfo
                   ?.symbol
               }
               .{' '}
-              <Link
+              <a
                 href="https://docs.troves.fi/p/ekubo-cl-vaults"
-                textDecoration={'underline'}
+                className="underline"
               >
                 Learn more
-              </Link>
+              </a>
               .
-            </Text>
-          </Tooltip>
+            </p>
+          </SimpleTooltip>
         )}
         {error && (
-          <Text
-            marginTop="2px"
-            marginLeft={'7px'}
-            color="red"
-            fontSize={'13px'}
-          >
-            {error}
-          </Text>
+          <p className="ml-[7px] mt-[2px] text-[13px] text-red">{error}</p>
         )}
-      </Box>
+      </div>
     );
   },
 );

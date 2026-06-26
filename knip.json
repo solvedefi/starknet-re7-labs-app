@@ -5,5 +5,6 @@
     "generateChangelog.js"
   ],
   "project": ["src/**/*.{ts,tsx}", "*.{js,mjs}"],
-  "ignoreDependencies": ["sharp"]
+  "ignore": ["src/components/ui/**"],
+  "ignoreDependencies": ["sharp", "class-variance-authority", "@radix-ui/*"]
 }

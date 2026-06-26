@@ -1,4 +1,3 @@
-import { MenuItemProps, MenuListProps } from '@chakra-ui/react';
 import { Call, num } from 'starknet';
 import { TOKENS } from './constants';
 import toast from 'react-hot-toast';
@@ -72,24 +71,6 @@ export function standariseAddress(address: string | bigint) {
   const a = num.getHexString(num.getDecimalString(_a.toString()));
   return a;
 }
-
-export const MyMenuListProps: MenuListProps = {
-  bg: '#2A2929',
-  color: 'white',
-  borderColor: 'bg',
-  textAlign: 'center',
-  minWidth: '120px',
-  margin: '0px',
-  paddingY: '0px',
-};
-
-export const MyMenuItemProps: MenuItemProps = {
-  bg: '#2A2929',
-  textAlign: 'center',
-  paddingX: '20px',
-  paddingY: '0px',
-  backgroundClip: 'padding-box',
-};
 
 export function getTokenInfoFromAddr(tokenAddr: string) {
   const info = TOKENS.find(
@@ -230,8 +211,12 @@ async function getPriceFromMyAPI(tokenInfo: MyMultiTokenInfo) {
 
   const endpoint = getEndpoint();
   const url = `${endpoint}/api/price/${convertToV2TokenInfo(tokenInfo).symbol}`;
-  console.log('getPrice url', url);
   const priceInfoRes = await fetch(url);
+  if (!priceInfoRes.ok) {
+    // Non-OK responses are HTML error pages; don't let .json() throw a noisy
+    // SyntaxError — surface a clean error so the caller falls back cleanly.
+    throw new Error(`price api ${priceInfoRes.status} for ${tokenInfo.name}`);
+  }
   const priceInfo = await priceInfoRes.json();
   const now = new Date();
   const priceTime = new Date(priceInfo.timestamp);

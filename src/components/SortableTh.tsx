@@ -1,4 +1,3 @@
-import { Th, Flex } from '@chakra-ui/react';
 import { SortColumn, SortDirection, SortIndicator } from './SortIndicator';
 import { ReactNode, useState } from 'react';
 
@@ -20,17 +19,14 @@ export const SortableTh = ({
 }: SortableThProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => setIsHovered(false);
-
   return (
-    <Th
-      cursor="pointer"
+    <th
+      className="cursor-pointer whitespace-nowrap px-6 py-3 text-left align-middle"
       onClick={() => handleSort(columnId)}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <Flex alignItems="center" justifyContent="flex-start">
+      <div className="flex items-center justify-start">
         {children}
         <SortIndicator
           column={columnId}
@@ -38,7 +34,7 @@ export const SortableTh = ({
           sortDirection={sortDirection}
           isHovered={isHovered}
         />
-      </Flex>
-    </Th>
+      </div>
+    </th>
   );
 };

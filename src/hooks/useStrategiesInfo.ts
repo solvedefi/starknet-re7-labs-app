@@ -150,32 +150,54 @@ export const useStrategiesInfo = () => {
 
   const { data: volume, isLoading: volumeLoading } = useVolume(fees);
   const dispatch = useDispatch();
-  return strkFarmPools.map((pool) => {
-    const contract = pool.contract[0].address;
-    const strat = {
-      ...pool,
-      depositDetails: {
-        amount: deposits?.[contract] || 0,
-        isLoading: depositsLoading || depositsPending,
-      },
-      fees: {
-        amount: fees?.[contract] || 0,
-        isLoading: feesLoading || feesPending,
-      },
-      yields: {
-        amount: yields[contract] || 0,
-        isLoading: yieldsLoading || depositsLoading || depositsPending,
-      },
-      volume: {
-        amount: volume?.[contract] || 0,
-        isLoading: volumeLoading[contract] ?? false,
-      },
-      calculatedApr:
-        pool.tvlUsd > 0 ? ((fees?.[contract] || 0) * 52) / pool.tvlUsd : 0,
-    };
 
-    dispatch(saveStrategy({ ...strat, id: strat.id }));
+  const strats = useMemo(() => {
+    return strkFarmPools.map((pool) => {
+      const contract = pool.contract[0].address;
+      return {
+        ...pool,
+        depositDetails: {
+          amount: deposits?.[contract] || 0,
+          isLoading: depositsLoading || depositsPending,
+        },
+        fees: {
+          amount: fees?.[contract] || 0,
+          isLoading: feesLoading || feesPending,
+        },
+        yields: {
+          amount: yields[contract] || 0,
+          isLoading: yieldsLoading || depositsLoading || depositsPending,
+        },
+        volume: {
+          amount: volume?.[contract] || 0,
+          isLoading: volumeLoading[contract] ?? false,
+        },
+        calculatedApr:
+          pool.tvlUsd > 0 ? ((fees?.[contract] || 0) * 52) / pool.tvlUsd : 0,
+      };
+    });
+  }, [
+    strkFarmPools,
+    deposits,
+    depositsLoading,
+    depositsPending,
+    fees,
+    feesLoading,
+    feesPending,
+    yields,
+    yieldsLoading,
+    volume,
+    volumeLoading,
+  ]);
 
-    return strat;
-  });
+  // Persist to the redux store in an effect (NOT during render — dispatching
+  // while rendering was triggering "Cannot update a component while rendering a
+  // different component" and a re-render/refetch cascade).
+  useEffect(() => {
+    strats.forEach((strat) => {
+      dispatch(saveStrategy({ ...strat, id: strat.id }));
+    });
+  }, [strats, dispatch]);
+
+  return strats;
 };

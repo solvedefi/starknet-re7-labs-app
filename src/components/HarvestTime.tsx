@@ -1,14 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import {
-  Box,
-  Container,
-  Flex,
-  Spinner,
-  Tag,
-  Text,
-  Tooltip,
-  VStack,
-} from '@chakra-ui/react';
+import { Loader2 } from 'lucide-react';
 import { useAccount } from '@starknet-react/core';
 import { StrategyInfo } from '@/store/strategies.atoms';
 import { useSelector } from 'react-redux';
@@ -18,6 +9,7 @@ import { formatTimediff, getDisplayCurrencyAmount, timeAgo } from '@/utils';
 import styles from '../app/border.module.css';
 import { selectStrategy } from '@/redux/features/strategySlice';
 import { RootState } from '@/redux/store';
+import { SimpleTooltip } from './ui/simple-tooltip';
 
 interface HarvestTimeProps {
   strategy: StrategyInfo<any>;
@@ -96,127 +88,94 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
   const defaultAPYTooltip =
     'Current APY including any fees. Net returns subject to change based on market conditions.';
   return (
-    <Box>
-      <Flex justifyContent="space-between">
-        <Flex>
-          <Tooltip
-            width={'180px'}
+    <div>
+      <div className="flex justify-between">
+        <div className="flex">
+          <SimpleTooltip
+            className="w-[180px]"
             label={
-              <Box fontSize={'13px'}>
-                <Text>{defaultAPYTooltip}</Text>
+              <div className="text-[13px]">
+                <p>{defaultAPYTooltip}</p>
                 {strategyInfo && (
-                  <Box
-                    marginTop={'10px'}
-                    justifyContent={'space-between'}
-                    display={'flex'}
-                  >
-                    <Box>
-                      <Text>Strategy APY:</Text>
-                      <Text fontSize={'12px'} opacity={0.7}>
-                        Including fees
-                      </Text>
-                    </Box>
-                    <Text fontWeight={'bold'}>
+                  <div className="mt-2.5 flex justify-between">
+                    <div>
+                      <p>Strategy APY:</p>
+                      <p className="text-xs opacity-70">Including fees</p>
+                    </div>
+                    <p className="font-bold">
                       {((strategyInfo?.calculatedApr || 0) * 100).toFixed(2)}%
-                    </Text>
-                  </Box>
+                    </p>
+                  </div>
                 )}
                 {strategyInfo && strategyInfo.apySplit.rewardsApy > 0 && (
-                  <Box
-                    marginTop={'10px'}
-                    justifyContent={'space-between'}
-                    display={'flex'}
-                  >
-                    <Box>
-                      <Text>Rewards APY:</Text>
-                      <Text fontSize={'12px'} opacity={0.7}>
+                  <div className="mt-2.5 flex justify-between">
+                    <div>
+                      <p>Rewards APY:</p>
+                      <p className="text-xs opacity-70">
                         Incentives by TrovesFi
-                      </Text>
-                    </Box>
-                    <Text fontWeight={'bold'}>
+                      </p>
+                    </div>
+                    <p className="font-bold">
                       {(strategyInfo.apySplit.rewardsApy * 100).toFixed(2)}%
-                    </Text>
-                  </Box>
+                    </p>
+                  </div>
                 )}
-              </Box>
+              </div>
             }
           >
-            <Container
-              className={styles.border}
-              marginRight={'5px'}
-              padding={'16px 21px'}
-              width={'160px'}
-              alignItems={'center'}
-              display={'flex'}
-              justifyContent={'space-between'}
+            <div
+              className={`${styles.border} mr-[5px] flex w-[160px] items-center justify-between px-[21px] py-4`}
             >
-              <VStack width={'100%'} gap={'0px'}>
-                <Text className="theme-strategy-subtitle">APY</Text>
-                <Text
-                  fontSize={'27px'}
-                  className="theme-gradient-starknet-text"
-                >
+              <div className="flex w-full flex-col items-center gap-0 text-center">
+                <p className="theme-strategy-subtitle">APY</p>
+                <p className="theme-gradient-starknet-text text-[27px]">
                   {((strategyInfo?.calculatedApr || 0) * 100).toFixed(2)}%
-                </Text>
-              </VStack>
-            </Container>
-          </Tooltip>
+                </p>
+              </div>
+            </div>
+          </SimpleTooltip>
           {strategyInfo && strategyInfo.apySplit.rewardsApy > 0 && (
-            <Flex flexDirection={'column'} justifyContent={'flex-end'}>
-              <Tooltip label="Boosted rewards from STRKFarm">
-                <Tag
-                  bg="bg"
-                  color={'white'}
-                  fontSize={'12px'}
-                  padding={'2px 5px'}
-                >
+            <div className="flex flex-col justify-end">
+              <SimpleTooltip label="Boosted rewards from STRKFarm">
+                <span className="flex items-center rounded bg-bg px-[5px] py-0.5 text-xs text-white">
                   🔥 Boosted
                   {leverage == 0 && (
-                    <Spinner size="xs" color="white" ml={'5px'} />
+                    <Loader2 className="ml-[5px] h-3 w-3 animate-spin" />
                   )}
-                </Tag>
-              </Tooltip>
-            </Flex>
+                </span>
+              </SimpleTooltip>
+            </div>
           )}
-        </Flex>
+        </div>
 
         {!strategy.settings.hideHarvestInfo && (
-          <Tooltip
+          <SimpleTooltip
             label={`This is when your investment increases as STRK rewards are automatically claimed and reinvested into the strategy's tokens.`}
           >
-            <Box
-              className={styles.border_gray}
-              display={'flex'}
-              justifyContent={'space-between'}
-              alignItems={'center'}
-              width={'360px'}
+            <div
+              className={`${styles.border_gray} flex w-[360px] items-center justify-between`}
             >
-              <VStack width={'100%'} gap={'0px'}>
-                <Text className="theme-strategy-subtitle">
+              <div className="flex w-full flex-col items-center gap-0 text-center">
+                <p className="theme-strategy-subtitle">
                   Next Harvest{' '}
-                  {harvestTimestamp.isZero && <Text>Anytime now</Text>}
-                </Text>
-                <Text fontSize={'27px'}>
+                  {harvestTimestamp.isZero && <span>Anytime now</span>}
+                </p>
+                <p className="text-[27px]">
                   {harvestTimestamp.days ?? 0}d {harvestTimestamp.hours ?? 0}h{' '}
                   {harvestTimestamp.minutes ?? 0}m
-                </Text>
-              </VStack>
-            </Box>
-          </Tooltip>
+                </p>
+              </div>
+            </div>
+          </SimpleTooltip>
         )}
-      </Flex>
+      </div>
 
       {!strategy.settings.hideHarvestInfo && (
-        <Box
-          className={styles.border_gray}
-          marginTop={'20px'}
-          display="flex"
-          width={'100%'}
-          alignItems={'center'}
-          justifyContent={'space-between'}
+        <div
+          className={`${styles.border_gray} mt-5 flex w-full items-center justify-between`}
         >
-          <Text className="theme-strategy-subtitle">Harvested</Text>
-          <Text>
+          <p className="theme-strategy-subtitle">Harvested</p>
+          <p>
             <b>
               {getDisplayCurrencyAmount(
                 harvestTime?.data?.totalStrkHarvestedByContract.STRKAmount || 0,
@@ -230,10 +189,10 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                 Last harvested <b>{timeAgo(lastHarvest)}</b> (Across all users).
               </span>
             )}
-          </Text>
-        </Box>
+          </p>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
 

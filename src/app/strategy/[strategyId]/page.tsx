@@ -1,5 +1,3 @@
-import { Container } from '@chakra-ui/react';
-
 import { getStrategies } from '@/store/strategies.atoms';
 import Strategy from './_components/Strategy';
 
@@ -33,8 +31,8 @@ export async function generateMetadata({ params }: StrategyPageProps) {
 export default async function StrategyPage({ params }: StrategyPageProps) {
   const { strategyId } = await params;
   return (
-    <Container maxWidth={'1000px'} margin={'0 auto'} padding="30px 10px">
+    <div className="mx-auto max-w-[1000px] px-2.5 py-[30px]">
       <Strategy params={{ strategyId }} />
-    </Container>
+    </div>
   );
 }

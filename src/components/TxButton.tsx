@@ -5,23 +5,13 @@ import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
 import { IStrategyProps, TokenInfo } from '@/strategies/IStrategy';
 import { getReferralUrl } from '@/utils';
 import apolloClient from '@/utils/apolloClient';
-import {
-  Box,
-  Button,
-  ButtonProps,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalOverlay,
-  Spinner,
-  Text,
-  useDisclosure,
-} from '@chakra-ui/react';
+import { cn } from '@/lib/utils';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Loader2 } from 'lucide-react';
 import { useAccount, useSendTransaction } from '@starknet-react/core';
 import { useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useSelector } from 'react-redux';
 import { TwitterShareButton } from 'react-share';
@@ -32,7 +22,7 @@ interface TxButtonProps {
   buttonText?: 'Deposit' | 'Redeem';
   text: string;
   calls: Call[];
-  buttonProps: ButtonProps;
+  buttonProps?: Record<string, any>;
   justDisableIfNoWalletConnect?: boolean;
   selectedMarket?: TokenInfo;
   strategy?: IStrategyProps<any>;
@@ -42,20 +32,14 @@ interface TxButtonProps {
 export default function TxButton(props: TxButtonProps) {
   const { address } = useAccount();
   const monitorNewTx = useSetAtom(monitorNewTxAtom);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
+  const onOpen = () => setIsOpen(true);
   const referralCode = useAtomValue(referralCodeAtom);
 
   const apr = useSelector(
     (state: RootState) =>
       selectStrategy(state, props.txInfo.strategyId)?.calculatedApr,
   );
-
-  const disabledStyle = {
-    bg: '#2F2F2F',
-    color: '#9A9393',
-    borderColor: '#2F2F2F',
-    borderWidth: '1px',
-  };
 
   const {
     sendAsync: writeAsync,
@@ -133,23 +117,15 @@ export default function TxButton(props: TxButtonProps) {
 
   if (disabledText) {
     return (
-      <Button
-        _disabled={{
-          ...disabledStyle,
-        }}
-        _hover={{
-          ...disabledStyle,
-        }}
-        _active={{
-          ...disabledStyle,
-        }}
-        isDisabled={true}
-        width={'100%'}
-        height={'60px'}
-        {...props.buttonProps}
+      <button
+        disabled
+        className={cn(
+          'h-[60px] w-full rounded-md border border-[#2F2F2F] bg-[#2F2F2F] text-[#9A9393]',
+          props.buttonProps?.className,
+        )}
       >
         {disabledText}
-      </Button>
+      </button>
     );
   }
 
@@ -157,40 +133,19 @@ export default function TxButton(props: TxButtonProps) {
 
   return (
     <>
-      <Modal onClose={onClose} isOpen={isOpen} isCentered>
-        <ModalOverlay />
-        <ModalContent maxW="32rem" bg="#212121" borderRadius="15px">
-          <ModalCloseButton color="white" />
-          <ModalBody
-            pt="4rem"
-            pb="3rem"
-            color="white"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            flexDirection="column"
-            gap="1rem"
-          >
-            <Text textAlign="center" fontSize="1.5rem" fontWeight="bold">
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-[32rem] rounded-[15px] bg-[#212121] text-white">
+          <div className="flex flex-col items-center justify-center gap-4 px-6 pb-12 pt-16">
+            <p className="text-center text-2xl font-bold">
               Thank you for your deposit!
-            </Text>
+            </p>
 
-            <Text textAlign="center" fontWeight="500">
+            <p className="text-center font-medium">
               While your deposit is being processed, if you like Re7 Labs, do
               you mind sharing on X/Twitter?
-            </Text>
+            </p>
 
-            <Box
-              bg="white"
-              borderRadius=".5rem"
-              px="1rem"
-              py=".5rem"
-              color="black"
-              _hover={{
-                opacity: 0.9,
-              }}
-              fontWeight="bold"
-            >
+            <div className="rounded-lg bg-white px-4 py-2 font-bold text-black hover:opacity-90">
               <TwitterShareButton
                 url={`${getReferralUrl(referralCode)}`}
                 title={`🚀I just invested my ${props.selectedMarket?.name ?? ''} in the high-yield  "${props.strategy?.name ?? ''}" strategy at @trovesfi, earning an impressive ${twitterSharedYield}yield! 💸. \n\nWant in? Join me and start earning: `}
@@ -218,24 +173,18 @@ export default function TxButton(props: TxButtonProps) {
                   />
                 </svg>{' '}
               </TwitterShareButton>
-            </Box>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-      <Box width={'100%'} textAlign={'center'}>
-        <Button
-          color={'white'}
-          bg="linear-gradient(to right, #2E45D0, #B1525C)"
-          variant={'ghost'}
-          height={'60px'}
-          width={'100%'}
-          _active={{
-            bg: 'linear-gradient(to right, #2E45D0, #B1525C)',
-          }}
-          _hover={{
-            bg: 'linear-gradient(to right, #2E45D0, #B1525C)',
-          }}
+      <div className="w-full text-center">
+        <button
+          className={cn(
+            'h-[60px] w-full text-white',
+            props.buttonProps?.className,
+          )}
+          style={{ background: 'linear-gradient(to right, #2E45D0, #B1525C)' }}
           onClick={async () => {
             mixpanel.track('Click strategy button', {
               strategyId: props.txInfo.strategyId,
@@ -245,12 +194,13 @@ export default function TxButton(props: TxButtonProps) {
 
             handleButton();
           }}
-          {...props.buttonProps}
         >
-          {isPending && <Spinner size={'sm'} marginRight={'5px'} />}{' '}
+          {isPending && (
+            <Loader2 className="mr-[5px] inline h-4 w-4 animate-spin" />
+          )}{' '}
           {props.text}
-        </Button>
-      </Box>
+        </button>
+      </div>
     </>
   );
 }

@@ -3,16 +3,12 @@
 import { LATEST_TNC_DOC_VERSION, RE7_TnC_DOC_URL } from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import {
-  Button,
-  Center,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalOverlay,
-  Spinner,
-  Text,
-  useDisclosure,
-} from '@chakra-ui/react';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { ExternalLink, Loader2 } from 'lucide-react';
 import { useAccount, useDisconnect } from '@starknet-react/core';
 import axios from 'axios';
 import { atomWithQuery } from 'jotai-tanstack-query';
@@ -20,7 +16,6 @@ import React, { useEffect, useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { referralCodeAtom } from '@/store/referral.store';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { ExternalLinkIcon } from '@chakra-ui/icons';
 import mixpanel from 'mixpanel-browser';
 import toast from 'react-hot-toast';
 import { lastWalletAtom } from '@/store/utils.atoms';
@@ -62,7 +57,9 @@ const TncModal: React.FC<TncModalProps> = () => {
   const pathname = usePathname();
   const userTncInfoRes = useAtomValue(UserTnCAtom);
   const setReferralCode = useSetAtom(referralCodeAtom);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
+  const onOpen = () => setIsOpen(true);
+  const onClose = () => setIsOpen(false);
   const [isSigningPending, setIsSigningPending] = useState(false);
   const { disconnectAsync } = useDisconnect();
   const setLastWallet = useSetAtom(lastWalletAtom);
@@ -156,103 +153,68 @@ const TncModal: React.FC<TncModalProps> = () => {
   };
 
   return (
-    <Modal
-      onClose={onClose}
-      isOpen={isOpen}
-      isCentered
-      closeOnOverlayClick={false}
+    <Dialog
+      open={isOpen}
+      onOpenChange={(o) => {
+        if (!o) onClose();
+      }}
     >
-      <ModalOverlay />
-      <ModalContent borderRadius=".5rem" maxW="32rem">
-        <ModalBody
-          backgroundColor="#1A1C26"
-          padding="3rem"
-          border="1px solid #7F49E5"
-          borderRadius=".5rem"
-          color="white"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          flexDirection="column"
-          gap="1rem"
-        >
-          <Text textAlign="center" fontSize="1.5rem" fontWeight="bold">
-            Terms and Conditions
-          </Text>
+      <DialogContent
+        className="max-w-[32rem] rounded-lg border border-[#7F49E5] bg-[#1A1C26] p-12 text-white [&>button]:hidden"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
+        <div className="flex flex-col items-center justify-center gap-4">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold">
+              Terms and Conditions
+            </DialogTitle>
+          </DialogHeader>
 
-          <Text textAlign="justify" color="white" width={'100%'}>
+          <p className="w-full text-justify text-white">
             Please read the following terms and conditions carefully before you
             continue.
-          </Text>
+          </p>
 
-          <Text
-            textAlign="left"
-            as={'a'}
-            width={'100%'}
-            fontWeight={'bold'}
+          <a
+            className="w-full text-left font-bold text-white hover:underline"
             href={RE7_TnC_DOC_URL}
-            color="white"
             target="_blank"
-            _hover={{ textDecor: 'underline' }}
-            autoFocus={false}
-            _focus={{
-              boxShadow: 'none',
-              outline: 'none',
-            }}
-            _focusVisible={{
-              boxShadow: 'none',
-              outline: 'none',
-            }}
+            rel="noreferrer"
           >
-            T&C Document <ExternalLinkIcon />
-          </Text>
+            T&C Document <ExternalLink className="inline h-4 w-4" />
+          </a>
 
-          <Text textAlign="left" width={'100%'}>
+          <p className="w-full text-left">
             By clicking agree, you agree to our terms and conditions as stated
             in the above document.
-          </Text>
+          </p>
 
-          <Center>
-            <Button
-              bg="purple"
-              borderRadius=".5rem"
-              px="1rem"
-              py=".5rem"
-              color="white"
-              cursor="pointer"
-              _hover={{
-                opacity: 0.9,
-                backgroundColor: '#7F49E5',
-              }}
+          <div className="flex items-center justify-center">
+            <button
+              className="rounded-lg bg-purple px-4 py-2 text-white hover:bg-[#7F49E5] hover:opacity-90 disabled:opacity-50"
               onClick={handleSign}
-              isDisabled={isSigningPending}
+              disabled={isSigningPending}
             >
               Agree{' '}
               {isSigningPending && (
-                <Spinner size={'xs'} color="white" ml={'5px'} />
+                <Loader2 className="ml-[5px] inline h-3 w-3 animate-spin" />
               )}
-            </Button>
-            <Button
-              bg="bg"
-              borderRadius=".5rem"
-              px="1rem"
-              py=".5rem"
-              color="color2"
-              cursor="pointer"
+            </button>
+            <button
+              className="ml-2.5 rounded-lg bg-bg px-4 py-2 text-color2"
               onClick={() => {
                 mixpanel.track('TnC declined', { address });
                 disconnectAsync();
                 setLastWallet(null);
                 onClose();
               }}
-              ml={'10px'}
             >
               Disconnect
-            </Button>
-          </Center>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+            </button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

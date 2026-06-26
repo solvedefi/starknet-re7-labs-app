@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Providers } from './providers';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import React from 'react';
-import { ibmPlexMonoHeader, ibmPlexMonoLight, ibmPlexMonoMain } from '@/fonts';
+import { ibmPlexMono } from '@/fonts';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -36,9 +36,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <meta name="theme-color" content="#111119" />
       </head>
-      <body
-        className={`${ibmPlexMonoMain.variable} ${ibmPlexMonoHeader.variable} ${ibmPlexMonoLight.variable}`}
-      >
+      <body className={`${ibmPlexMono.variable} font-mono`}>
         <Providers>{children}</Providers>
         <GoogleAnalytics gaId="G-K05JV94KM9" />
       </body>

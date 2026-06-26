@@ -265,7 +265,7 @@ export default function Navbar(props: NavbarProps) {
   }, [connector]);
 
   const buttonClasses = cn(
-    'flex items-center rounded-[146px] border border-[#2F2F2F] px-2 py-2.5 text-[0.8rem] text-white hover:border-white sm:px-5 sm:py-5 sm:text-[15px]',
+    'flex items-center gap-2 self-center rounded-[146px] border border-[#2F2F2F] px-4 py-2.5 text-[0.8rem] font-semibold leading-none text-white hover:border-white sm:px-5 sm:text-[15px]',
   );
   const buttonStyle = {
     background: isWalletConnected
@@ -289,12 +289,12 @@ export default function Navbar(props: NavbarProps) {
               style={buttonStyle}
               onClick={() => connectWallet()}
             >
-              <span className="flex items-center gap-2.5 p-2 sm:gap-5">
-                <h3 className="mt-[3px]">CONNECT</h3>
+              <span className="flex items-center gap-2">
+                <span>CONNECT</span>
                 <img
                   src={connectImg.src}
                   alt="pfp"
-                  className="-mr-[5px] h-3 w-3 rounded-full sm:-mr-2.5 sm:h-[18px] sm:w-[18px]"
+                  className="h-3 w-3 rounded-full sm:h-[18px] sm:w-[18px]"
                 />
               </span>
             </button>
@@ -315,11 +315,11 @@ export default function Navbar(props: NavbarProps) {
                         connectorDisplayDetails.rounded && 'rounded-full',
                       )}
                     />
-                    <h3 className="mt-[3px]">
+                    <span>
                       {starkProfile && starkProfile.name
                         ? truncate(starkProfile.name, 6, isMobile ? 0 : 6)
                         : shortAddress(address, 4, isMobile ? 0 : 4)}
-                    </h3>
+                    </span>
                     <ChevronDown className="h-4 w-4" />
                   </span>
                 </button>

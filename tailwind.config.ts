@@ -70,9 +70,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        mono: ['var(--font-ibm-plex-mono-main)', 'monospace'],
-        heading: ['var(--font-ibm-plex-mono-header)', 'monospace'],
-        light: ['var(--font-ibm-plex-mono-light)', 'monospace'],
+        mono: ['var(--font-ibm-plex-mono)', 'monospace'],
+        heading: ['var(--font-ibm-plex-mono)', 'monospace'],
+        light: ['var(--font-ibm-plex-mono)', 'monospace'],
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -115,7 +115,7 @@ const Strategy = ({ params }: StrategyParams) => {
   }, [txHistory, balData]);
 
   useEffect(() => {
-    if (profit == 0) {
+    if (profit === 0) {
       computeProfit();
     }
   }, [txHistory, balData]);
@@ -165,7 +165,7 @@ const Strategy = ({ params }: StrategyParams) => {
                           );
                         })}
                       {strategy &&
-                        strategy.metadata.depositTokens.length == 0 && (
+                        strategy.metadata.depositTokens.length === 0 && (
                           <Avatar className="mr-[5px] h-12 w-12">
                             <AvatarImage
                               src={strategy?.holdingTokens[0].logo}
@@ -286,7 +286,7 @@ const Strategy = ({ params }: StrategyParams) => {
 
                   {address &&
                     balData.data &&
-                    strategy.id == 'xstrk_sensei' &&
+                    strategy.id === 'xstrk_sensei' &&
                     profit < 0 &&
                     profit /
                       Number(balData.data.amount.toEtherToFixedDecimals(6)) <
@@ -375,7 +375,7 @@ const Strategy = ({ params }: StrategyParams) => {
                         </p>
                       </div>
                     ))}
-                  {(!strategyCached || strategyCached.actions.length == 0) && (
+                  {(!strategyCached || strategyCached.actions.length === 0) && (
                     <div className="flex w-full items-center justify-center p-2.5">
                       <Loader2 className="h-3 w-3 animate-spin text-white" />
                     </div>

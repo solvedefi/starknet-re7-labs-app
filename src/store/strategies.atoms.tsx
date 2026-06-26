@@ -107,14 +107,14 @@ export const strategiesAtom = atom<StrategyInfo<any>[]>((get) => {
 });
 
 export function getLiveStatusNumber(status: StrategyLiveStatus) {
-  if (status == StrategyLiveStatus.HOT) {
+  if (status === StrategyLiveStatus.HOT) {
     return 1;
   }
-  if (status == StrategyLiveStatus.NEW) {
+  if (status === StrategyLiveStatus.NEW) {
     return 2;
-  } else if (status == StrategyLiveStatus.ACTIVE) {
+  } else if (status === StrategyLiveStatus.ACTIVE) {
     return 3;
-  } else if (status == StrategyLiveStatus.COMING_SOON) {
+  } else if (status === StrategyLiveStatus.COMING_SOON) {
     return 4;
   }
   return 5;

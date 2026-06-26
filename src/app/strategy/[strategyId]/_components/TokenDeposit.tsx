@@ -56,7 +56,7 @@ export function TokenDeposit(props: TokenDepositProps) {
         </div>
 
         <div className="mt-5 w-full py-2.5">
-          {tabIndex == 0 && (
+          {tabIndex === 0 && (
             <>
               <Deposit
                 strategy={strategy}
@@ -67,7 +67,7 @@ export function TokenDeposit(props: TokenDepositProps) {
               {strategy.settings.alerts != undefined && (
                 <div className="flex flex-col gap-2">
                   {strategy.settings.alerts
-                    .filter((a) => a.tab == 'deposit' || a.tab == 'all')
+                    .filter((a) => a.tab === 'deposit' || a.tab === 'all')
                     .map((alert, index) => (
                       <AlertRow key={index} text={alert.text} />
                     ))}
@@ -75,7 +75,7 @@ export function TokenDeposit(props: TokenDepositProps) {
               )}
             </>
           )}
-          {tabIndex == 1 && (
+          {tabIndex === 1 && (
             <>
               <Redeem
                 strategy={strategy}
@@ -86,7 +86,7 @@ export function TokenDeposit(props: TokenDepositProps) {
               {strategy.settings.alerts != undefined && (
                 <div className="mt-5 flex flex-col gap-2">
                   {strategy.settings.alerts
-                    .filter((a) => a.tab == 'withdraw' || a.tab == 'all')
+                    .filter((a) => a.tab === 'withdraw' || a.tab === 'all')
                     .map((alert, index) => (
                       <AlertRow key={index} text={alert.text} />
                     ))}

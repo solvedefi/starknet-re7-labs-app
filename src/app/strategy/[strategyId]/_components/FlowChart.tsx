@@ -177,7 +177,7 @@ function InternalFlowChart(props: FlowChartProps) {
   const hasMeasuredNodes = useRef(false);
 
   useEffect(() => {
-    if (nodes.length == 0 && strategyCached?.investmentFlows.length) {
+    if (nodes.length === 0 && strategyCached?.investmentFlows.length) {
       const { nodes: _nodes, edges: _edges } = getNodesAndEdges(
         strategyCached?.investmentFlows || [],
         null,
@@ -220,7 +220,7 @@ function InternalFlowChart(props: FlowChartProps) {
 
   const proOptions = { hideAttribution: true };
 
-  if (strategyCached && strategyCached.investmentFlows.length == 0) {
+  if (strategyCached && strategyCached.investmentFlows.length === 0) {
     return null;
   }
 

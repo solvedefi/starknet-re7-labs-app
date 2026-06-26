@@ -242,7 +242,7 @@ const AmountInput = forwardRef(
               index: props.index,
             },
             _inputsInfo.map((item, index) => {
-              if (index == props.index) {
+              if (index === props.index) {
                 return {
                   amount: _amtWeb3,
                   tokenInfo: _token,
@@ -401,7 +401,7 @@ const AmountInput = forwardRef(
             index: props.index,
           },
           inputsInfo.map((item, index) => {
-            if (index == props.index) {
+            if (index === props.index) {
               return {
                 amount: amt,
                 tokenInfo: props.tokenInfo,
@@ -415,7 +415,7 @@ const AmountInput = forwardRef(
         )
         .then((output) => {
           output.map((item, _index) => {
-            if (_index == props.index) {
+            if (_index === props.index) {
               setSimulatedMaxAmount({
                 isSet: true,
                 amount: Number(item.amount.toFixed(13)),
@@ -533,14 +533,14 @@ const AmountInput = forwardRef(
         />
 
         {/* Validation error messages */}
-        {simulatedMaxAmount.amount == 0 && (
+        {simulatedMaxAmount.amount === 0 && (
           <SimpleTooltip
             label={
               <span>
                 The liquidity at the current market price, is only in{' '}
                 {
-                  inputsInfo.find((_, index) => index != props.index)?.tokenInfo
-                    ?.symbol
+                  inputsInfo.find((_, index) => index !== props.index)
+                    ?.tokenInfo?.symbol
                 }
                 . It may be in {props.tokenInfo.symbol}, when the market price
                 re-aligns.
@@ -550,7 +550,7 @@ const AmountInput = forwardRef(
             <p className="ml-[7px] mt-[2px] text-[12px] text-light_grey">
               The liquidity at the current market price, is only in{' '}
               {
-                inputsInfo.find((_, index) => index != props.index)?.tokenInfo
+                inputsInfo.find((_, index) => index !== props.index)?.tokenInfo
                   ?.symbol
               }
               .{' '}

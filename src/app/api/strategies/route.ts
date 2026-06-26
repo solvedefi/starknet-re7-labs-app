@@ -89,7 +89,6 @@ async function getStrategyInfo(
 const REDIS_KEY = `${process.env.VK_REDIS_PREFIX}::strategies`;
 
 export async function GET(req: Request) {
-  console.log('GET /api/strategies', req.url);
   const cacheData = await getDataFromRedis(REDIS_KEY, req.url, revalidate);
   if (cacheData) {
     const resp = NextResponse.json(cacheData);

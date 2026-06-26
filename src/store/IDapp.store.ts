@@ -16,7 +16,6 @@ export class IDapp<BaseAPYT> {
     pools: PoolInfo[],
     data: CustomAtomWithQueryResult<BaseAPYT, Error>,
   ): PoolInfo[] {
-    console.log(`lending: ${this.name}`, data);
     if (data.isError) {
       console.error('Error fetching lending base', data.error);
     }

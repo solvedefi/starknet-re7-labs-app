@@ -155,7 +155,6 @@ function copyReferralLink(refCode: string) {
 }
 
 export async function getPrice(tokenInfo: MyMultiTokenInfo, source?: string) {
-  console.log(`getPrice::${source}`, tokenInfo.name);
   try {
     const price = await getPriceFromMyAPI(tokenInfo);
     if (isNaN(price)) {
@@ -165,7 +164,6 @@ export async function getPrice(tokenInfo: MyMultiTokenInfo, source?: string) {
   } catch (e) {
     console.warn('getPriceFromMyAPI error', e);
   }
-  console.log('getPrice coinbase', tokenInfo.name);
   const priceInfo = await fetchWithRetry(
     `https://api.coinbase.com/v2/prices/${convertToV2TokenInfo(tokenInfo).symbol}-USDT/spot`,
     {},
@@ -207,8 +205,6 @@ export function getHosturl() {
 }
 
 async function getPriceFromMyAPI(tokenInfo: MyMultiTokenInfo) {
-  console.log('getPrice from redis', tokenInfo.name);
-
   const endpoint = getEndpoint();
   const url = `${endpoint}/api/price/${convertToV2TokenInfo(tokenInfo).symbol}`;
   const priceInfoRes = await fetch(url);
@@ -222,8 +218,6 @@ async function getPriceFromMyAPI(tokenInfo: MyMultiTokenInfo) {
   const priceTime = new Date(priceInfo.timestamp);
   if (now.getTime() - priceTime.getTime() > 900000) {
     // 15 mins
-    console.log('getPrice priceInfo', priceInfo);
-    console.log('getPrice priceTime', now, tokenInfo.name);
     throw new Error('Price is stale');
   }
   const price = Number(priceInfo.price);
@@ -300,11 +294,6 @@ export function convertToV1TokenInfo(
 export type MyMultiWeb3Number = Web3Number | MyNumber;
 export type MyWeb3Number = Web3Number;
 export function convertToV2Web3Number(amount: MyMultiWeb3Number): MyWeb3Number {
-  console.log(
-    'convertToV2Web3Number',
-    typeof amount,
-    amount instanceof Web3Number,
-  );
   if (amount instanceof Web3Number) {
     return amount;
   }

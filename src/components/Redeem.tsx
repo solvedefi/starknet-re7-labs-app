@@ -107,7 +107,6 @@ const updateInputInfoAtom = atom(
   ) => {
     const inputInfo = get(inputsInfoAtoms[index]);
     const newInputInfo = { ...inputInfo, ...info };
-    console.log(`onAmountsChange [2]`, index, info, newInputInfo);
     set(inputsInfoAtoms[index], newInputInfo);
   },
 );

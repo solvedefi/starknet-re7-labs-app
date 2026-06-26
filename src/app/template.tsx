@@ -13,6 +13,7 @@ import { RpcProviderOptions, constants } from 'starknet';
 
 import { isMobile } from 'react-device-detect';
 import { StrategyDetailsProvider } from './providers/StrategyDetailsProvider';
+import QueryDevtools from '@/components/QueryDevtools';
 
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
 
@@ -57,6 +58,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
             <StrategyDetailsProvider />
           </React.Suspense>
         </div>
+        <QueryDevtools />
       </StarknetConfig>
     </JotaiProvider>
   );

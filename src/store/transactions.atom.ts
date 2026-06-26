@@ -298,7 +298,9 @@ async function getTxHistory(
             amount
             timestamp
             type
-            txHash
+            # indexer renamed this field to tx_hash; alias it back to txHash so
+            # the rest of the app keeps using txHash unchanged
+            txHash: tx_hash
             asset
           }
         }

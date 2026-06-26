@@ -30,13 +30,13 @@ function Spinner() {
 }
 
 function getStratCardBg(status: StrategyLiveStatus, index: number) {
-  if (status == StrategyLiveStatus.HOT) {
+  if (status === StrategyLiveStatus.HOT) {
     return 'bg-[#414173]';
   }
   if (isLive(status)) {
     return index % 2 === 0 ? 'bg-color1_50p' : 'bg-color2_50p';
   }
-  if (status == StrategyLiveStatus.RETIRED) {
+  if (status === StrategyLiveStatus.RETIRED) {
     return 'bg-black';
   }
   return 'bg-bg';
@@ -159,7 +159,7 @@ function StrategyAPY(props: YieldCardProps) {
           {getAPRWithToolTip(pool)}
 
           {pool.aprSplits.length &&
-            pool.aprSplits.some((a) => a.title == 'Rewards APY') && (
+            pool.aprSplits.some((a) => a.title === 'Rewards APY') && (
               <SimpleTooltip
                 label="Boosted rewards from STRKFarm"
                 className="bg-gray-300 text-black"
@@ -229,7 +229,7 @@ function StrategyTVL(props: YieldCardProps) {
         </p>
       )}
       {!isPoolLive && <p>-</p>}
-      {address && isPoolLive && pool.protocol.name == 'STRKFarm' && (
+      {address && isPoolLive && pool.protocol.name === 'STRKFarm' && (
         <div className="mt-[5px] flex w-full items-center justify-center rounded-[20px] text-xs text-grey_text">
           <SimpleTooltip label="Your deposits in this STRKFarm strategy">
             <div className="w-full font-semibold">
@@ -241,7 +241,7 @@ function StrategyTVL(props: YieldCardProps) {
                   <FaWallet className="-mt-0.5 ml-[3px]" />
                 </div>
               </div>
-              {holdingsInfo.amount != 0 && (
+              {holdingsInfo.amount !== 0 && (
                 <div className="-mt-[5px] flex w-full justify-end opacity-50">
                   <p className="text-right text-[11px]">
                     {getDisplayCurrencyAmount(

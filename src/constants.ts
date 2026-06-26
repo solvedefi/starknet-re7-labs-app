@@ -254,7 +254,7 @@ export const NFTS: NFTInfo[] = [
 ];
 
 function getNetwork(): constants.StarknetChainId {
-  if (process.env.NEXT_PUBLIC_NETWORK == 'sepolia') {
+  if (process.env.NEXT_PUBLIC_NETWORK === 'sepolia') {
     return constants.StarknetChainId.SN_SEPOLIA;
   }
   return constants.StarknetChainId.SN_MAIN;

@@ -135,7 +135,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
   ): Promise<SingleActionAmount[]> {
     const changes = args[0];
     const allAmounts = args[1];
-    const isToken0Change = changes.index == 0;
+    const isToken0Change = changes.index === 0;
     const input = {
       token0: isToken0Change
         ? {
@@ -164,7 +164,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
     const token1Info = getTokenInfoFromName(
       this.metadata.depositTokens[1].symbol,
     );
-    if (!address || address == '0x0' || !amount2) {
+    if (!address || address === '0x0' || !amount2) {
       return [
         {
           ...buildStrategyActionHook([], [token0Info, token1Info]),
@@ -213,7 +213,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
       ],
       onAmountsChange: this.onAmountsChange.bind(this),
     };
-    if (!address || address == '0x0' || !amount2) {
+    if (!address || address === '0x0' || !amount2) {
       return [output];
     }
     const amt = Web3Number.fromWei(

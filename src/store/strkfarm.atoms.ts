@@ -102,7 +102,7 @@ class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
           isLoading: false,
         },
         apr:
-          rewardsApy.length && rewardsApy[0].apr != 'Err'
+          rewardsApy.length && rewardsApy[0].apr !== 'Err'
             ? rewardsApy[0].apr
             : 0,
         tvl: rawPool.tvlUsd,

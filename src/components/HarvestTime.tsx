@@ -135,7 +135,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
               <SimpleTooltip label="Boosted rewards from STRKFarm">
                 <span className="flex items-center rounded bg-bg px-[5px] py-0.5 text-xs text-white">
                   🔥 Boosted
-                  {leverage == 0 && (
+                  {leverage === 0 && (
                     <Loader2 className="ml-[5px] h-3 w-3 animate-spin" />
                   )}
                 </span>

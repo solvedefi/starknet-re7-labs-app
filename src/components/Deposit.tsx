@@ -212,7 +212,7 @@ function InternalDeposit(props: DepositProps) {
       setInvestedSummary(null);
       return;
     }
-    if (callsInfo[0].amounts.length == 1) {
+    if (callsInfo[0].amounts.length === 1) {
       setInvestedSummary(firstInputInfo.amount);
       setLoadingInvestmentSummary(false);
       return;
@@ -271,7 +271,7 @@ function InternalDeposit(props: DepositProps) {
   const tvlInfo = useAtomValue(props.strategy.tvlAtom);
   const isTVLFull = useMemo(() => {
     return (
-      props.strategy.settings.maxTVL != 0 &&
+      props.strategy.settings.maxTVL !== 0 &&
       tvlInfo.data?.amounts[0].amount.greaterThan(
         props.strategy.settings.maxTVL.toFixed(6),
       )
@@ -355,7 +355,7 @@ function InternalDeposit(props: DepositProps) {
         />
       </div>
 
-      {!props.strategy.isRetired() && props.strategy.settings.maxTVL != 0 && (
+      {!props.strategy.isRetired() && props.strategy.settings.maxTVL !== 0 && (
         <div className="mt-[15px] w-full">
           <div className="flex justify-between">
             <p className="text-xs font-bold text-color2">Current TVL Limit:</p>

@@ -140,9 +140,9 @@ export interface DepositActionInputs {
 
 export function isLive(status: StrategyLiveStatus) {
   return (
-    status == StrategyLiveStatus.ACTIVE ||
-    status == StrategyLiveStatus.HOT ||
-    status == StrategyLiveStatus.NEW
+    status === StrategyLiveStatus.ACTIVE ||
+    status === StrategyLiveStatus.HOT ||
+    status === StrategyLiveStatus.NEW
   );
 }
 
@@ -218,7 +218,7 @@ export class IStrategyProps<T> {
   }
 
   isRetired() {
-    return this.liveStatus == StrategyLiveStatus.RETIRED;
+    return this.liveStatus === StrategyLiveStatus.RETIRED;
   }
 
   constructor(
@@ -367,7 +367,7 @@ export class IStrategy<T> extends IStrategyProps<T> {
             _amount,
             this.actions,
           );
-          if (this.actions.length != i + 1) {
+          if (this.actions.length !== i + 1) {
             console.warn(`actions`, this.actions.length, 'i', i);
             throw new Error('one new action per step required');
           }
@@ -407,14 +407,14 @@ export class IStrategy<T> extends IStrategyProps<T> {
 }
 
 export function getLiveStatusEnum(status: number) {
-  if (status == 1) {
+  if (status === 1) {
     return StrategyLiveStatus.HOT;
   }
-  if (status == 2) {
+  if (status === 2) {
     return StrategyLiveStatus.NEW;
-  } else if (status == 3) {
+  } else if (status === 3) {
     return StrategyLiveStatus.ACTIVE;
-  } else if (status == 4) {
+  } else if (status === 4) {
     return StrategyLiveStatus.COMING_SOON;
   }
   return StrategyLiveStatus.RETIRED;

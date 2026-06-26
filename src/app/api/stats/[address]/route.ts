@@ -22,7 +22,7 @@ export async function GET(_req: Request, context: any) {
   const values: Promise<StrategyWise>[] = strategies.map(async (strategy) => {
     if (strategy.isLive()) {
       const balanceInfo: AmountsInfo = await strategy.getUserTVL(pAddr);
-      if (balanceInfo.amounts.length == 1) {
+      if (balanceInfo.amounts.length === 1) {
         return {
           id: strategy.id,
           usdValue: balanceInfo.usdValue,

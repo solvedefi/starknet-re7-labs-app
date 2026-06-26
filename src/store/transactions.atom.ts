@@ -331,7 +331,7 @@ export const TxHistoryAtom = (contract: string, owner: string) =>
   atomWithQuery((get) => ({
     // balData just to trigger a refetch
     queryKey: ['tx_history', contract, owner, JSON.stringify(get(newTxsAtom))],
-    queryFn: async ({ queryKey }: any): Promise<TxHistory> => {
+    queryFn: async (): Promise<TxHistory> => {
       // const [, { contract, owner }] = queryKey;
       const res = await getTxHistory(contract, owner);
 
@@ -412,9 +412,6 @@ async function waitForTransaction(
   get: Getter,
   set: Setter,
 ) {
-  const provider = new RpcProvider({
-    nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
-  });
   await isTxAccepted(tx.txHash);
   // Tx confirmed on-chain → balances, positions, user stats and TVL have all
   // changed. Refetch them now (event-driven) rather than relying on a polling

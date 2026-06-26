@@ -1,11 +1,6 @@
 import { Call, num } from 'starknet';
 import { TOKENS } from './constants';
-import toast from 'react-hot-toast';
-import {
-  AmountsInfo,
-  IStrategyActionHook,
-  TokenInfo,
-} from './strategies/IStrategy';
+import { IStrategyActionHook, TokenInfo } from './strategies/IStrategy';
 import {
   ContractAddr,
   TokenInfo as TokenInfoV2,
@@ -21,14 +16,6 @@ import { Atom, atom } from 'jotai';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import assert from 'assert';
 import MyNumber from './utils/MyNumber';
-
-function getUniqueStrings(arr: Array<string>) {
-  const _arr: string[] = [];
-  arr.forEach((item) => {
-    if (!_arr.includes(item)) _arr.push(item);
-  });
-  return _arr;
-}
 
 function getUnique<T>(arr: Array<T>, uniqueField: string) {
   const _arr: T[] = [];
@@ -146,15 +133,7 @@ export function formatTimediff(endTime: Date) {
   };
 }
 
-function copyReferralLink(refCode: string) {
-  navigator.clipboard.writeText(getReferralUrl(refCode));
-
-  toast.success('Referral link copied to clipboard', {
-    position: 'bottom-right',
-  });
-}
-
-export async function getPrice(tokenInfo: MyMultiTokenInfo, source?: string) {
+export async function getPrice(tokenInfo: MyMultiTokenInfo, _source?: string) {
   try {
     const price = await getPriceFromMyAPI(tokenInfo);
     if (isNaN(price)) {
@@ -304,31 +283,6 @@ export function convertToMyNumber(amount: MyWeb3Number): MyNumber {
   return new MyNumber(amount.toWei(), amount.decimals);
 }
 
-function ZeroAmountsInfo(tokens: MyMultiTokenInfo[]): AmountsInfo {
-  const res: AmountsInfo = {
-    usdValue: 0,
-    amounts: [],
-  };
-  for (let i = 0; i < tokens.length; i++) {
-    const token: any = tokens[i];
-    const isTokenInfoV1 = token.token !== undefined;
-    res.amounts.push({
-      amount: Web3Number.fromWei('0', tokens[i].decimals),
-      tokenInfo: isTokenInfoV1
-        ? convertToV2TokenInfo(TOKENS[i])
-        : (tokens[i] as TokenInfoV2),
-      usdValue: 0,
-    });
-  }
-  return res;
-}
-
-function DummyStrategyActionHook(
-  tokens: MyMultiTokenInfo[],
-): IStrategyActionHook {
-  return buildStrategyActionHook([], tokens, null, true);
-}
-
 export function buildStrategyActionHook(
   calls: Call[],
   tokens: MyMultiTokenInfo[],
@@ -366,14 +320,6 @@ export function buildStrategyActionHook(
       };
     }),
   };
-}
-
-function formatUSD(amount: number) {
-  return amount > 1000000
-    ? `${(amount / 1000000).toFixed(2)}M`
-    : amount > 1000
-      ? amount.toFixed(0)
-      : amount.toFixed(2);
 }
 
 export function formatTokenBalance(amount: MyNumber, decimals: number = 0) {

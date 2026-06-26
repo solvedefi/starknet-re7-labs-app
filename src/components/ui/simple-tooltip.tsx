@@ -15,7 +15,6 @@ export function SimpleTooltip({
   label,
   children,
   className,
-  hasArrow,
 }: {
   label: React.ReactNode;
   children: React.ReactNode;

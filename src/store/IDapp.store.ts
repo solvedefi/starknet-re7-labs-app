@@ -8,7 +8,7 @@ export class IDapp<BaseAPYT> {
   logo: string = '';
 
   incentiveDataKey: string = '';
-  _computePoolsInfo(data: any): PoolInfo[] {
+  _computePoolsInfo(_data: any): PoolInfo[] {
     throw new Error('not implemented: _computePoolsInfo');
   }
 
@@ -34,8 +34,8 @@ export class IDapp<BaseAPYT> {
   }
 
   getBaseAPY(
-    p: PoolInfo,
-    data: AtomWithQueryResult<BaseAPYT, Error>,
+    _p: PoolInfo,
+    _data: AtomWithQueryResult<BaseAPYT, Error>,
   ): {
     baseAPY: number | 'Err';
     splitApr: APRSplit | null;

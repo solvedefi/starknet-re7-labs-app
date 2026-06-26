@@ -194,13 +194,13 @@ export class IStrategyProps<T> {
   }
 
   depositMethods = async (
-    inputs: DepositActionInputs,
+    _inputs: DepositActionInputs,
   ): Promise<IStrategyActionHook[]> => {
     return [];
   };
 
   withdrawMethods = async (
-    inputs: WithdrawActionInputs,
+    _inputs: WithdrawActionInputs,
   ): Promise<IStrategyActionHook[]> => {
     return [];
   };
@@ -209,7 +209,7 @@ export class IStrategyProps<T> {
     throw new Error('getTVL: Not implemented');
   };
 
-  getUserTVL = async (user: string): Promise<AmountsInfo> => {
+  getUserTVL = async (_user: string): Promise<AmountsInfo> => {
     throw new Error('getTVL: Not implemented');
   };
 
@@ -242,10 +242,10 @@ export class IStrategyProps<T> {
     this.liveStatus = liveStatus;
     this.settings = settings;
     this.metadata = metadata;
-    this.tvlAtom = atomWithQuery((get) => {
+    this.tvlAtom = atomWithQuery(() => {
       return {
         queryKey: ['tvl', this.id],
-        queryFn: async ({ queryKey }: any): Promise<AmountsInfo> => {
+        queryFn: async (): Promise<AmountsInfo> => {
           return this.getTVL();
         },
         // Gentle poll for the strategy detail page (TVL drifts from other users'

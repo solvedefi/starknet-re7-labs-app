@@ -60,7 +60,7 @@ type RedeemAtomType = {
 };
 
 function getInputInfoAtoms() {
-  return [1, 2].map((i) => {
+  return [1, 2].map(() => {
     return atom<AmountInputInfo>({
       isMaxClicked: false,
       amount: Web3Number.fromWei('0', 0),
@@ -216,7 +216,6 @@ function InternalRedeem(props: RedeemProps) {
   const maxAmount: MyNumber = useMemo(() => {
     if (!selectedToken) return MyNumber.fromZero();
 
-    const currentTVL = Number(tvlInfo.data?.amounts[0].amount.toFixed(6) || 0);
     const maxAllowed = Number(balance.toEtherToFixedDecimals(8));
 
     const adjustedMaxAllowed = MyNumber.fromEther(
@@ -544,8 +543,6 @@ function InternalRedeem(props: RedeemProps) {
     JSON.stringify(firstInputInfo),
     isMaxClicked,
   ]);
-
-  const isRedeem = useMemo(() => props.buttonText === 'Redeem', [props]);
 
   const [loadingInvestmentSummary, setLoadingInvestmentSummary] =
     useState(false);

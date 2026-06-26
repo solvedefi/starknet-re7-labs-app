@@ -20,7 +20,6 @@ import {
 } from '@strkfarm/sdk';
 import AmountInput, { AmountInputRef } from './AmountInput';
 import { addressAtom } from '@/store/claims.atoms';
-import { strategyByIdAtom } from '@/store/strategiesInfo.atoms';
 
 interface DepositProps {
   strategy: StrategyInfo<any>;
@@ -58,7 +57,7 @@ export type DepositAtomType = {
 };
 
 function getInputInfoAtoms() {
-  return [1, 2].map((i) => {
+  return [1, 2].map(() => {
     return atom<AmountInputInfo>({
       isMaxClicked: false,
       amount: Web3Number.fromWei('0', 0),
@@ -151,8 +150,6 @@ function InternalDeposit(props: DepositProps) {
   const inputRefs = [inputRef1, inputRef2];
   const inputErrors = [inputError1, inputError2];
   const setInputErrors = [setInputError1, setInputError2];
-
-  const strategyDetails = useAtomValue(strategyByIdAtom(props.strategy.id));
 
   // since we use a separate jotai provider,
   // need to set this again here

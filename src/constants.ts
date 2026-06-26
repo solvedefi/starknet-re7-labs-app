@@ -1,4 +1,4 @@
-import { constants, RpcProvider } from 'starknet';
+import { RpcProvider } from 'starknet';
 import { Global } from '@strkfarm/sdk';
 import { NFTInfo, TokenInfo } from './strategies/IStrategy';
 import { standariseAddress } from './utils';
@@ -252,13 +252,6 @@ export const NFTS: NFTInfo[] = [
     },
   },
 ];
-
-function getNetwork(): constants.StarknetChainId {
-  if (process.env.NEXT_PUBLIC_NETWORK === 'sepolia') {
-    return constants.StarknetChainId.SN_SEPOLIA;
-  }
-  return constants.StarknetChainId.SN_MAIN;
-}
 
 export const provider = new RpcProvider({
   nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,

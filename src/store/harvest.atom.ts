@@ -71,7 +71,7 @@ async function getHarvestData(
 }
 
 export const HarvestTimeAtom = (contract: string) =>
-  atomWithQuery((get) => ({
+  atomWithQuery(() => ({
     queryKey: ['harvest_data', contract],
     queryFn: async () => {
       const result = await getHarvestData(contract);

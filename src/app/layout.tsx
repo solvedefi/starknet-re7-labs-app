@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { Providers } from './providers';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import React from 'react';
 import { ibmPlexMono } from '@/fonts';
@@ -37,7 +36,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#111119" />
       </head>
       <body className={`${ibmPlexMono.variable} font-mono`}>
-        <Providers>{children}</Providers>
+        {children}
         <GoogleAnalytics gaId="G-K05JV94KM9" />
       </body>
     </html>

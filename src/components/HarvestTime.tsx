@@ -14,7 +14,7 @@ interface HarvestTimeProps {
   balData: any;
 }
 
-const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
+const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy }) => {
   const { address } = useAccount();
   const holdingToken: any = strategy.holdingTokens[0];
   const contractAddress = holdingToken.address || holdingToken.token || '';

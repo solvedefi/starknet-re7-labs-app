@@ -153,8 +153,8 @@ interface NavbarProps {
   forceShowConnect?: boolean;
 }
 
-export default function Navbar(props: NavbarProps) {
-  const { address, connector, account } = useAccount();
+export default function Navbar(_props: NavbarProps) {
+  const { address, connector } = useAccount();
   const { disconnectAsync } = useDisconnect();
   const setAddress = useSetAtom(addressAtom);
   const { data: starkProfile } = useStarkProfile({
@@ -163,7 +163,7 @@ export default function Navbar(props: NavbarProps) {
   });
   const { connect: connectSnReact } = useConnect();
 
-  const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
+  const [, setLastWallet] = useAtom(lastWalletAtom);
 
   const getTokenBalance = async (token: string, address: string) => {
     const tokenInfo = getTokenInfoFromName(token);

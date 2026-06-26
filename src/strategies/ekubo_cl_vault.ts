@@ -157,7 +157,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
   }
 
   depositMethods = async (inputs: DepositActionInputs) => {
-    const { amount, address, provider, amount2 } = inputs;
+    const { amount, address, amount2 } = inputs;
     const token0Info = getTokenInfoFromName(
       this.metadata.depositTokens[0].symbol,
     );
@@ -198,7 +198,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
   withdrawMethods = async (
     inputs: WithdrawActionInputs,
   ): Promise<IStrategyActionHook[]> => {
-    const { amount, address, provider, amount2 } = inputs;
+    const { amount, address, amount2 } = inputs;
     const output = {
       calls: [],
       amounts: [
@@ -246,7 +246,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
     ];
   };
 
-  async solve(pools: PoolInfo[], amount: string) {
+  async solve(_pools: PoolInfo[], _amount: string) {
     const yieldInfo = await this.clVault.netAPY('latest', 16000);
     this.netYield = yieldInfo;
     this.leverage = 1;
@@ -269,7 +269,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
           get(addressAtom),
           JSON.stringify(get(holdingBalAtom).data),
         ],
-        queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
+        queryFn: async (): Promise<BalanceResult> => {
           try {
             const bal = get(holdingBalAtom);
             if (!bal.data) {
@@ -309,7 +309,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
           ),
           get(addressAtom),
         ],
-        queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
+        queryFn: async (): Promise<BalanceResult> => {
           const bal1 = get(this.balanceAtoms[0]);
           const bal2 = get(this.balanceAtoms[1]);
           if (

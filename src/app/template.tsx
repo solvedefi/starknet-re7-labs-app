@@ -27,7 +27,7 @@ export const CONNECTOR_NAMES = ['Braavos', 'Argent X', 'Argent (mobile)']; // 'A
 export default function Template({ children }: { children: React.ReactNode }) {
   const chains = [mainnet];
   const provider = jsonRpcProvider({
-    rpc: (chain) => {
+    rpc: () => {
       const args: RpcProviderOptions = {
         nodeUrl:
           'https://rpc.nethermind.io/mainnet-juno?apikey=t1HPjhplOyEQpxqVMhpwLGuwmOlbXN0XivWUiPAxIBs0kHVK',

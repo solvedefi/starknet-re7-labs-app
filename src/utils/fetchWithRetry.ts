@@ -4,7 +4,7 @@ import { logErrorOnce } from '@/utils/errorLog';
 async function fetchWithRetry(
   url: string,
   options: any = {},
-  errorToast: string = 'Failed to fetch',
+  _errorToast: string = 'Failed to fetch',
 ): Promise<Response | null> {
   const maxRetries = 3;
   const baseDelay = 1000;

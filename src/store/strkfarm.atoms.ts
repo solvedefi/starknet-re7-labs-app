@@ -152,11 +152,9 @@ class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
   }
 }
 
-export const STRKFarmBaseAPYsAtom = atomWithQuery((get) => ({
+export const STRKFarmBaseAPYsAtom = atomWithQuery(() => ({
   queryKey: ['strkfarm_base_aprs'],
-  queryFn: async ({
-    queryKey,
-  }): Promise<{
+  queryFn: async (): Promise<{
     strategies: STRKFarmStrategyAPIResult[];
   }> => {
     const response = await fetch(`${CONSTANTS.STRKFarm.BASE_APR_API}`);

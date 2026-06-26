@@ -122,7 +122,7 @@ function getERC20BalanceAtom(token: TokenInfo | undefined) {
   return atomWithQuery((get) => {
     return {
       queryKey: ['getERC20Balance', token?.token, get(addressAtom)],
-      queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
+      queryFn: async (): Promise<BalanceResult> => {
         return getERC20Balance(token, get(addressAtom));
       },
       // No polling: balances refetch on mount (e.g. opening the deposit form),
@@ -137,7 +137,7 @@ function getERC4626BalanceAtom(token: TokenInfo | undefined) {
   return atomWithQuery((get) => {
     return {
       queryKey: ['getERC4626Balance', token?.token, get(addressAtom)],
-      queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
+      queryFn: async (): Promise<BalanceResult> => {
         return getERC4626Balance(token, get(addressAtom));
       },
       staleTime: 0,
@@ -149,7 +149,7 @@ function getERC721PositionValueAtom(token: NFTInfo | undefined) {
   return atomWithQuery((get) => {
     return {
       queryKey: ['getERC721PositionValue', token?.address, get(addressAtom)],
-      queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
+      queryFn: async (): Promise<BalanceResult> => {
         try {
           return await getERC721PositionValue(token, get(addressAtom));
         } catch (e) {
@@ -161,28 +161,9 @@ function getERC721PositionValueAtom(token: NFTInfo | undefined) {
   });
 }
 
-async function getBalance(
-  token: TokenInfo | NFTInfo | undefined,
-  address: string,
-) {
-  if (token) {
-    if (Object.prototype.hasOwnProperty.call(token, 'isERC4626')) {
-      const _token = <TokenInfo>token;
-      if (_token.isERC4626) return getERC4626Balance(_token, address);
-    } else {
-      const _token = <NFTInfo>token;
-      const isNFT = NFTS.find((nft) => nft.address === _token.address);
-      if (isNFT) return getERC721PositionValue(_token, address);
-    }
-    return getERC20Balance(<TokenInfo>token, address);
-  }
-
-  return returnEmptyBal();
-}
-
 export function getBalanceAtom(
   token: TokenInfo | NFTInfo | undefined,
-  enabledAtom: Atom<boolean>,
+  _enabledAtom: Atom<boolean>,
 ) {
   if (token) {
     if (Object.prototype.hasOwnProperty.call(token, 'isERC4626')) {
@@ -199,10 +180,10 @@ export function getBalanceAtom(
   return getERC20BalanceAtom(<TokenInfo>token);
 }
 
-export const DUMMY_BAL_ATOM = atomWithQuery((get) => {
+export const DUMMY_BAL_ATOM = atomWithQuery(() => {
   return {
     queryKey: ['DUMMY_BAL_ATOM'],
-    queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
+    queryFn: async (): Promise<BalanceResult> => {
       return returnEmptyBal();
     },
     refetchInterval: 100000000,

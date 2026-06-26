@@ -12,7 +12,7 @@ interface DAppStats {
   tvl: number;
 }
 
-export const dAppStatsAtom = atomWithQuery((get) => ({
+export const dAppStatsAtom = atomWithQuery(() => ({
   queryKey: ['stats'],
   queryFn: async (): Promise<DAppStats> => {
     const res = await fetchWithRetry(

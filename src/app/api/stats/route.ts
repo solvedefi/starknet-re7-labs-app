@@ -20,7 +20,7 @@ export async function GET(_req: Request) {
 
   const strategies = getStrategies();
 
-  const values = strategies.map(async (strategy, index) => {
+  const values = strategies.map(async (strategy) => {
     if (strategy.isLive()) {
       let retry = 0;
       while (retry < 3) {

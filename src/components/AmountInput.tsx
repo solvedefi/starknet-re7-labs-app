@@ -86,9 +86,7 @@ const AmountInput = forwardRef(
     }, [inputsInfo, inputInfo.rawAmount]);
 
     // Default token state
-    const [selectedMarket, setSelectedMarket] = useState<TokenInfoV2>(
-      props.tokenInfo,
-    );
+    const [selectedMarket] = useState<TokenInfoV2>(props.tokenInfo);
 
     useImperativeHandle(ref, () => ({
       reset: () => {

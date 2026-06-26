@@ -1,4 +1,4 @@
-import { saveStrategy } from '@/redux/features/strategySlice';
+import { strategiesInfoAtom } from '@/store/strategiesInfo.atoms';
 import { getStrategies, strategiesAtom } from '@/store/strategies.atoms';
 import {
   STRKFarmBaseAPYsAtom,
@@ -10,10 +10,9 @@ import {
 } from '@/store/transactions.atom';
 import { useAccount } from '@starknet-react/core';
 import { EkuboCLVault } from '@strkfarm/sdk';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { useEffect, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 type LoadedNumericalValue = {
   amount: number;
@@ -149,7 +148,7 @@ export const useStrategiesInfo = () => {
   const { data: yields, isLoading: yieldsLoading } = useUserYields(deposits);
 
   const { data: volume, isLoading: volumeLoading } = useVolume(fees);
-  const dispatch = useDispatch();
+  const setStrategiesInfo = useSetAtom(strategiesInfoAtom);
 
   const strats = useMemo(() => {
     return strkFarmPools.map((pool) => {
@@ -190,14 +189,16 @@ export const useStrategiesInfo = () => {
     volumeLoading,
   ]);
 
-  // Persist to the redux store in an effect (NOT during render — dispatching
-  // while rendering was triggering "Cannot update a component while rendering a
+  // Publish to the shared Jotai atom in an effect (NOT during render — setting
+  // state while rendering triggers "Cannot update a component while rendering a
   // different component" and a re-render/refetch cascade).
   useEffect(() => {
+    const byId: Record<string, StrategyDetails> = {};
     strats.forEach((strat) => {
-      dispatch(saveStrategy({ ...strat, id: strat.id }));
+      byId[strat.id] = strat;
     });
-  }, [strats, dispatch]);
+    setStrategiesInfo(byId);
+  }, [strats, setStrategiesInfo]);
 
   return strats;
 };

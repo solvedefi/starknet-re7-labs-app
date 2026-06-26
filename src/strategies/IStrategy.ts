@@ -248,7 +248,10 @@ export class IStrategyProps<T> {
         queryFn: async ({ queryKey }: any): Promise<AmountsInfo> => {
           return this.getTVL();
         },
-        refetchInterval: 15000,
+        // Gentle poll for the strategy detail page (TVL drifts from other users'
+        // activity / rebalances); paused when the tab is hidden via the global
+        // refetchIntervalInBackground:false.
+        refetchInterval: 60000,
       };
     });
     this.balancesAtom = this.getBalancesAtom();

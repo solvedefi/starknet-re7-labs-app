@@ -268,41 +268,45 @@ function StrategyMobileCard(props: YieldCardProps) {
   const { pool, index } = props;
   const router = useRouter();
   return (
-    <div
-      role="link"
-      onClick={() => {
-        getLinkProps(pool, props.showProtocolName).onClick();
-        router.push(`/strategy/${pool.pool.id}`);
-      }}
-      className={cn(
-        'grid cursor-pointer grid-cols-3 gap-2 border-b border-bg p-5 text-white md:hidden',
-        getStratCardBg(
-          pool.additional?.tags[0] || StrategyLiveStatus.ACTIVE,
-          index,
-        ),
-      )}
-      style={{
-        gridTemplateRows: props.showProtocolName
-          ? 'repeat(4, 1fr)'
-          : 'repeat(3, 1fr)',
-      }}
-    >
-      <div className="col-span-3" style={{ gridRow: 'span 2' }}>
-        <StrategyInfo
-          pool={pool}
-          index={index}
-          showProtocolName={props.showProtocolName}
-        />
-      </div>
-      <div className="col-span-1" style={{ gridRow: 'span 2' }}>
-        <p className="text-left text-[13px] font-bold text-color2">APY</p>
-        <StrategyAPY pool={pool} index={index} />
-      </div>
-      <div className="col-span-1" style={{ gridRow: 'span 2' }}>
-        <p className="text-left text-[13px] font-bold text-color2">TVL</p>
-        <StrategyTVL pool={pool} index={index} />
-      </div>
-    </div>
+    <tr className="md:hidden">
+      <td colSpan={8} className="p-0">
+        <div
+          role="link"
+          onClick={() => {
+            getLinkProps(pool, props.showProtocolName).onClick();
+            router.push(`/strategy/${pool.pool.id}`);
+          }}
+          className={cn(
+            'grid cursor-pointer grid-cols-3 gap-2 border-b border-bg p-5 text-white',
+            getStratCardBg(
+              pool.additional?.tags[0] || StrategyLiveStatus.ACTIVE,
+              index,
+            ),
+          )}
+          style={{
+            gridTemplateRows: props.showProtocolName
+              ? 'repeat(4, 1fr)'
+              : 'repeat(3, 1fr)',
+          }}
+        >
+          <div className="col-span-3" style={{ gridRow: 'span 2' }}>
+            <StrategyInfo
+              pool={pool}
+              index={index}
+              showProtocolName={props.showProtocolName}
+            />
+          </div>
+          <div className="col-span-1" style={{ gridRow: 'span 2' }}>
+            <p className="text-left text-[13px] font-bold text-color2">APY</p>
+            <StrategyAPY pool={pool} index={index} />
+          </div>
+          <div className="col-span-1" style={{ gridRow: 'span 2' }}>
+            <p className="text-left text-[13px] font-bold text-color2">TVL</p>
+            <StrategyTVL pool={pool} index={index} />
+          </div>
+        </div>
+      </td>
+    </tr>
   );
 }
 

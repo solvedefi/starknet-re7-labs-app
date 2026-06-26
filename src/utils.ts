@@ -211,8 +211,12 @@ async function getPriceFromMyAPI(tokenInfo: MyMultiTokenInfo) {
 
   const endpoint = getEndpoint();
   const url = `${endpoint}/api/price/${convertToV2TokenInfo(tokenInfo).symbol}`;
-  console.log('getPrice url', url);
   const priceInfoRes = await fetch(url);
+  if (!priceInfoRes.ok) {
+    // Non-OK responses are HTML error pages; don't let .json() throw a noisy
+    // SyntaxError — surface a clean error so the caller falls back cleanly.
+    throw new Error(`price api ${priceInfoRes.status} for ${tokenInfo.name}`);
+  }
   const priceInfo = await priceInfoRes.json();
   const now = new Date();
   const priceTime = new Date(priceInfo.timestamp);

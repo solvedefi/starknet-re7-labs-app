@@ -232,7 +232,6 @@ export default function Navbar(props: NavbarProps) {
 
   // Set last wallet when a new wallet is connected
   useEffect(() => {
-    console.log('lastWallet connector', connector?.name);
     if (connector) {
       const name: string = connector.id;
       setLastWallet(name);
@@ -242,7 +241,6 @@ export default function Navbar(props: NavbarProps) {
 
   // set address atom
   useEffect(() => {
-    console.log('tncinfo address', address);
     setAddress(address);
   }, [address]);
 
@@ -329,7 +327,6 @@ export default function Navbar(props: NavbarProps) {
                   className="h-[52px] cursor-pointer focus:bg-white/10"
                   onClick={() => {
                     disconnectAsync().then(() => {
-                      console.log('wallet disconnected');
                       setLastWallet(null);
                       setIsWalletConnected(false);
                     });

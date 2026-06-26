@@ -358,19 +358,7 @@ export class IStrategy<T> extends IStrategyProps<T> {
           _pools = filter.bind(this)(_pools, amount, this.actions);
         }
 
-        console.log(
-          'solve',
-          {
-            i,
-            poolsLen: pools.length,
-            _amount,
-          },
-          this.actions,
-          _pools,
-        );
-
         if (_pools.length > 0) {
-          console.log('solving', step.name);
           this.actions = step.optimizer.bind(this)(
             _pools,
             _amount,
@@ -391,15 +379,12 @@ export class IStrategy<T> extends IStrategyProps<T> {
       return;
     }
 
-    console.log('Completed solving actions', this.actions.length);
     this.actions.forEach((action) => {
       const sign = action.isDeposit ? 1 : -1;
       const apr = action.isDeposit ? action.pool.apr : action.pool.borrow.apr;
       netYield += sign * apr * Number(action.amount);
-      console.log('netYield1', sign, apr, action.amount, netYield);
     });
     this.netYield = netYield / Number(amount);
-    console.log('netYield2', netYield, this.netYield, Number(amount));
     this.leverage = this.netYield / this.actions[0].pool.apr;
 
     this.postSolve();

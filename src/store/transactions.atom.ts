@@ -12,6 +12,7 @@ import { createAtomWithStorage, tokenPricesAtom } from './utils.atoms';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/utils/apolloClient';
+import { logErrorOnce } from '@/utils/errorLog';
 import { Web3Number } from '@strkfarm/sdk';
 
 export interface StrategyTxProps {
@@ -87,7 +88,7 @@ const getFeesHistory = async (
     });
     return data.contractFeeEarnings;
   } catch (error) {
-    console.error('GraphQL Error:', error);
+    logErrorOnce('graphql:contractFeeEarnings', 'GraphQL Error:', error);
     return {
       contract,
       dailyEarnings: [],
@@ -174,7 +175,7 @@ const getUserTxHistory = async (
       token1: tx.token1,
     }));
   } catch (error) {
-    console.error('GraphQL Error:', error);
+    logErrorOnce('graphql:ekuboVaultFlows', 'GraphQL Error:', error);
     return [];
   }
 };
@@ -316,7 +317,7 @@ async function getTxHistory(
 
     return data;
   } catch (error) {
-    console.error('GraphQL Error:', error);
+    logErrorOnce('graphql:investmentFlows', 'GraphQL Error:', error);
     throw error;
   }
 }
@@ -331,10 +332,8 @@ export const TxHistoryAtom = (contract: string, owner: string) =>
       // const [, { contract, owner }] = queryKey;
       const res = await getTxHistory(contract, owner);
 
-      console.log('TxHistoryAtom res', res, { contract, owner, queryKey });
       // add new txs from local cache
       const newTxs = get(newTxsAtom);
-      console.log('TxHistoryAtom newTxs', newTxs);
       const allTxs = res.findManyInvestment_flows.concat(
         newTxs.map((tx) => {
           return {
@@ -348,7 +347,6 @@ export const TxHistoryAtom = (contract: string, owner: string) =>
         }),
       );
 
-      console.log('TxHistoryAtom', allTxs);
       // remove any duplicate txs by txHash
       const txMap: any = {}; // txHash: boolean
       const txHashes = allTxs.filter((txInfo) => {
@@ -359,7 +357,6 @@ export const TxHistoryAtom = (contract: string, owner: string) =>
         return true;
       });
 
-      console.log('TxHistoryAtom txHashes', txHashes);
       return {
         findManyInvestment_flows: txHashes,
       };
@@ -403,7 +400,6 @@ const transactionsAtom = createAtomWithStorage<TransactionInfo[]>(
 export const monitorNewTxAtom = atom(
   null,
   async (get, set, tx: TransactionInfo) => {
-    console.log('monitorNewTxAtom', tx);
     await initToast(tx, get, set);
   },
 );
@@ -416,23 +412,18 @@ async function waitForTransaction(
   const provider = new RpcProvider({
     nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
   });
-  console.log('waitForTransaction', tx);
   await isTxAccepted(tx.txHash);
-  console.log('waitForTransaction done', tx);
   const txs = await get(transactionsAtom);
   tx.status = 'success';
   txs.push(tx);
   set(transactionsAtom, txs);
 
   let newTxs = get(newTxsAtom);
-  console.log('waitForTransaction newTxs', newTxs);
   const txExists = newTxs.find(
     (t) => t.txHash.toLowerCase() === tx.txHash.toLowerCase(),
   );
-  console.log('waitForTransaction txExists', txExists);
   if (!txExists) {
     newTxs = [...newTxs, tx];
-    console.log('waitForTransaction newTxs2', newTxs);
     set(newTxsAtom, newTxs);
   }
 }
@@ -460,7 +451,6 @@ async function isTxAccepted(txHash: string) {
       continue;
     }
 
-    console.debug('isTxAccepted', txInfo);
     if (!txInfo.finality_status || txInfo.finality_status == 'RECEIVED') {
       // do nothing
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -481,8 +471,6 @@ async function isTxAccepted(txHash: string) {
 }
 
 async function initToast(tx: TransactionInfo, get: Getter, set: Setter) {
-  console.log('Deposit txInfo 2', tx, tx.info.amount.toEtherStr());
-
   const msg = StrategyTxPropsToMessage(tx.info, get);
   await toast.promise(
     waitForTransaction(tx, get, set),

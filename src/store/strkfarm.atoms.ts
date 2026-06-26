@@ -124,7 +124,6 @@ class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
           is_promoted: poolName.includes('Stake'),
         },
       };
-      console.log('rawPool', poolName, poolInfo);
       return poolInfo;
     });
   }

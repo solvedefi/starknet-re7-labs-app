@@ -31,7 +31,6 @@ export async function getERC20Balance(
   token: TokenInfo | undefined,
   address: string | undefined,
 ) {
-  console.log('getERC20Balance', token?.token, address);
   if (!token) return returnEmptyBal();
   if (!address) return returnEmptyBal();
 

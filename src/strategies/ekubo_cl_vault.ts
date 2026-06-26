@@ -115,7 +115,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
   };
 
   getTVL = async (): Promise<AmountsInfo> => {
-    console.log('getTVL [1]');
     const res = await this.clVault.getTVL();
     return {
       usdValue: res.usdValue,
@@ -124,7 +123,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
   };
 
   getUserTVL = async (user: string): Promise<AmountsInfo> => {
-    console.log('getUserTVL [1]', user);
     const res = await this.clVault.getUserTVL(ContractAddr.from(user));
     return {
       usdValue: res.usdValue,
@@ -135,10 +133,8 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
   async onAmountsChange(
     ...args: Parameters<onStratAmountsChangeFn>
   ): Promise<SingleActionAmount[]> {
-    console.log('onAmountsChange [1]');
     const changes = args[0];
     const allAmounts = args[1];
-    console.log('onAmountsChange [1.1]', changes, allAmounts);
     const isToken0Change = changes.index == 0;
     const input = {
       token0: isToken0Change
@@ -156,21 +152,7 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
           }
         : { ...changes.amountInfo },
     };
-    console.log(
-      'onAmountsChange [1.2]',
-      [input.token0, input.token1].map((item) => ({
-        amount: item.amount.toFixed(item.tokenInfo.decimals),
-        tokenInfo: item.tokenInfo,
-      })),
-    );
     const output = await this.clVault.matchInputAmounts(input);
-    console.log(
-      'onAmountsChange [1.3]',
-      [output.token0, output.token1].map((item) => ({
-        amount: item.amount.toFixed(item.tokenInfo.decimals),
-        tokenInfo: item.tokenInfo,
-      })),
-    );
     return [output.token0, output.token1];
   }
 
@@ -182,12 +164,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
     const token1Info = getTokenInfoFromName(
       this.metadata.depositTokens[1].symbol,
     );
-    console.log(
-      'Deposit calls [1]',
-      amount.toString(),
-      amount2?.toString(),
-      address,
-    );
     if (!address || address == '0x0' || !amount2) {
       return [
         {
@@ -196,7 +172,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
         },
       ];
     }
-    console.log('Deposit calls [2]', amount, amount2);
     const amt = Web3Number.fromWei(amount.toString(), token0Info.decimals);
     const amt2 = Web3Number.fromWei(amount2.toString(), token1Info.decimals);
     const calls = await this.clVault.depositCall(
@@ -212,7 +187,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
       },
       ContractAddr.from(address),
     );
-    console.log('Deposit calls [3]', calls);
     return [
       {
         ...buildStrategyActionHook(calls, [token0Info, token1Info]),
@@ -242,7 +216,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
     if (!address || address == '0x0' || !amount2) {
       return [output];
     }
-    console.log('Withdraw calls [1]');
     const amt = Web3Number.fromWei(
       amount.isZero() ? MyNumber.fromOne().toString() : amount.toString(),
       amount.decimals,
@@ -298,12 +271,10 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
         ],
         queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
           try {
-            console.log('getEkuboStratBalanceAtom [-1]', queryKey);
             const bal = get(holdingBalAtom);
             if (!bal.data) {
               return returnEmptyBal();
             }
-            console.log('getEkuboStratBalanceAtom [0]', bal.data);
             const userTVL = await this.getUserTVL(get(addressAtom) || '');
             const amountInfo = userTVL.amounts.find((amountInfo) =>
               amountInfo.tokenInfo.address.eqString(underlyingToken.token),
@@ -311,7 +282,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
             if (!amountInfo) {
               return returnEmptyBal();
             }
-            console.log('getEkuboStratBalanceAtom [1]', amountInfo);
             return {
               amount: MyNumber.fromEther(
                 amountInfo.amount.toFixed(),
@@ -342,7 +312,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
         queryFn: async ({ queryKey }: any): Promise<BalanceResult> => {
           const bal1 = get(this.balanceAtoms[0]);
           const bal2 = get(this.balanceAtoms[1]);
-          console.log('getSummaryBalanceAtom', bal1.data, bal2.data);
           if (
             !bal1.data ||
             !bal2.data ||
@@ -351,7 +320,6 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
           ) {
             return returnEmptyBal();
           }
-          console.log('getSummaryBalanceAtom [0]', bal1.data, bal2.data);
           const bal1Data = bal1.data;
           const bal2Data = bal2.data;
           const amounts: SingleActionAmount[] = [bal1Data, bal2Data].map(
@@ -360,16 +328,11 @@ export class EkuboClStrategy extends IStrategy<CLVaultStrategySettings> {
               tokenInfo: convertToV2TokenInfo(b.tokenInfo!),
             }),
           );
-          console.log(
-            'getSummaryBalanceAtom [1]',
-            amounts.map((x) => x.amount.toWei()),
-          );
           const amountWeb3Number = await this.computeSummaryValue(
             amounts,
             this.settings.quoteToken,
             'ekubo::summary',
           );
-          console.log('getSummaryBalanceAtom [2]', amountWeb3Number.toString());
           return {
             amount: convertToMyNumber(amountWeb3Number),
             tokenInfo: convertToV1TokenInfo(this.settings.quoteToken),

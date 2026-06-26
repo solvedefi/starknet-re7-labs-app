@@ -39,7 +39,6 @@ export interface UserStats {
 export const userStatsAtom = atomWithQuery((get) => ({
   queryKey: ['user_stats', get(addressAtom)],
   queryFn: async ({ queryKey }: any): Promise<UserStats | null> => {
-    console.log('queryKey', queryKey);
     const [_, addr] = queryKey;
     if (!addr) {
       return null;

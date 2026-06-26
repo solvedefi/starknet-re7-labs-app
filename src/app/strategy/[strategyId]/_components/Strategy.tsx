@@ -79,12 +79,6 @@ const Strategy = ({ params }: StrategyParams) => {
         }),
       };
     }
-    console.log(
-      'TxHistoryAtom',
-      txHistoryResult.error,
-      txHistoryResult.isError,
-      txHistoryResult.isLoading,
-    );
     return txHistoryResult.data || { findManyInvestment_flows: [] };
   }, [JSON.stringify(txHistoryResult.data)]);
 

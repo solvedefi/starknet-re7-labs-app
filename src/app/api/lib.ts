@@ -27,7 +27,6 @@ export async function getDataFromRedis(
     new Date().getTime() - new Date(cacheData.lastUpdated).getTime() <
       revalidate * 1000
   ) {
-    console.log(`Cache hit for ${key}`);
     return cacheData;
   }
 
@@ -40,7 +39,6 @@ export async function setDataToRedis(key: string, data: any) {
   }
 
   await kvRedis.set(key, data);
-  console.log(`Cache set for ${key}`);
 }
 
 export const getRewardsInfo = async (
@@ -97,7 +95,6 @@ export const getRewardsInfo = async (
       const shareValue = await tokenContractVToken.call('convert_to_assets', [
         uint256.bnToUint256((1e18).toString()),
       ]);
-      console.log(`shareValue::${stratId}::${shareValue}`);
       const tokenPrice =
         (priceData.price *
           Number(
@@ -105,27 +102,18 @@ export const getRewardsInfo = async (
               BigInt((1e18).toString()),
           )) /
         10000;
-      console.log(
-        `RewardCalc::${stratId}::tokenPrice::${tokenPrice}, underlyingTokenPrice::${priceData.price}`,
-      );
 
       const tvlUsd = strat.tvlUsd;
-      console.log(`RewardCalc::${stratId}::tvlUsd::${tvlUsd}`);
 
       // Calculate the hourly reward based on TVL and token price
       const rewardBasedOnTVL =
         (tvlUsd * stratAllowed.maxAPY) / (100 * 365 * 24 * tokenPrice);
-      console.log(
-        `RewardCalc::${stratId}::ewardBasedOnTVL::${rewardBasedOnTVL}`,
-      );
-      console.log(`RewardCalc::${stratId}::tvl::${tvlUsd}`);
 
       // Ensure the reward does not exceed max rewards per day
       let finalReward = Math.min(
         rewardBasedOnTVL,
         stratAllowed.maxRewardsPerDay / 24,
       );
-      console.log(`RewardCalc::${stratId}::finalReward::${finalReward}`);
 
       // if less bal available, use the available balance
       const rewardToken = stratAllowed.rewardToken;
@@ -141,12 +129,8 @@ export const getRewardsInfo = async (
           BigInt(available.toString()) /
             BigInt(10 ** (stratAllowed.decimals - 4)),
         ) / 10000;
-      console.log(
-        `RewardCalc::${stratId}::availableBal::${availableBal.toString()}`,
-      );
 
       finalReward = Math.min(finalReward, availableBal);
-      console.log(`RewardCalc::${stratId}::finalReward::${finalReward}`);
 
       // Calculate the reward APY
       rewardsInfo.push({

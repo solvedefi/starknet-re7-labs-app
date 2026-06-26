@@ -106,7 +106,6 @@ export const updateInputInfoAtom = atom(
   ) => {
     const inputInfo = get(inputsInfoAtoms[index]);
     const newInputInfo = { ...inputInfo, ...info };
-    console.log(`onAmountsChange [2]`, index, info, newInputInfo);
     set(inputsInfoAtoms[index], newInputInfo);
   },
 );
@@ -178,14 +177,6 @@ function InternalDeposit(props: DepositProps) {
         inputsInfo[1].tokenInfo?.decimals || 0,
       );
     }
-    console.log(
-      'Deposit calls [0]',
-      amount1.toString(),
-      amount2?.toString(),
-      address,
-      firstInputInfo.tokenInfo?.decimals,
-      inputsInfo[1].tokenInfo?.decimals,
-    );
     props
       .callsInfo({
         amount: amount1,
@@ -195,7 +186,6 @@ function InternalDeposit(props: DepositProps) {
         isMax: isMaxClicked,
       })
       .then((calls) => {
-        console.log('Deposit calls', calls);
         setCallsInfo(calls);
         setDepositInfo({
           ...depositInfo,

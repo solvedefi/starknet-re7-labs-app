@@ -4,8 +4,6 @@ import { timingSafeEqual } from 'crypto';
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
-  console.error('Authorization header:', authHeader);
-
   const provided = authHeader?.replace(/^Bearer\s+/i, '') || '';
   const expected = process.env.CRON_SECRET || '';
 
@@ -17,20 +15,13 @@ export async function GET(request: Request) {
     timingSafeEqual(providedBuffer, expectedBuffer);
 
   if (!isAuthorized) {
-    console.error('Unauthorized request');
     return new Response('Unauthorized', { status: 401 });
   }
 
-  console.error('Revalidating...', `${process.env.HOSTNAME}/api/strategies`);
   const prom1 = axios(`${process.env.HOSTNAME}/api/strategies?no_cache=true`);
   const prom2 = axios(`${process.env.HOSTNAME}/api/stats?no_cache=true`);
 
-  const result = await Promise.all([prom1, prom2]);
-  console.error('Revalidation complete');
-  const res1 = await result[0].data;
-  const res2 = await result[1].data;
-  console.error(`Value 1: ${res1.lastUpdated}`);
-  console.error(`Value 2: ${res2.lastUpdated}`);
+  await Promise.all([prom1, prom2]);
   return NextResponse.json(
     {
       revalidated: true,

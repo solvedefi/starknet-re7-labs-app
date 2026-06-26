@@ -2,13 +2,11 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useAccount } from '@starknet-react/core';
 import { StrategyInfo } from '@/store/strategies.atoms';
-import { useSelector } from 'react-redux';
 import { HarvestTimeAtom } from '@/store/harvest.atom';
 import { useAtomValue } from 'jotai';
 import { formatTimediff, getDisplayCurrencyAmount, timeAgo } from '@/utils';
 import styles from '../app/border.module.css';
-import { selectStrategy } from '@/redux/features/strategySlice';
-import { RootState } from '@/redux/store';
+import { strategyByIdAtom } from '@/store/strategiesInfo.atoms';
 import { SimpleTooltip } from './ui/simple-tooltip';
 
 interface HarvestTimeProps {
@@ -76,9 +74,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
     return formatTimediff(nextHarvest);
   }, [data?.timestamp, lastHarvest, currentTime]);
 
-  const strategyInfo = useSelector((state: RootState) =>
-    selectStrategy(state, strategy.id),
-  );
+  const strategyInfo = useAtomValue(strategyByIdAtom(strategy.id));
 
   const leverage = useMemo(() => {
     if (!strategyInfo) return 0;

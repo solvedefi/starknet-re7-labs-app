@@ -8,14 +8,11 @@ import mixpanel from 'mixpanel-browser';
 import { useEffect } from 'react';
 import { TotalYield } from '@/components/TotalYield';
 import { StrategyDetails } from '@/hooks/useStrategiesInfo';
-import { useSelector } from 'react-redux';
-import { selectAllStrategiesAsArray } from '@/redux/features/strategySlice';
-import { RootState } from '@/redux/store';
+import { useAtomValue } from 'jotai';
+import { allStrategiesAtom } from '@/store/strategiesInfo.atoms';
 
 export default function Home() {
-  const strategies: StrategyDetails[] = useSelector((state: RootState) =>
-    selectAllStrategiesAsArray(state),
-  );
+  const strategies: StrategyDetails[] = useAtomValue(allStrategiesAtom);
 
   useEffect(() => {
     mixpanel.track('Page open');

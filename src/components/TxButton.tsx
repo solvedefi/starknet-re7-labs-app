@@ -1,5 +1,4 @@
-import { selectStrategy } from '@/redux/features/strategySlice';
-import { RootState } from '@/redux/store';
+import { strategyByIdAtom } from '@/store/strategiesInfo.atoms';
 import { referralCodeAtom } from '@/store/referral.store';
 import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
 import { IStrategyProps, TokenInfo } from '@/strategies/IStrategy';
@@ -13,7 +12,6 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { useSelector } from 'react-redux';
 import { TwitterShareButton } from 'react-share';
 import { Call } from 'starknet';
 
@@ -36,10 +34,9 @@ export default function TxButton(props: TxButtonProps) {
   const onOpen = () => setIsOpen(true);
   const referralCode = useAtomValue(referralCodeAtom);
 
-  const apr = useSelector(
-    (state: RootState) =>
-      selectStrategy(state, props.txInfo.strategyId)?.calculatedApr,
-  );
+  const apr = useAtomValue(
+    strategyByIdAtom(props.txInfo.strategyId),
+  )?.calculatedApr;
 
   const {
     sendAsync: writeAsync,

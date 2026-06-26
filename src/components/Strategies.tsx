@@ -65,8 +65,11 @@ export default function Strategies({ strategies }: StrategiesProps) {
           aValue = b.name.toLowerCase();
           break;
         case 'apy':
-          aValue = a.apy;
-          bValue = b.apy;
+          // Sort by the SAME value shown in the APY column (calculatedApr =
+          // fees-derived APR), not the raw API `apy` field — otherwise rows
+          // reorder by a hidden number and sorting looks broken.
+          aValue = a.calculatedApr;
+          bValue = b.calculatedApr;
           break;
         case 'tvl':
           aValue = a.tvlUsd;

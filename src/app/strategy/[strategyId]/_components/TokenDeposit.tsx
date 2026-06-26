@@ -29,7 +29,7 @@ export function TokenDeposit(props: TokenDepositProps) {
   const tabs = ['DEPOSIT', 'WITHDRAW'];
 
   return (
-    <div className="w-full rounded-md bg-[#212121] p-[15px] text-white">
+    <div className="w-full rounded-md bg-[#212121] p-[22px] text-white">
       <div className="relative w-full">
         <div className="flex">
           {tabs.map((label, i) => (

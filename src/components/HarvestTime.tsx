@@ -126,7 +126,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
             <div
               className={`${styles.border} mr-[5px] flex w-[160px] items-center justify-between px-[21px] py-4`}
             >
-              <div className="flex w-full flex-col gap-0">
+              <div className="flex w-full flex-col items-center gap-0 text-center">
                 <p className="theme-strategy-subtitle">APY</p>
                 <p className="theme-gradient-starknet-text text-[27px]">
                   {((strategyInfo?.calculatedApr || 0) * 100).toFixed(2)}%
@@ -155,7 +155,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
             <div
               className={`${styles.border_gray} flex w-[360px] items-center justify-between`}
             >
-              <div className="flex w-full flex-col gap-0">
+              <div className="flex w-full flex-col items-center gap-0 text-center">
                 <p className="theme-strategy-subtitle">
                   Next Harvest{' '}
                   {harvestTimestamp.isZero && <span>Anytime now</span>}

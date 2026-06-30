@@ -29,8 +29,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const provider = jsonRpcProvider({
     rpc: () => {
       const args: RpcProviderOptions = {
-        nodeUrl:
-          'https://rpc.nethermind.io/mainnet-juno?apikey=t1HPjhplOyEQpxqVMhpwLGuwmOlbXN0XivWUiPAxIBs0kHVK',
+        nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
         chainId: constants.StarknetChainId.SN_MAIN,
       };
       return args;
@@ -44,6 +43,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
         chains={chains}
         provider={provider}
         connectors={getConnectors(isMobile)}
+        autoConnect
       >
         <div className="flex min-h-screen bg-[#171717]">
           <React.Suspense>

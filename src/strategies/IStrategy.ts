@@ -274,14 +274,16 @@ export class IStrategyProps<T> {
     quoteToken: MyTokenInfo,
     source: string,
   ): Promise<MyWeb3Number> {
-    const valuesProm = amounts.map((amount) => {
-      return this.getValueInQuoteToken(
-        convertToV2Web3Number(amount.amount),
-        convertToV2TokenInfo(amount.tokenInfo),
-        quoteToken,
-        source,
-      );
-    });
+    const valuesProm = amounts
+      .filter((amount) => Boolean(amount?.tokenInfo))
+      .map((amount) => {
+        return this.getValueInQuoteToken(
+          convertToV2Web3Number(amount.amount),
+          convertToV2TokenInfo(amount.tokenInfo),
+          quoteToken,
+          source,
+        );
+      });
     const values = await Promise.all(valuesProm);
     const total = values.reduce(
       (acc, amount) => {

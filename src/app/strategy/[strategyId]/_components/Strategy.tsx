@@ -10,7 +10,7 @@ import { DUMMY_BAL_ATOM, returnEmptyBal } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { strategiesAtom, StrategyInfo } from '@/store/strategies.atoms';
 import { TxHistoryAtom } from '@/store/transactions.atom';
-import { formatTokenBalance, getTokenInfoFromAddr } from '@/utils';
+import { formatTokenBalance, getTokenInfoFromAddrOrNull } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
 import { StrategyParams } from '../page';
 import FlowChart from './FlowChart';
@@ -89,7 +89,7 @@ const Strategy = ({ params }: StrategyParams) => {
   const [profit, setProfit] = useState(0);
   const computeProfit = useCallback(() => {
     if (!txHistory.findManyInvestment_flows.length) return 0;
-    const tokenInfo = getTokenInfoFromAddr(
+    const tokenInfo = getTokenInfoFromAddrOrNull(
       txHistory.findManyInvestment_flows[0].asset,
     );
     if (!tokenInfo) return 0;

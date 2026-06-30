@@ -183,15 +183,28 @@ export function getHosturl() {
 }
 
 async function getPriceFromMyAPI(tokenInfo: MyMultiTokenInfo) {
-  const endpoint = getEndpoint();
-  const url = `${endpoint}/api/price/${convertToV2TokenInfo(tokenInfo).symbol}`;
-  const priceInfoRes = await fetch(url);
-  if (!priceInfoRes.ok) {
-    // Non-OK responses are HTML error pages; don't let .json() throw a noisy
-    // SyntaxError — surface a clean error so the caller falls back cleanly.
-    throw new Error(`price api ${priceInfoRes.status} for ${tokenInfo.name}`);
+  const symbol = convertToV2TokenInfo(tokenInfo).symbol;
+
+  let priceInfo: { price: number | string; timestamp: string | Date };
+  if (typeof window === 'undefined') {
+    // Server-side: price directly via the pricer instead of HTTP-hopping
+    // through `${getEndpoint()}/api/price`. The endpoint falls back to a
+    // foreign app (app.troves.fi) when HOSTNAME is unset, which returns a stub
+    // and breaks server-side pricing (e.g. /api/stats). Dynamic import keeps
+    // the SDK pricer out of the client bundle.
+    const { getServerPrice } = await import('./utils/serverPricer');
+    priceInfo = await getServerPrice(symbol);
+  } else {
+    const url = `${getEndpoint()}/api/price/${symbol}`;
+    const priceInfoRes = await fetch(url);
+    if (!priceInfoRes.ok) {
+      // Non-OK responses are HTML error pages; don't let .json() throw a noisy
+      // SyntaxError — surface a clean error so the caller falls back cleanly.
+      throw new Error(`price api ${priceInfoRes.status} for ${tokenInfo.name}`);
+    }
+    priceInfo = await priceInfoRes.json();
   }
-  const priceInfo = await priceInfoRes.json();
+
   const now = new Date();
   const priceTime = new Date(priceInfo.timestamp);
   if (now.getTime() - priceTime.getTime() > 900000) {

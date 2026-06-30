@@ -59,14 +59,13 @@ export function standariseAddress(address: string | bigint) {
   return a;
 }
 
-export function getTokenInfoFromAddr(tokenAddr: string) {
-  const info = TOKENS.find(
+// Returns undefined when the address isn't a known token, so callers in
+// render/effect paths can guard instead of crashing the React tree on an
+// unknown asset (e.g. a vault/LP token not in TOKENS).
+export function getTokenInfoFromAddrOrNull(tokenAddr: string) {
+  return TOKENS.find(
     (t) => standariseAddress(t.token) === standariseAddress(tokenAddr),
   );
-  if (!info) {
-    throw new Error('Token not found');
-  }
-  return info;
 }
 
 export function getTokenInfoFromName(tokenName: string) {

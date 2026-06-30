@@ -10,7 +10,7 @@ import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
 import DeltaNeutralAbi2 from '@/abi/deltaNeutral.2.abi.json';
 import { Atom } from 'jotai';
 import {
-  getTokenInfoFromAddr,
+  getTokenInfoFromAddrOrNull,
   getTokenInfoFromName,
   standariseAddress,
 } from '@/utils';
@@ -70,7 +70,9 @@ async function getERC4626Balance(
   ]);
 
   const asset = await erc4626Contract.call('asset', []);
-  const assetInfo = getTokenInfoFromAddr(standariseAddress(asset as string));
+  const assetInfo = getTokenInfoFromAddrOrNull(
+    standariseAddress(asset as string),
+  );
   if (!assetInfo) {
     throw new Error('ERC4626: Asset not found');
   }

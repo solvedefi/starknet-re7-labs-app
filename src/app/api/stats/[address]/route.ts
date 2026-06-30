@@ -20,40 +20,46 @@ export async function GET(_req: Request, context: any) {
 
   const strategies = getStrategies();
   const values: Promise<StrategyWise>[] = strategies.map(async (strategy) => {
-    if (strategy.isLive()) {
-      const balanceInfo: AmountsInfo = await strategy.getUserTVL(pAddr);
-      if (balanceInfo.amounts.length === 1) {
+    try {
+      if (strategy.isLive()) {
+        const balanceInfo: AmountsInfo = await strategy.getUserTVL(pAddr);
+        if (balanceInfo.amounts.length === 1) {
+          return {
+            id: strategy.id,
+            usdValue: balanceInfo.usdValue,
+            holdings: [
+              {
+                tokenInfo: balanceInfo.amounts[0].tokenInfo,
+                amount: balanceInfo.amounts[0].amount,
+                usdValue: balanceInfo.amounts[0].usdValue,
+              },
+            ],
+          };
+        }
+        const summary = await strategy.computeSummaryValue(
+          balanceInfo.amounts.map((a) => ({
+            tokenInfo: a.tokenInfo,
+            amount: a.amount,
+          })),
+          strategy.settings.quoteToken,
+          'stats[address]',
+        );
         return {
           id: strategy.id,
           usdValue: balanceInfo.usdValue,
           holdings: [
             {
-              tokenInfo: balanceInfo.amounts[0].tokenInfo,
-              amount: balanceInfo.amounts[0].amount,
-              usdValue: balanceInfo.amounts[0].usdValue,
+              tokenInfo: strategy.settings.quoteToken,
+              amount: summary,
+              usdValue: balanceInfo.usdValue,
             },
           ],
         };
       }
-      const summary = await strategy.computeSummaryValue(
-        balanceInfo.amounts.map((a) => ({
-          tokenInfo: a.tokenInfo,
-          amount: a.amount,
-        })),
-        strategy.settings.quoteToken,
-        'stats[address]',
-      );
-      return {
-        id: strategy.id,
-        usdValue: balanceInfo.usdValue,
-        holdings: [
-          {
-            tokenInfo: strategy.settings.quoteToken,
-            amount: summary,
-            usdValue: balanceInfo.usdValue,
-          },
-        ],
-      };
+    } catch (e) {
+      // A single strategy failing (e.g. a price lookup) must not 500 the whole
+      // portfolio endpoint; log it and return zero holdings for that strategy.
+      console.error(`[api/stats] strategy ${strategy.id} failed:`, e);
     }
 
     return {

@@ -1,4 +1,4 @@
-import { getMainnetConfig, Global, PricerFromApi } from '@strkfarm/sdk';
+import { getServerPrice } from '@/utils/serverPricer';
 import { NextResponse } from 'next/server';
 
 export const revalidate = 300; // 5 mins
@@ -13,10 +13,7 @@ export async function GET(_req: Request, context: any) {
       throw new Error('Invalid token');
     }
 
-    const rpcUrl = process.env.RPC_URL || process.env.NEXT_PUBLIC_RPC_URL;
-    const config = getMainnetConfig(rpcUrl, 'latest');
-    const pricer = new PricerFromApi(config, Global.getDefaultTokens());
-    const priceInfo = await pricer.getPrice(tokenName);
+    const priceInfo = await getServerPrice(tokenName);
 
     const resp = NextResponse.json({
       price: priceInfo.price,

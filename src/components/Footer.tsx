@@ -12,7 +12,9 @@ const DOCUMENTS: { name: string; href: string }[] = [
   { name: 'Privacy', href: 'https://www.re7labs.xyz/privacy' },
 ];
 
-const linkClass = 'text-color2 transition-colors hover:text-white';
+// Match re7labs.xyz: greyish links that dim slightly on hover.
+const linkClass =
+  'text-[#9b9b9b] transition-all duration-150 hover:brightness-[0.8]';
 
 function FooterLink({ name, href }: { name: string; href: string }) {
   if (href.startsWith('/')) {
@@ -33,7 +35,7 @@ export default function Footer() {
   return (
     <footer className="mt-16 w-full border-t border-white/10 px-6 py-8 md:px-10">
       <div className="mx-auto flex w-full max-w-[1280px] flex-col-reverse items-center justify-between gap-6 lg:flex-row">
-        <div className="text-sm text-color2">
+        <div className="text-sm text-[#9b9b9b]">
           © {new Date().getFullYear()} Re7 Labs
         </div>
         <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm">

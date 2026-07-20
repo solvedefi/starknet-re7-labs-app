@@ -48,12 +48,12 @@ export default function Template({ children }: { children: React.ReactNode }) {
       >
         <div className="flex min-h-screen bg-[#171717]">
           <React.Suspense>
-            <div className="block w-full p-0 pt-[100px]">
+            <div className="flex min-h-screen w-full flex-col p-0 pt-[100px]">
               <Navbar
                 hideTg={pathname!.includes('slinks')}
                 forceShowConnect={pathname!.includes('slinks')}
               />
-              {children}
+              <main className="flex-1">{children}</main>
               <Footer />
               <Toaster />
             </div>

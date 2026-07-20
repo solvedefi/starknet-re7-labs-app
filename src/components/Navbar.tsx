@@ -48,7 +48,7 @@ import {
   isInBraavosMobileAppBrowser,
 } from 'starknetkit/braavosMobile';
 import { WebWalletConnector } from 'starknetkit/webwallet';
-import TncModal from './TncModal';
+import TncGate from './TncGate';
 
 export function getConnectors(isMobile: boolean) {
   const mobileConnector = ArgentMobileConnector.init({
@@ -273,7 +273,7 @@ export default function Navbar(_props: NavbarProps) {
 
   return (
     <div className="fixed top-0 z-[999] w-full bg-[#0C0C0C]">
-      <TncModal />
+      <TncGate />
       <div className="mx-auto w-full max-w-[1400px] px-5 pb-2.5 pt-5">
         <div className="flex w-full">
           <NextLink href="/" className="my-auto mr-auto text-left">

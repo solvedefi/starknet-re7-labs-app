@@ -259,7 +259,6 @@ export const provider = new RpcProvider({
 
 // T&C version - increment when terms change to force users to re-accept
 export const LATEST_TNC_DOC_VERSION = 'tnc/v2';
-export const RE7_TnC_DOC_URL = `/terms`;
 interface Vault {
   name: string;
   address: string;

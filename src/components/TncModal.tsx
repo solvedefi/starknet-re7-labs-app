@@ -162,6 +162,7 @@ const TncModal: React.FC<TncModalProps> = () => {
       <DialogContent
         className="max-w-[32rem] rounded-lg border border-[#7F49E5] bg-[#1A1C26] p-12 text-white [&>button]:hidden"
         onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <div className="flex flex-col items-center justify-center gap-4">
           <DialogHeader>

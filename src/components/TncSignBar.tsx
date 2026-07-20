@@ -52,9 +52,9 @@ const TncSignBar = () => {
   }, [disconnect, router]);
 
   // Only gate a connected wallet that still needs to sign the current version.
-  // if (!isQueryReady || !address || hasTncAccepted) {
-  //   return null;
-  // }
+  if (!isQueryReady || !address || hasTncAccepted) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#7F49E5] bg-[#1A1C26]/95 backdrop-blur">

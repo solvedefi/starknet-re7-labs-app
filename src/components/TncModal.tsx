@@ -64,7 +64,7 @@ const TncModal: React.FC<TncModalProps> = () => {
   const { disconnectAsync } = useDisconnect();
   const setLastWallet = useSetAtom(lastWalletAtom);
 
-  const isTncPage = pathname === '/terms-and-conditions';
+  const isTncPage = pathname === '/terms';
 
   // Extract specific values to avoid triggering effect on every object change
   const {

@@ -68,6 +68,12 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        // Renamed to /terms; keep old bookmarks/links/SEO working.
+        source: '/terms-and-conditions',
+        destination: '/terms',
+        permanent: true,
+      },
+      {
         source: '/usdc',
         destination: '/strategy/usdc_sensei',
         permanent: true,

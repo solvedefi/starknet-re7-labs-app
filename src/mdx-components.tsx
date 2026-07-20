@@ -6,19 +6,26 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <h1 className="my-6 scroll-mt-20 text-4xl font-bold" {...props} />
     ),
     h2: (props) => (
-      <h2 className="my-5 scroll-mt-20 text-3xl font-bold" {...props} />
+      <h2 className="mb-5 mt-14 scroll-mt-20 text-3xl font-bold" {...props} />
     ),
     h3: (props) => (
-      <h3 className="my-4 scroll-mt-20 text-2xl font-bold" {...props} />
+      <h3 className="mb-4 mt-12 scroll-mt-20 text-2xl font-bold" {...props} />
     ),
     h4: (props) => (
-      <h4 className="my-3 scroll-mt-20 text-xl font-bold" {...props} />
+      <h4 className="mb-3 mt-8 scroll-mt-20 text-xl font-bold" {...props} />
     ),
-    p: (props) => <p className="my-4 leading-relaxed" {...props} />,
-    a: (props) => <a className="text-purple" {...props} />,
-    ul: (props) => <ul className="my-4 list-disc pl-4" {...props} />,
-    ol: (props) => <ol className="my-4 list-decimal pl-4" {...props} />,
-    li: (props) => <li className="my-1" {...props} />,
+    p: (props) => <p className="my-8 leading-7" {...props} />,
+    a: (props) => (
+      <a
+        className="text-white underline underline-offset-2 transition-colors duration-200 hover:text-[#7F49E5]"
+        {...props}
+      />
+    ),
+    ul: (props) => <ul className="my-8 list-disc space-y-3 pl-5" {...props} />,
+    ol: (props) => (
+      <ol className="my-8 list-decimal space-y-3 pl-5" {...props} />
+    ),
+    li: (props) => <li className="leading-7" {...props} />,
     code: (props) => (
       <code className="rounded-md bg-white/10 px-2 py-1" {...props} />
     ),

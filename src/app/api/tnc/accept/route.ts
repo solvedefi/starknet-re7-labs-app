@@ -57,13 +57,24 @@ export async function POST(req: Request) {
         data: {
           isTncSigned: true,
           tncDocVersion: LATEST_TNC_DOC_VERSION,
-          Signatures: {
-            create: {
-              signature: 'click-to-agree',
-              tncDocVersion: LATEST_TNC_DOC_VERSION,
-            },
+        },
+      });
+
+      // Upsert the signature so re-accepting the same version is idempotent
+      // and doesn't violate the (userId, tncDocVersion) unique constraint.
+      await db.signatures.upsert({
+        where: {
+          unique_signature: {
+            userId: existingUser.id,
+            tncDocVersion: LATEST_TNC_DOC_VERSION,
           },
         },
+        create: {
+          userId: existingUser.id,
+          signature: 'click-to-agree',
+          tncDocVersion: LATEST_TNC_DOC_VERSION,
+        },
+        update: {},
       });
 
       mixpanel.track('TnC accepted', {

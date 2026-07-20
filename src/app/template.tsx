@@ -1,5 +1,6 @@
 'use client';
 
+import Footer from '@/components/Footer';
 import Navbar, { getConnectors } from '@/components/Navbar';
 import { MY_STORE } from '@/store';
 import { mainnet } from '@starknet-react/chains';
@@ -53,6 +54,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
                 forceShowConnect={pathname!.includes('slinks')}
               />
               {children}
+              <Footer />
               <Toaster />
             </div>
             <StrategyDetailsProvider />
